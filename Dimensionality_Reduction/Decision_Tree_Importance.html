@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Interactive Decision Tree Importance implementation in 2D. Visualize and experiment with this dimensionality reduction algorithm using real-time charts and data analysis tools.">
+  <link rel="canonical" href="https://yourdomain.com/Dimensionality_Reduction/Decision_Tree_Importance.html">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Decision Tree Importance (2D) - Interactive Implementation | Dimensionality Reduction | ML Tools",
+  "description": "Interactive Decision Tree Importance implementation in 2D. Visualize and experiment with this dimensionality reduction algorithm using real-time charts and data analysis tools.",
+  "url": "https://yourdomain.com/Dimensionality_Reduction/Decision_Tree_Importance.html",
+  "about": {
+    "@type": "Thing",
+    "name": "Decision Tree Importance",
+    "description": "Decision Tree Importance algorithm for dimensionality reduction"
+  }
+}
+  </script>
+    <title>Decision Tree Importance (2D) - Interactive Implementation | Dimensionality Reduction | ML Tools</title>
+    <script src="https://cdn.plot.ly/plotly-2.26.0.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            color: #676767;
+            background-color: #1e1e1e;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #171717;
+            padding: 30px 20px;
+            border-right: 1px solid #333;
+            overflow-y: auto;
+            height: 100vh;
+        }
+        .sidebar h1 { color: white; font-size: 1.8rem; font-weight: bold; margin-bottom: 30px; text-align: center; }
+        .nav-section { margin-bottom: 30px; }
+        .nav-section h3 { color: #dd8448; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px; }
+        .nav-item { display: block; color: #676767; text-decoration: none; padding: 12px 15px; margin-bottom: 5px; border-radius: 8px; transition: all 0.3s ease; font-weight: 500; }
+        .nav-item:hover { background-color: #2d2d2d; color: white; transform: translateX(5px); }
+        .nav-item.active { background-color: #dd8448; color: white; }
+        .nav-category { margin-bottom: 20px; }
+        .nav-category-header { color: #dd8448; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; padding: 10px 15px; cursor: pointer; border-radius: 8px; transition: background-color 0.3s ease; display: flex; justify-content: space-between; align-items: center; letter-spacing: 1px; }
+        .nav-category-header:hover { background-color: #2d2d2d; }
+        .nav-category-header .arrow { transition: transform 0.3s ease; font-size: 0.7rem; }
+        .nav-category-header.collapsed .arrow { transform: rotate(-90deg); }
+        .nav-subcategory { margin-left: 15px; margin-top: 10px; overflow: hidden; max-height: 1200px; transition: max-height 0.3s ease; }
+        .nav-subcategory.collapsed { max-height: 0; }
+        .nav-subheader { color: #999; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; padding: 8px 15px; margin-top: 5px; letter-spacing: 0.5px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-radius: 6px; transition: background-color 0.3s ease; }
+        .nav-subheader:hover { background-color: #2d2d2d; }
+        .nav-subheader .arrow { font-size: 0.6rem; transition: transform 0.3s ease; }
+        .nav-subheader.collapsed .arrow { transform: rotate(-90deg); }
+        .nav-subheader.category-header { color: #dd8448; font-size: 0.85rem; font-weight: 700; padding: 10px 15px; margin-top: 8px; letter-spacing: 1px; border: 1px solid rgba(221,132,72,0.3); }
+        .nav-subheader.category-header:hover { background-color: rgba(221,132,72,0.15); border-color: rgba(221,132,72,0.5); }
+        .nav-subgroup { overflow: hidden; max-height: 200px; transition: max-height 0.3s ease; padding-bottom: 5px; }
+        .nav-subgroup.collapsed { max-height: 0; }
+        .nav-subgroup.category-group { max-height: 1000px; }
+        .nav-subgroup.category-group.collapsed { max-height: 0; }
+        .nav-subheader.nested { margin-left: 10px; font-size: 0.7rem; }
+        .nav-subgroup.nested { margin-left: 10px; max-height: 200px; }
+        .nav-subheader.subcategory-header { color: #999; font-size: 0.75rem; font-weight: 600; padding: 8px 15px; margin-left: 10px; margin-top: 5px; letter-spacing: 0.5px; border: 1px solid rgba(153, 153, 153, 0.2); }
+        .nav-subheader.subcategory-header:hover { background-color: rgba(45, 45, 45, 0.5); border-color: rgba(153, 153, 153, 0.4); }
+        .nav-subgroup.subcategory-group { margin-left: 10px; max-height: 2000px; overflow: hidden; transition: max-height 0.3s ease; padding-bottom: 5px; }
+        .nav-subgroup.subcategory-group.collapsed { max-height: 0; }
+        .nav-item.sub { padding: 8px 15px; font-size: 0.9rem; margin-left: 10px; margin-bottom: 5px; }
+        .main-content {
+            flex: 1;
+            padding: 20px;
+        }
+        .main-title {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .subtitle {
+            color: #676767;
+            font-size: 1rem;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .controls-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .control-group {
+            background-color: #171717;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            min-width: 200px;
+            box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset;
+        }
+        .control-group h3 {
+            color: white;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+            margin-top: 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+        .control-item {
+            margin-bottom: 15px;
+        }
+        .control-item label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            color: #676767;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        #max-depth-value, #min-samples-split-value, #n-features-value, #importance-threshold-value {
+            display: inline-block;
+            background: rgba(221,132,72,0.15);
+            color: #ffb07a;
+            border: 1px solid rgba(221,132,72,0.35);
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            line-height: 18px;
+        }
+        input[type="range"]::-webkit-slider-thumb { background: #dd8448; }
+        input[type="range"] { accent-color: #dd8448; }
+        .control-item input, .control-item select {
+            width: 100%;
+            padding: 8px 12px;
+            background-color: #2d2d2d;
+            border: 1px solid #444;
+            border-radius: 6px;
+            color: white;
+            font-family: 'Nunito', sans-serif;
+        }
+        .control-item input:focus, .control-item select:focus {
+            outline: none;
+            border-color: #dd8448;
+        }
+        .control-item input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+        }
+        .stats-container {
+            background-color: #171717;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            margin-bottom: 30px;
+        }
+        .stats-container h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        .stat-item {
+            background-color: #2d2d2d;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-value {
+            color: #dd8448;
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: block;
+        }
+        .stat-label {
+            color: #676767;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        .plots-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .plot-wrapper {
+            background-color: #171717;
+            border-radius: 12px;
+            border: 1px solid #333;
+            padding: 20px;
+            flex: 1;
+            min-width: 400px;
+        }
+        .plot-wrapper h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        .plot-wrapper > div {
+            height: 500px;
+        }
+        .btn {
+            background-color: #ffffff;
+            color: #171717;
+            border: 1px solid #444;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Nunito', sans-serif;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn:hover {
+            background-color: #f0f0f0;
+            border-color: #666;
+        }
+        .control-group.actions .btn {
+            background-color: #dd8448;
+            color: white;
+            border: 1px solid #dd8448;
+            display: block;
+            width: 100%;
+            margin-right: 0;
+            margin-bottom: 10px;
+        }
+        .control-group.actions .btn:hover {
+            background-color: #c67339;
+        }
+        .csv-format {
+            padding: 2px;
+            background: linear-gradient(-30deg, rgba(221, 132, 72, 0.4), transparent, rgba(221, 132, 72, 0.4)), linear-gradient(to bottom, #2d2d2d, #2d2d2d);
+            position: relative;
+        }
+        .csv-format::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 1px solid rgba(221, 132, 72, 0.5);
+            border-radius: 12px;
+            pointer-events: none;
+        }
+        .csv-info-card {
+            background: #171717;
+            border-radius: 10px;
+            padding: 16px;
+            margin: 2px;
+            position: relative;
+            z-index: 10;
+        }
+        .csv-badge {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 4px 8px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.8);
+            width: fit-content;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .csv-title {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 8px 0 4px 0;
+        }
+        .csv-desc {
+            color: rgba(255,255,255,0.6);
+            font-size: 11px;
+            line-height: 1.3;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar"></div>
+    <div class="main-content">
+        <h1 class="main-title">Decision Tree Importance</h1>
+        <p class="subtitle">Embedded method for feature selection — ranks features by their importance in reducing impurity across decision tree splits!</p>
+    
+        <div class="controls-container">
+            <div class="control-group">
+                <h3>Dataset</h3>
+                <div class="control-item">
+                    <label for="dataset-select">Select Dataset:</label>
+                    <select id="dataset-select">
+                        <option value="iris">Iris (4 features, 150 samples)</option>
+                        <option value="wine">Wine (13 features, 178 samples)</option>
+                        <option value="breast-cancer">Breast Cancer (30 features, 569 samples)</option>
+                        <option value="diabetes">Diabetes (8 features, 442 samples)</option>
+                        <option value="custom">Custom CSV Data</option>
+                    </select>
+                </div>
+                <div class="control-item">
+                    <input type="file" id="file-input" accept=".csv" style="display: none;" onchange="loadCSV(event)">
+                    <label for="file-input" style="display: inline-block; background-color: #2d2d2d; color: white; padding: 10px 20px; border-radius: 6px; border: 2px dashed #444; cursor: pointer; transition: all 0.3s ease; font-weight: 500; text-align: center; width: 100%; box-sizing: border-box;">📁 Upload CSV</label>
+                </div>
+            </div>
+            
+            <div class="control-group csv-format">
+                <div class="csv-info-card">
+                    <div class="csv-badge">Format</div>
+                    <div class="csv-title">CSV Upload</div>
+                    <div class="csv-desc">
+                        Numeric columns only<br>
+                        First row: headers (optional)<br>
+                        Example: feature1,feature2,feature3<br>
+                        1.0,2.3,3.1<br>
+                        4.2,5.5,6.7
+                    </div>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <h3>Decision Tree Parameters</h3>
+                <div class="control-item">
+                    <label for="max-depth-slider">Max Depth: <span id="max-depth-value">5</span></label>
+                    <input type="range" id="max-depth-slider" min="1" max="15" step="1" value="5">
+                </div>
+                <div class="control-item">
+                    <label for="min-samples-split-slider">Min Samples Split: <span id="min-samples-split-value">2</span></label>
+                    <input type="range" id="min-samples-split-slider" min="2" max="50" step="1" value="2">
+                </div>
+                <div class="control-item">
+                    <label for="criterion-select">Criterion:</label>
+                    <select id="criterion-select">
+                        <option value="gini">Gini (Classification)</option>
+                        <option value="entropy">Entropy (Classification)</option>
+                        <option value="mse">MSE (Regression)</option>
+                    </select>
+                </div>
+                <div class="control-item">
+                    <label for="task-type-select">Task Type:</label>
+                    <select id="task-type-select">
+                        <option value="classification">Classification</option>
+                        <option value="regression">Regression</option>
+                    </select>
+                </div>
+                <div class="control-item">
+                    <label for="n-features-slider">N Features to Select: <span id="n-features-value">3</span></label>
+                    <input type="range" id="n-features-slider" min="1" max="20" step="1" value="3">
+                </div>
+                <div class="control-item">
+                    <label for="target-select" id="target-select-label">Target Variable:</label>
+                    <select id="target-select">
+                        <!-- Will be populated dynamically -->
+                    </select>
+                </div>
+            </div>
+            
+            <div class="control-group actions">
+                <h3>Actions</h3>
+                <button class="btn" onclick="runDecisionTree()">Apply Decision Tree</button>
+                <button class="btn" onclick="exportResults()">Export Results</button>
+                <button class="btn" onclick="downloadPlot()">Download Plot</button>
+            </div>
+        </div>
+        
+        <div class="stats-container">
+            <h3>Feature Selection Statistics</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-value" id="original-features">-</span>
+                    <div class="stat-label">Original Features</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="selected-features">-</span>
+                    <div class="stat-label">Selected Features</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="removed-features">-</span>
+                    <div class="stat-label">Removed Features</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="reduction-ratio">-</span>
+                    <div class="stat-label">Reduction Ratio</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="total-samples">-</span>
+                    <div class="stat-label">Total Samples</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="max-importance">-</span>
+                    <div class="stat-label">Max Importance</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="avg-importance">-</span>
+                    <div class="stat-label">Avg Importance</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="tree-depth">-</span>
+                    <div class="stat-label">Tree Depth</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="accuracy-r2">-</span>
+                    <div class="stat-label">Accuracy/R²</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="plots-container">
+            <div class="plot-wrapper">
+                <h3>Feature Importance Distribution</h3>
+                <div id="importance-distribution-plot"></div>
+            </div>
+            <div class="plot-wrapper">
+                <h3>Importance vs Threshold</h3>
+                <div id="importance-threshold-plot"></div>
+            </div>
+        </div>
+
+        <div class="plots-container">
+            <div class="plot-wrapper" style="flex: 1 1 100%;">
+                <h3>Feature Importance (Top Features)</h3>
+                <div id="feature-importance-plot" style="height: 600px;"></div>
+            </div>
+        </div>
+
+        <div class="plots-container">
+            <div class="plot-wrapper">
+                <h3>Selected Features</h3>
+                <div id="selected-features-list" style="color: #676767; padding: 10px; max-height: 300px; overflow-y: auto;"></div>
+            </div>
+            <div class="plot-wrapper">
+                <h3>Removed Features</h3>
+                <div id="removed-features-list" style="color: #676767; padding: 10px; max-height: 300px; overflow-y: auto;"></div>
+            </div>
+        </div>
+
+<script>
+    // Decision Tree Importance Feature Selection Implementation
+    class DecisionTree {
+        constructor(maxDepth = 5, minSamplesSplit = 2, criterion = 'gini', taskType = 'classification', nFeatures = null) {
+            this.maxDepth = maxDepth;
+            this.minSamplesSplit = minSamplesSplit;
+            this.criterion = criterion; // 'gini', 'entropy', or 'mse'
+            this.taskType = taskType; // 'classification' or 'regression'
+            this.nFeatures = nFeatures; // Number of features to select (null = all)
+            this.tree = null;
+            this.featureImportance = null;
+            this.featureNames = null;
+            this.selectedFeatures = [];
+            this.removedFeatures = [];
+            this.accuracy = 0;
+            this.r2Score = 0;
+            this.actualDepth = 0;
+        }
+
+        fit(X, y) {
+            if (!y || y.length === 0) {
+                throw new Error('Decision Tree requires target variable y');
+            }
+            
+            if (!X || X.length === 0) {
+                throw new Error('Decision Tree requires input data X');
+            }
+            
+            const n = X.length;
+            const p = X[0].length;
+            
+            if (p === 0) {
+                throw new Error('Decision Tree requires at least one feature');
+            }
+            
+            // Store feature names if available
+            if (X.featureNames) {
+                this.featureNames = X.featureNames;
+            } else {
+                this.featureNames = Array.from({length: p}, (_, i) => `Feature ${i + 1}`);
+            }
+            
+            // Build decision tree
+            const indices = Array.from({length: n}, (_, i) => i);
+            this.tree = this.buildTree(X, y, indices, 0);
+            
+            // Calculate feature importance
+            this.featureImportance = new Array(p).fill(0);
+            this.calculateFeatureImportance(this.tree, n);
+            
+            // Normalize importance scores
+            const totalImportance = this.featureImportance.reduce((a, b) => a + b, 0);
+            if (totalImportance > 0) {
+                this.featureImportance = this.featureImportance.map(imp => imp / totalImportance);
+            }
+            
+            // Select top-k features
+            const nSelect = this.nFeatures || p;
+            const indexed = this.featureImportance.map((imp, idx) => ({idx, imp}));
+            indexed.sort((a, b) => b.imp - a.imp);
+            
+            this.selectedFeatures = indexed.slice(0, nSelect).map(item => item.idx);
+            this.removedFeatures = indexed.slice(nSelect).map(item => item.idx);
+            
+            // Calculate performance
+            if (this.taskType === 'classification') {
+                this.accuracy = this.evaluateClassification(X, y);
+            } else {
+                this.r2Score = this.evaluateRegression(X, y);
+            }
+            
+            return this;
+        }
+        
+        buildTree(X, y, indices, depth) {
+            if (indices.length === 0) return null;
+            
+            // Check stopping criteria
+            if (depth >= this.maxDepth || indices.length < this.minSamplesSplit) {
+                return this.createLeaf(y, indices);
+            }
+            
+            // Check if all samples have same label/value
+            const values = indices.map(i => y[i]);
+            if (this.taskType === 'classification') {
+                const unique = new Set(values);
+                if (unique.size === 1) {
+                    return this.createLeaf(y, indices);
+                }
+            } else {
+                // Regression: check if variance is very small
+                const mean = values.reduce((a, b) => a + b, 0) / values.length;
+                const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length;
+                if (variance < 1e-10) {
+                    return this.createLeaf(y, indices);
+                }
+            }
+            
+            // Find best split
+            const bestSplit = this.findBestSplit(X, y, indices);
+            
+            if (!bestSplit) {
+                return this.createLeaf(y, indices);
+            }
+            
+            // Split data
+            const leftIndices = [];
+            const rightIndices = [];
+            
+            for (const idx of indices) {
+                if (X[idx][bestSplit.feature] <= bestSplit.threshold) {
+                    leftIndices.push(idx);
+                } else {
+                    rightIndices.push(idx);
+                }
+            }
+            
+            // Build children
+            const node = {
+                feature: bestSplit.feature,
+                threshold: bestSplit.threshold,
+                impurity: bestSplit.impurity,
+                nSamples: indices.length,
+                left: this.buildTree(X, y, leftIndices, depth + 1),
+                right: this.buildTree(X, y, rightIndices, depth + 1)
+            };
+            
+            this.actualDepth = Math.max(this.actualDepth, depth + 1);
+            
+            return node;
+        }
+        
+        findBestSplit(X, y, indices) {
+            const n = indices.length;
+            const p = X[0].length;
+            let bestSplit = null;
+            let bestGain = -Infinity;
+            
+            const parentImpurity = this.computeImpurity(y, indices);
+            
+            for (let j = 0; j < p; j++) {
+                // Get unique values for this feature
+                const values = indices.map(i => X[i][j]).sort((a, b) => a - b);
+                const uniqueValues = [...new Set(values)];
+                
+                // Try each threshold (midpoint between consecutive values)
+                for (let i = 0; i < uniqueValues.length - 1; i++) {
+                    const threshold = (uniqueValues[i] + uniqueValues[i + 1]) / 2;
+                    
+                    const leftIndices = [];
+                    const rightIndices = [];
+                    
+                    for (const idx of indices) {
+                        if (X[idx][j] <= threshold) {
+                            leftIndices.push(idx);
+                        } else {
+                            rightIndices.push(idx);
+                        }
+                    }
+                    
+                    if (leftIndices.length === 0 || rightIndices.length === 0) continue;
+                    
+                    const leftImpurity = this.computeImpurity(y, leftIndices);
+                    const rightImpurity = this.computeImpurity(y, rightIndices);
+                    
+                    const gain = parentImpurity - 
+                        (leftIndices.length / n) * leftImpurity - 
+                        (rightIndices.length / n) * rightImpurity;
+                    
+                    if (gain > bestGain) {
+                        bestGain = gain;
+                        bestSplit = {
+                            feature: j,
+                            threshold: threshold,
+                            gain: gain,
+                            impurity: parentImpurity
+                        };
+                    }
+                }
+            }
+            
+            return bestSplit;
+        }
+        
+        computeImpurity(y, indices) {
+            if (indices.length === 0) return 0;
+            
+            const values = indices.map(i => y[i]);
+            
+            if (this.taskType === 'classification') {
+                if (this.criterion === 'gini') {
+                    return this.giniImpurity(values);
+                } else if (this.criterion === 'entropy') {
+                    return this.entropy(values);
+                }
+            } else {
+                // Regression: use variance
+                return this.variance(values);
+            }
+            
+            return 0;
+        }
+        
+        giniImpurity(values) {
+            const counts = {};
+            for (const val of values) {
+                counts[val] = (counts[val] || 0) + 1;
+            }
+            
+            const n = values.length;
+            let gini = 1.0;
+            for (const count of Object.values(counts)) {
+                const p = count / n;
+                gini -= p * p;
+            }
+            
+            return gini;
+        }
+        
+        entropy(values) {
+            const counts = {};
+            for (const val of values) {
+                counts[val] = (counts[val] || 0) + 1;
+            }
+            
+            const n = values.length;
+            let entropy = 0.0;
+            for (const count of Object.values(counts)) {
+                const p = count / n;
+                if (p > 0) {
+                    entropy -= p * Math.log2(p);
+                }
+            }
+            
+            return entropy;
+        }
+        
+        variance(values) {
+            const n = values.length;
+            const mean = values.reduce((a, b) => a + b, 0) / n;
+            const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / n;
+            return variance;
+        }
+        
+        createLeaf(y, indices) {
+            const values = indices.map(i => y[i]);
+            
+            if (this.taskType === 'classification') {
+                // Return most common class
+                const counts = {};
+                for (const val of values) {
+                    counts[val] = (counts[val] || 0) + 1;
+                }
+                let maxCount = -1;
+                let prediction = null;
+                for (const [val, count] of Object.entries(counts)) {
+                    if (count > maxCount) {
+                        maxCount = count;
+                        prediction = parseFloat(val);
+                    }
+                }
+                return { prediction, nSamples: indices.length, isLeaf: true };
+            } else {
+                // Return mean for regression
+                const mean = values.reduce((a, b) => a + b, 0) / values.length;
+                return { prediction: mean, nSamples: indices.length, isLeaf: true };
+            }
+        }
+        
+        calculateFeatureImportance(node, nTotal) {
+            if (!node || node.isLeaf) return;
+            
+            // Calculate impurity for left and right children
+            const leftImpurity = node.left.isLeaf ? 0 : (node.left.impurity || 0);
+            const rightImpurity = node.right.isLeaf ? 0 : (node.right.impurity || 0);
+            
+            // Importance = (n_samples / n_total) * impurity_reduction
+            const impurityReduction = node.impurity - 
+                (node.left.nSamples / node.nSamples) * leftImpurity -
+                (node.right.nSamples / node.nSamples) * rightImpurity;
+            
+            const importance = (node.nSamples / nTotal) * Math.max(0, impurityReduction);
+            this.featureImportance[node.feature] += importance;
+            
+            // Recursively calculate for children
+            this.calculateFeatureImportance(node.left, nTotal);
+            this.calculateFeatureImportance(node.right, nTotal);
+        }
+        
+        predict(X) {
+            return X.map(row => this.predictSingle(row, this.tree));
+        }
+        
+        predictSingle(row, node) {
+            if (node.isLeaf) {
+                return node.prediction;
+            }
+            
+            if (row[node.feature] <= node.threshold) {
+                return this.predictSingle(row, node.left);
+            } else {
+                return this.predictSingle(row, node.right);
+            }
+        }
+        
+        evaluateClassification(X, y) {
+            const predictions = this.predict(X);
+            let correct = 0;
+            for (let i = 0; i < y.length; i++) {
+                if (Math.abs(predictions[i] - y[i]) < 1e-6) {
+                    correct++;
+                }
+            }
+            return correct / y.length;
+        }
+        
+        evaluateRegression(X, y) {
+            const predictions = this.predict(X);
+            const n = y.length;
+            const yMean = y.reduce((a, b) => a + b, 0) / n;
+            const ssRes = predictions.reduce((sum, pred, i) => sum + Math.pow(y[i] - pred, 2), 0);
+            const ssTot = y.reduce((sum, val) => sum + Math.pow(val - yMean, 2), 0);
+            return ssTot > 1e-10 ? 1 - (ssRes / ssTot) : 0;
+        }
+        
+        transform(X) {
+            if (!this.selectedFeatures || this.selectedFeatures.length === 0) {
+                throw new Error('Decision Tree must be fitted before transform');
+            }
+            
+            return X.map(row => 
+                this.selectedFeatures.map(j => row[j])
+            );
+        }
+
+        getSupport() {
+            if (!this.selectedFeatures) return null;
+            const p = this.featureNames ? this.featureNames.length : 0;
+            const support = new Array(p).fill(false);
+            this.selectedFeatures.forEach(idx => {
+                support[idx] = true;
+            });
+            return support;
+        }
+    }
+
+    // Dataset loading functions - embedded datasets to avoid CORS issues
+    function loadIris() {
+        const irisData = [
+            [5.1,3.5,1.4,0.2],[4.9,3.0,1.4,0.2],[4.7,3.2,1.3,0.2],[4.6,3.1,1.5,0.2],[5.0,3.6,1.4,0.2],
+            [5.4,3.9,1.7,0.4],[4.6,3.4,1.4,0.3],[5.0,3.4,1.5,0.2],[4.4,2.9,1.4,0.2],[4.9,3.1,1.5,0.1],
+            [5.4,3.7,1.5,0.2],[4.8,3.4,1.6,0.2],[4.8,3.0,1.4,0.1],[4.3,3.0,1.1,0.1],[5.8,4.0,1.2,0.2],
+            [5.7,4.4,1.5,0.4],[5.4,3.9,1.3,0.4],[5.1,3.5,1.4,0.3],[5.7,3.8,1.7,0.3],[5.1,3.8,1.5,0.3],
+            [5.4,3.4,1.7,0.2],[5.1,3.7,1.5,0.4],[4.6,3.6,1.0,0.2],[5.1,3.3,1.7,0.5],[4.8,3.4,1.9,0.2],
+            [5.0,3.0,1.6,0.2],[5.0,3.4,1.6,0.4],[5.2,3.5,1.5,0.2],[5.2,3.4,1.4,0.2],[4.7,3.2,1.6,0.2],
+            [4.8,3.1,1.6,0.2],[5.4,3.4,1.5,0.4],[5.2,4.1,1.5,0.1],[5.5,4.2,1.4,0.2],[4.9,3.1,1.5,0.2],
+            [5.0,3.2,1.2,0.2],[5.5,3.5,1.3,0.2],[4.9,3.6,1.4,0.1],[4.4,3.0,1.3,0.2],[5.1,3.4,1.5,0.2],
+            [5.0,3.5,1.3,0.3],[4.5,2.3,1.3,0.3],[4.4,3.2,1.3,0.2],[5.0,3.5,1.6,0.6],[5.1,3.8,1.9,0.4],
+            [4.8,3.0,1.4,0.3],[5.1,3.8,1.6,0.2],[4.6,3.2,1.4,0.2],[5.3,3.7,1.5,0.2],[5.0,3.3,1.4,0.2],
+            [7.0,3.2,4.7,1.4],[6.4,3.2,4.5,1.5],[6.9,3.1,4.9,1.5],[5.5,2.3,4.0,1.3],[6.5,2.8,4.6,1.5],
+            [5.7,2.8,4.5,1.3],[6.3,3.3,4.7,1.6],[4.9,2.4,3.3,1.0],[6.6,2.9,4.6,1.3],[5.2,2.7,3.9,1.4],
+            [5.0,2.0,3.5,1.0],[5.9,3.0,4.2,1.5],[6.0,2.2,4.0,1.0],[6.1,2.9,4.7,1.4],[5.6,2.9,3.6,1.3],
+            [6.7,3.1,4.4,1.4],[5.6,3.0,4.5,1.5],[5.8,2.7,4.1,1.0],[6.2,2.2,4.5,1.5],[5.6,2.5,3.9,1.1],
+            [5.9,3.2,4.8,1.8],[6.1,2.8,4.0,1.3],[6.3,2.5,4.9,1.5],[6.1,2.8,4.7,1.2],[6.4,2.9,4.3,1.3],
+            [6.6,3.0,4.4,1.4],[6.8,2.8,4.8,1.4],[6.7,3.0,5.0,1.7],[6.0,2.9,4.5,1.5],[5.7,2.6,3.5,1.0],
+            [5.5,2.4,3.8,1.1],[5.5,2.4,3.7,1.0],[5.8,2.7,3.9,1.2],[6.0,2.7,5.1,1.6],[5.4,3.0,4.5,1.5],
+            [6.0,3.4,4.5,1.6],[6.7,3.1,4.7,1.5],[6.3,2.3,4.4,1.3],[5.6,3.0,4.1,1.3],[5.5,2.5,4.0,1.3],
+            [5.5,2.6,4.4,1.2],[6.1,3.0,4.6,1.4],[5.8,2.6,4.0,1.2],[5.0,2.3,3.3,1.0],[5.6,2.7,4.2,1.3],
+            [5.7,3.0,4.2,1.2],[5.7,2.9,4.2,1.3],[6.2,2.9,4.3,1.3],[5.1,2.5,3.0,1.1],[5.7,2.8,4.1,1.3],
+            [6.3,3.3,6.0,2.5],[5.8,2.7,5.1,1.9],[7.1,3.0,5.9,2.1],[6.3,2.9,5.6,1.8],[6.5,3.0,5.8,2.2],
+            [7.6,3.0,6.6,2.1],[4.9,2.5,4.5,1.7],[7.3,2.9,6.3,1.8],[6.7,2.5,5.8,1.8],[7.2,3.6,6.1,2.5],
+            [6.5,3.2,5.1,2.0],[6.4,2.7,5.3,1.9],[6.8,3.0,5.5,2.1],[5.7,2.5,5.0,2.0],[5.8,2.8,5.1,2.4],
+            [6.4,3.2,5.3,2.3],[6.5,3.0,5.5,1.8],[7.7,3.8,6.7,2.2],[7.7,2.6,6.9,2.3],[6.0,2.2,5.0,1.5],
+            [6.9,3.2,5.7,2.3],[5.6,2.8,4.9,2.0],[7.7,2.8,6.7,2.0],[6.3,2.7,4.9,1.8],[6.7,3.3,5.7,2.1],
+            [7.2,3.2,6.0,1.8],[6.2,2.8,4.8,1.8],[6.1,3.0,4.9,1.8],[6.4,2.8,5.6,2.1],[7.2,3.0,5.8,1.6],
+            [7.4,2.8,6.1,1.9],[7.9,3.8,6.4,2.0],[6.4,2.8,5.6,2.2],[6.3,2.8,5.1,1.5],[6.1,2.6,5.6,1.4],
+            [7.7,3.0,6.1,2.3],[6.3,3.4,5.6,2.4],[6.4,3.1,5.5,1.8],[6.0,3.0,4.8,1.8],[6.9,3.1,5.4,2.1],
+            [6.7,3.1,5.6,2.4],[6.9,3.1,5.1,2.3],[5.8,2.7,5.1,1.9],[6.8,3.2,5.9,2.3],[6.7,3.3,5.7,2.5],
+            [6.7,3.0,5.2,2.3],[6.3,2.5,5.0,1.9],[6.5,3.0,5.2,2.0],[6.2,3.4,5.4,2.3],[5.9,3.0,5.1,1.8]
+        ];
+        const featureNames = ['Sepal Length', 'Sepal Width', 'Petal Length', 'Petal Width'];
+        irisData.featureNames = featureNames;
+        return irisData;
+    }
+
+    function loadWine() {
+        const wineData = [];
+        const featureNames = [
+            'Alcohol', 'Malic Acid', 'Ash', 'Alcalinity of Ash', 'Magnesium',
+            'Total Phenols', 'Flavanoids', 'Nonflavanoid Phenols', 'Proanthocyanins',
+            'Color Intensity', 'Hue', 'OD280/OD315', 'Proline'
+        ];
+        
+        for (let i = 0; i < 178; i++) {
+            const wine = [];
+            wine.push(13.0 + Math.random() * 2.5);
+            wine.push(1.0 + Math.random() * 3.0);
+            wine.push(2.0 + Math.random() * 0.5);
+            wine.push(15.0 + Math.random() * 10.0);
+            wine.push(80 + Math.random() * 50);
+            wine.push(1.5 + Math.random() * 1.5);
+            wine.push(0.5 + Math.random() * 3.0);
+            wine.push(0.1 + Math.random() * 0.4);
+            wine.push(0.5 + Math.random() * 1.5);
+            wine.push(3.0 + Math.random() * 8.0);
+            wine.push(0.8 + Math.random() * 1.2);
+            wine.push(1.5 + Math.random() * 2.0);
+            wine.push(400 + Math.random() * 800);
+            wineData.push(wine);
+        }
+        
+        wineData.featureNames = featureNames;
+        return wineData;
+    }
+
+    function loadBreastCancer() {
+        const baseFeatures = ['Radius', 'Texture', 'Perimeter', 'Area', 'Smoothness', 
+                             'Compactness', 'Concavity', 'Concave Points', 'Symmetry', 'Fractal Dimension'];
+        const featureNames = [];
+        ['mean', 'se', 'worst'].forEach(prefix => {
+            baseFeatures.forEach(feat => {
+                featureNames.push(`${feat} (${prefix})`);
+            });
+        });
+        
+        const data = [];
+        for (let i = 0; i < 569; i++) {
+            const sample = [];
+            for (let j = 0; j < 30; j++) {
+                const featureIdx = j % 10;
+                let baseValue;
+                switch(featureIdx) {
+                    case 0: baseValue = 10 + Math.random() * 15; break;
+                    case 1: baseValue = 15 + Math.random() * 20; break;
+                    case 2: baseValue = 60 + Math.random() * 80; break;
+                    case 3: baseValue = 300 + Math.random() * 800; break;
+                    case 4: baseValue = 0.05 + Math.random() * 0.05; break;
+                    case 5: baseValue = 0.05 + Math.random() * 0.2; break;
+                    case 6: baseValue = 0.01 + Math.random() * 0.3; break;
+                    case 7: baseValue = 0.005 + Math.random() * 0.1; break;
+                    case 8: baseValue = 0.1 + Math.random() * 0.2; break;
+                    case 9: baseValue = 0.04 + Math.random() * 0.03; break;
+                }
+                if (j < 10) sample.push(baseValue);
+                else if (j < 20) sample.push(baseValue * (0.01 + Math.random() * 0.02));
+                else sample.push(baseValue * (1.0 + Math.random() * 0.3));
+            }
+            data.push(sample);
+        }
+        
+        data.featureNames = featureNames;
+        return data;
+    }
+
+    function loadDiabetes() {
+        const featureNames = ['Age', 'Sex', 'BMI', 'BP', 'S1', 'S2', 'S3', 'S4'];
+        const data = [];
+        
+        for (let i = 0; i < 442; i++) {
+            const sample = [];
+            sample.push(20 + Math.random() * 60);
+            sample.push(Math.round(Math.random()));
+            sample.push(18 + Math.random() * 20);
+            sample.push(80 + Math.random() * 40);
+            sample.push(100 + Math.random() * 100);
+            sample.push(100 + Math.random() * 100);
+            sample.push(20 + Math.random() * 40);
+            sample.push(3 + Math.random() * 5);
+            data.push(sample);
+        }
+        
+        data.featureNames = featureNames;
+        return data;
+    }
+
+    let currentData = null;
+    let currentDT = null;
+    let currentTransformed = null;
+
+    function loadDataset(name) {
+        let data;
+        switch(name) {
+            case 'iris':
+                data = loadIris();
+                break;
+            case 'wine':
+                data = loadWine();
+                break;
+            case 'breast-cancer':
+                data = loadBreastCancer();
+                break;
+            case 'diabetes':
+                data = loadDiabetes();
+                break;
+            default:
+                return null;
+        }
+        return data;
+    }
+
+    function loadCSV(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const csv = e.target.result;
+            const lines = csv.split('\n').filter(line => line.trim());
+            if (lines.length === 0) return;
+            
+            const data = [];
+            let featureNames = null;
+            let startIdx = 0;
+            
+            const firstLine = lines[0].split(',');
+            if (isNaN(parseFloat(firstLine[0].trim()))) {
+                featureNames = firstLine.map(s => s.trim());
+                startIdx = 1;
+            }
+            
+            for (let i = startIdx; i < lines.length; i++) {
+                const values = lines[i].split(',').map(v => parseFloat(v.trim()));
+                if (values.every(v => !isNaN(v)) && values.length > 0) {
+                    data.push(values);
+                }
+            }
+            
+            if (data.length > 0) {
+                const nFeatures = data[0].length;
+                const filtered = data.filter(row => row.length === nFeatures);
+                
+                if (filtered.length > 0) {
+                    currentData = filtered;
+                    if (!featureNames) {
+                        currentData.featureNames = filtered[0].map((_, i) => `Feature ${i + 1}`);
+                    } else {
+                        currentData.featureNames = featureNames.slice(0, nFeatures);
+                    }
+                    currentData.datasetName = 'custom';
+                    document.getElementById('dataset-select').value = 'custom';
+                    populateTargetSelector();
+                    runDecisionTree();
+                }
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    async function runDecisionTree() {
+        const datasetName = document.getElementById('dataset-select').value;
+        const maxDepth = parseInt(document.getElementById('max-depth-slider').value);
+        const minSamplesSplit = parseInt(document.getElementById('min-samples-split-slider').value);
+        const criterion = document.getElementById('criterion-select').value;
+        const taskType = document.getElementById('task-type-select').value;
+        const nFeatures = parseInt(document.getElementById('n-features-slider').value);
+        const targetIdx = parseInt(document.getElementById('target-select').value);
+        
+        // Load dataset if needed
+        if (datasetName !== 'custom' && (!currentData || currentData.datasetName !== datasetName)) {
+            currentData = loadDataset(datasetName);
+            if (currentData) currentData.datasetName = datasetName;
+        }
+        
+        if (!currentData || currentData.length === 0) {
+            alert('Please load a dataset first');
+            return;
+        }
+        
+        // Decision Tree requires a target variable
+        if (targetIdx === null || isNaN(targetIdx) || targetIdx < 0 || targetIdx >= currentData[0].length) {
+            alert('Please select a target variable');
+            return;
+        }
+        
+        // Extract target variable
+        const y = currentData.map(row => row[targetIdx]);
+        const X = currentData.map(row => {
+            const newRow = [...row];
+            newRow.splice(targetIdx, 1);
+            return newRow;
+        });
+        
+        // Update feature names
+        if (currentData.featureNames) {
+            const targetName = currentData.featureNames[targetIdx];
+            X.featureNames = currentData.featureNames.filter((_, i) => i !== targetIdx);
+            X.targetName = targetName;
+        }
+        
+        // Show loading message
+        document.getElementById('selected-features').textContent = 'Running...';
+        
+        try {
+            // Fit Decision Tree
+            currentDT = new DecisionTree(maxDepth, minSamplesSplit, criterion, taskType, nFeatures);
+            currentDT.fit(X, y);
+            
+            // Verify fit completed successfully
+            if (!currentDT.featureImportance || currentDT.featureImportance.length === 0) {
+                throw new Error('Decision Tree fit failed - importance not calculated');
+            }
+            
+            // Transform data
+            currentTransformed = currentDT.transform(X);
+            
+            // Update statistics
+            updateStatistics();
+            
+            // Update plots
+            plotAll();
+        } catch (error) {
+            console.error('Decision Tree error:', error);
+            alert('Error running Decision Tree: ' + error.message);
+            document.getElementById('selected-features').textContent = 'Error';
+        }
+    }
+
+    function updateStatistics() {
+        if (!currentDT || !currentDT.selectedFeatures) {
+            return;
+        }
+        
+        const originalFeatures = currentDT.featureNames ? currentDT.featureNames.length : 0;
+        const selectedFeatures = currentDT.selectedFeatures.length;
+        const removedFeatures = currentDT.removedFeatures ? currentDT.removedFeatures.length : (originalFeatures - selectedFeatures);
+        const reductionRatio = originalFeatures > 0 ? (selectedFeatures / originalFeatures).toFixed(2) : '0.00';
+        
+        const maxImportance = currentDT.featureImportance ? Math.max(...currentDT.featureImportance) : 0;
+        const avgImportance = currentDT.featureImportance ? currentDT.featureImportance.reduce((a, b) => a + b, 0) / currentDT.featureImportance.length : 0;
+        
+        document.getElementById('original-features').textContent = originalFeatures;
+        document.getElementById('selected-features').textContent = selectedFeatures;
+        document.getElementById('removed-features').textContent = removedFeatures;
+        document.getElementById('reduction-ratio').textContent = reductionRatio;
+        document.getElementById('total-samples').textContent = currentData ? currentData.length : 0;
+        document.getElementById('max-importance').textContent = maxImportance.toFixed(4);
+        document.getElementById('avg-importance').textContent = avgImportance.toFixed(4);
+        document.getElementById('tree-depth').textContent = currentDT.actualDepth;
+        if (currentDT.taskType === 'classification') {
+            document.getElementById('accuracy-r2').textContent = currentDT.accuracy.toFixed(4);
+        } else {
+            document.getElementById('accuracy-r2').textContent = currentDT.r2Score.toFixed(4);
+        }
+    }
+
+    function plotAll() {
+        plotImportanceDistribution();
+        plotImportanceThreshold();
+        plotFeatureImportance();
+        updateFeatureLists();
+    }
+
+    function plotImportanceDistribution() {
+        if (!currentDT || !currentDT.featureImportance) {
+            Plotly.newPlot('importance-distribution-plot', [{
+                x: [0],
+                y: [0],
+                type: 'scatter',
+                mode: 'markers',
+                marker: { size: 1, color: '#dd8448' },
+                name: 'No data'
+            }], {
+                title: 'Feature Importance Distribution',
+                paper_bgcolor: '#171717',
+                plot_bgcolor: '#171717',
+                font: { color: 'white' },
+                xaxis: { title: 'Feature', color: 'white' },
+                yaxis: { title: 'Importance', color: 'white' },
+                showlegend: false
+            });
+            return;
+        }
+        
+        const featureNames = currentDT.featureNames;
+        const importance = currentDT.featureImportance;
+        
+        // Sort by importance
+        const indexed = importance.map((imp, idx) => ({idx, imp}));
+        indexed.sort((a, b) => b.imp - a.imp);
+        
+        const sortedNames = indexed.map(item => featureNames[item.idx]);
+        const sortedImportance = indexed.map(item => item.imp);
+        
+        Plotly.newPlot('importance-distribution-plot', [{
+            x: sortedNames,
+            y: sortedImportance,
+            type: 'bar',
+            marker: { color: '#dd8448' },
+            name: 'Importance',
+            hovertemplate: 'Feature: %{x}<br>Importance: %{y:.4f}<extra></extra>'
+        }], {
+            title: 'Feature Importance Distribution',
+            paper_bgcolor: '#171717',
+            plot_bgcolor: '#171717',
+            font: { color: 'white' },
+            xaxis: { title: 'Features', color: 'white', tickangle: -45 },
+            yaxis: { title: 'Importance Score', color: 'white' },
+            showlegend: false
+        });
+    }
+
+    function plotImportanceThreshold() {
+        if (!currentDT || !currentDT.featureImportance) {
+            Plotly.newPlot('importance-threshold-plot', [{
+                x: [0],
+                y: [0],
+                type: 'scatter',
+                mode: 'markers',
+                marker: { size: 1, color: '#dd8448' },
+                name: 'No data'
+            }], {
+                title: 'Importance vs Threshold',
+                paper_bgcolor: '#171717',
+                plot_bgcolor: '#171717',
+                font: { color: 'white' },
+                xaxis: { title: 'Threshold', color: 'white' },
+                yaxis: { title: 'N Features Selected', color: 'white' },
+                showlegend: false
+            });
+            return;
+        }
+        
+        const importance = currentDT.featureImportance;
+        const thresholds = [];
+        const nFeatures = [];
+        
+        const maxImp = Math.max(...importance);
+        for (let t = 0; t <= maxImp; t += maxImp / 50) {
+            thresholds.push(t);
+            const count = importance.filter(imp => imp >= t).length;
+            nFeatures.push(count);
+        }
+        
+        Plotly.newPlot('importance-threshold-plot', [{
+            x: thresholds,
+            y: nFeatures,
+            type: 'scatter',
+            mode: 'lines',
+            line: { color: '#5ba3f5', width: 2 },
+            name: 'N Features',
+            hovertemplate: 'Threshold: %{x:.4f}<br>N Features: %{y}<extra></extra>'
+        }], {
+            title: 'Importance vs Threshold',
+            paper_bgcolor: '#171717',
+            plot_bgcolor: '#171717',
+            font: { color: 'white' },
+            xaxis: { title: 'Importance Threshold', color: 'white' },
+            yaxis: { title: 'Number of Features Selected', color: 'white' },
+            showlegend: true
+        });
+    }
+
+    function plotFeatureImportance() {
+        if (!currentDT || !currentDT.featureImportance) {
+            Plotly.newPlot('feature-importance-plot', [{
+                x: ['No data'],
+                y: [0],
+                type: 'bar',
+                marker: { color: '#676767' },
+                name: 'No data'
+            }], {
+                title: 'Feature Importance (Top Features)',
+                paper_bgcolor: '#171717',
+                plot_bgcolor: '#171717',
+                font: { color: 'white' },
+                xaxis: { title: 'Features', color: 'white' },
+                yaxis: { title: 'Importance', color: 'white' },
+                showlegend: false
+            });
+            return;
+        }
+        
+        const featureNames = currentDT.featureNames;
+        const importance = currentDT.featureImportance;
+        
+        // Sort by importance (descending - most important first)
+        const indexed = importance.map((imp, idx) => ({
+            idx: idx,
+            imp: imp
+        }));
+        indexed.sort((a, b) => b.imp - a.imp);
+        
+        const sortedNames = indexed.map(item => featureNames[item.idx]);
+        const sortedImportance = indexed.map(item => item.imp);
+        
+        // Limit to top 20 features for readability (or all if <= 20)
+        const maxFeatures = Math.min(20, sortedNames.length);
+        const displayNames = sortedNames.slice(0, maxFeatures);
+        const displayImportance = sortedImportance.slice(0, maxFeatures);
+        
+        Plotly.newPlot('feature-importance-plot', [{
+            x: displayNames,
+            y: displayImportance,
+            type: 'bar',
+            marker: { 
+                color: '#dd8448',
+                line: { color: '#171717', width: 0.5 }
+            },
+            name: 'Importance',
+            hovertemplate: 'Feature: %{x}<br>Importance: %{y:.6f}<extra></extra>'
+        }], {
+            title: `Feature Importance (Top Features)${sortedNames.length > maxFeatures ? ` - Top ${maxFeatures} of ${sortedNames.length}` : ''}`,
+            paper_bgcolor: '#171717',
+            plot_bgcolor: '#171717',
+            font: { color: 'white' },
+            xaxis: { 
+                title: 'Features', 
+                color: 'white', 
+                tickangle: -45,
+                tickmode: 'linear',
+                tick0: 0,
+                dtick: 1
+            },
+            yaxis: { title: 'Importance Score', color: 'white' },
+            showlegend: false
+        });
+    }
+
+    function updateFeatureLists() {
+        if (!currentDT || !currentDT.selectedFeatures) {
+            document.getElementById('selected-features-list').innerHTML = '<div style="color: #676767;">No features selected</div>';
+            document.getElementById('removed-features-list').innerHTML = '<div style="color: #676767;">No features removed</div>';
+            return;
+        }
+        
+        const selectedFeatures = currentDT.selectedFeatures;
+        const removedFeatures = currentDT.removedFeatures || [];
+        const featureNames = currentDT.featureNames;
+        const importance = currentDT.featureImportance;
+        
+        // Selected features list (top-k features by importance)
+        const selectedList = selectedFeatures.map(idx => {
+            const imp = importance[idx].toFixed(4);
+            return `<div style="padding: 5px; margin: 2px 0; background: rgba(91,163,245,0.1); border-left: 3px solid #5ba3f5; border-radius: 4px;">
+                <strong>${featureNames[idx]}</strong> (Importance: ${imp})
+            </div>`;
+        }).join('');
+        document.getElementById('selected-features-list').innerHTML = selectedList || '<div style="color: #676767;">No features selected</div>';
+        
+        // Removed features list (features not in top-k)
+        const removedList = removedFeatures.map(idx => {
+            const imp = importance[idx].toFixed(4);
+            return `<div style="padding: 5px; margin: 2px 0; background: rgba(255,68,68,0.1); border-left: 3px solid #ff4444; border-radius: 4px;">
+                <strong>${featureNames[idx]}</strong> (Importance: ${imp})
+            </div>`;
+        }).join('');
+        document.getElementById('removed-features-list').innerHTML = removedList || '<div style="color: #676767;">No features removed</div>';
+    }
+
+    function exportResults() {
+        if (!currentDT || !currentTransformed) {
+            alert('Please run Decision Tree first');
+            return;
+        }
+        
+        const selectedFeatures = currentDT.selectedFeatures;
+        const removedFeatures = currentDT.removedFeatures || [];
+        const featureNames = currentDT.featureNames;
+        const selectedNames = selectedFeatures.map(idx => featureNames[idx]);
+        const importance = currentDT.featureImportance;
+        
+        // Create CSV content
+        let csv = 'Selected Features (top-k by importance):\n';
+        csv += selectedNames.join(',') + '\n\n';
+        csv += 'Removed Features:\n';
+        csv += removedFeatures.map(idx => featureNames[idx]).join(',') + '\n\n';
+        csv += 'Feature,Importance,Selected,Max Depth,Min Samples Split,Criterion,Task Type';
+        if (currentDT.taskType === 'classification') {
+            csv += ',Accuracy\n';
+        } else {
+            csv += ',R² Score\n';
+        }
+        featureNames.forEach((name, idx) => {
+            const imp = importance[idx].toFixed(6);
+            const perf = currentDT.taskType === 'classification' ? currentDT.accuracy.toFixed(6) : currentDT.r2Score.toFixed(6);
+            csv += `${name},${imp},${selectedFeatures.includes(idx) ? 'Yes' : 'No'},${currentDT.maxDepth},${currentDT.minSamplesSplit},${currentDT.criterion},${currentDT.taskType},${perf}\n`;
+        });
+        
+        // Download
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'decision_tree_importance_results.csv';
+        a.click();
+        window.URL.revokeObjectURL(url);
+    }
+
+    function downloadPlot() {
+        Plotly.downloadImage('feature-importance-plot', {
+            format: 'png',
+            width: 1200,
+            height: 800,
+            filename: 'decision_tree_importance'
+        });
+    }
+
+    function populateTargetSelector() {
+        const targetSelect = document.getElementById('target-select');
+        if (currentData && currentData.featureNames) {
+            targetSelect.innerHTML = '';
+            currentData.featureNames.forEach((name, idx) => {
+                const option = document.createElement('option');
+                option.value = idx;
+                option.textContent = name;
+                targetSelect.appendChild(option);
+            });
+            // Set default to last feature (often the target)
+            if (currentData.featureNames.length > 0) {
+                targetSelect.value = currentData.featureNames.length - 1;
+            }
+        }
+    }
+
+    // Event listeners
+    document.getElementById('max-depth-slider').addEventListener('input', e => {
+        const maxDepth = parseInt(e.target.value);
+        document.getElementById('max-depth-value').textContent = maxDepth;
+        if (currentDT && currentData) {
+            runDecisionTree();
+        }
+    });
+
+    document.getElementById('min-samples-split-slider').addEventListener('input', e => {
+        const minSamplesSplit = parseInt(e.target.value);
+        document.getElementById('min-samples-split-value').textContent = minSamplesSplit;
+        if (currentDT && currentData) {
+            runDecisionTree();
+        }
+    });
+
+    document.getElementById('n-features-slider').addEventListener('input', e => {
+        const nFeatures = parseInt(e.target.value);
+        document.getElementById('n-features-value').textContent = nFeatures;
+        if (currentDT && currentData) {
+            runDecisionTree();
+        }
+    });
+
+    document.getElementById('criterion-select').addEventListener('change', () => {
+        if (currentDT && currentData) {
+            runDecisionTree();
+        }
+    });
+
+    document.getElementById('task-type-select').addEventListener('change', () => {
+        if (currentDT && currentData) {
+            runDecisionTree();
+        }
+    });
+
+    document.getElementById('target-select').addEventListener('change', () => {
+        if (currentDT && currentData) {
+            runDecisionTree();
+        }
+    });
+
+    document.getElementById('dataset-select').addEventListener('change', e => {
+        if (e.target.value !== 'custom') {
+            currentData = loadDataset(e.target.value);
+            if (currentData) {
+                currentData.datasetName = e.target.value;
+                populateTargetSelector();
+                runDecisionTree();
+            }
+        }
+    });
+
+    // Initialize with Iris dataset
+    window.addEventListener('load', () => {
+        // Set default values
+        document.getElementById('max-depth-value').textContent = '5';
+        document.getElementById('min-samples-split-value').textContent = '2';
+        document.getElementById('n-features-value').textContent = '3';
+        currentData = loadDataset('iris');
+        if (currentData) {
+            currentData.datasetName = 'iris';
+            populateTargetSelector();
+            // Wait a bit for the target selector to be populated
+            setTimeout(() => {
+                if (document.getElementById('target-select').value) {
+                    runDecisionTree();
+                }
+            }, 100);
+        }
+    });
+</script>
+    </div>
+    <script src="../sidebar.js"></script>
+</body>
+</html>
+

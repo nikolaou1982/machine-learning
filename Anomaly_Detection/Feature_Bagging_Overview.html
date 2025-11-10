@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Learn about Feature Bagging, a anomaly detection method. Comprehensive overview with theory, applications, and use cases for machine learning and data science.">
+  <link rel="canonical" href="https://yourdomain.com/Anomaly_Detection/Feature_Bagging_Overview.html">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "name": "Feature Bagging - Overview & Theory | Anomaly Detection | ML Tools",
+  "description": "Learn about Feature Bagging, a anomaly detection method. Comprehensive overview with theory, applications, and use cases for machine learning and data science.",
+  "url": "https://yourdomain.com/Anomaly_Detection/Feature_Bagging_Overview.html",
+  "about": {
+    "@type": "Thing",
+    "name": "Feature Bagging",
+    "description": "Feature Bagging algorithm for anomaly detection"
+  },
+  "headline": "Feature Bagging",
+  "articleSection": "Anomaly Detection"
+}
+  </script>
+    <title>Feature Bagging - Overview & Theory | Anomaly Detection | ML Tools</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            color: #cfcfcf;
+            background-color: #1e1e1e;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #171717;
+            padding: 30px 20px;
+            border-right: 1px solid #333;
+            overflow-y: auto;
+            height: 100vh;
+        }
+        .sidebar h1 { color: white; font-size: 1.8rem; font-weight: bold; margin-bottom: 30px; text-align: center; }
+        .nav-section { margin-bottom: 30px; }
+        .nav-section h3 { color: #dd8448; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px; }
+        .nav-item { display: block; color: #676767; text-decoration: none; padding: 12px 15px; margin-bottom: 5px; border-radius: 8px; transition: all 0.3s ease; font-weight: 500; }
+        .nav-item:hover { background-color: #2d2d2d; color: white; transform: translateX(5px); }
+        .nav-item.active { background-color: #dd8448; color: white; }
+        .nav-category { margin-bottom: 20px; }
+        .nav-category-header { color: #dd8448; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; padding: 10px 15px; cursor: pointer; border-radius: 8px; transition: background-color 0.3s ease; display: flex; justify-content: space-between; align-items: center; letter-spacing: 1px; }
+        .nav-category-header:hover { background-color: #2d2d2d; }
+        .nav-category-header .arrow { transition: transform 0.3s ease; font-size: 0.7rem; }
+        .nav-category-header.collapsed .arrow { transform: rotate(-90deg); }
+        .nav-subcategory { margin-left: 15px; margin-top: 10px; overflow: hidden; max-height: 1200px; transition: max-height 0.3s ease; }
+        .nav-subcategory.collapsed { max-height: 0; }
+        .nav-subheader { color: #999; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; padding: 8px 15px; margin-top: 5px; letter-spacing: 0.5px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-radius: 6px; transition: background-color 0.3s ease; }
+        .nav-subheader:hover { background-color: #2d2d2d; }
+        .nav-subheader .arrow { font-size: 0.6rem; transition: transform 0.3s ease; }
+        .nav-subheader.collapsed .arrow { transform: rotate(-90deg); }
+        .nav-subheader.category-header { color: #dd8448; font-size: 0.85rem; font-weight: 700; padding: 10px 15px; margin-top: 8px; letter-spacing: 1px; border: 1px solid rgba(221,132,72,0.3); }
+        .nav-subheader.category-header:hover { background-color: rgba(221,132,72,0.15); border-color: rgba(221,132,72,0.5); }
+        .nav-subgroup { overflow: hidden; max-height: 200px; transition: max-height 0.3s ease; padding-bottom: 5px; }
+        .nav-subgroup.collapsed { max-height: 0; }
+        .nav-subgroup.category-group { max-height: 1000px; }
+        .nav-subgroup.category-group.collapsed { max-height: 0; }
+        .nav-subheader.nested { margin-left: 10px; font-size: 0.7rem; }
+        .nav-subgroup.nested { margin-left: 10px; max-height: 200px; }
+        .nav-subheader.subcategory-header { color: #999; font-size: 0.75rem; font-weight: 600; padding: 8px 15px; margin-left: 10px; margin-top: 5px; letter-spacing: 0.5px; border: 1px solid rgba(153, 153, 153, 0.2); }
+        .nav-subheader.subcategory-header:hover { background-color: rgba(45, 45, 45, 0.5); border-color: rgba(153, 153, 153, 0.4); }
+        .nav-subgroup.subcategory-group { margin-left: 10px; max-height: 800px; overflow: hidden; transition: max-height 0.3s ease; padding-bottom: 5px; }
+        .nav-subgroup.subcategory-group.collapsed { max-height: 0; }
+        .nav-item.sub { padding: 8px 15px; font-size: 0.9rem; margin-left: 10px; margin-bottom: 5px; }
+        .main-content {
+            flex: 1;
+            padding: 40px;
+        }
+        .title {
+            color: #ffffff;
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin: 0 0 8px 0;
+        }
+        .subtitle {
+            color: #8a8a8a;
+            font-size: 1rem;
+            margin-bottom: 28px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+        .card {
+            background-color: #171717;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 22px;
+            transition: border-color 0.3s ease, transform 0.3s ease;
+        }
+        .card:hover { border-color: #dd8448; transform: translateY(-3px); }
+        .card h3 { color: #ffffff; margin: 0 0 8px 0; font-size: 1.15rem; }
+        .card p { color: #9a9a9a; margin: 0; line-height: 1.6; }
+        .section {
+            background-color: #171717;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .section h2 {
+            color: #ffffff;
+            font-size: 1.5rem;
+            margin: 0 0 12px 0;
+        }
+        .badge {
+            display: inline-block;
+            background: rgba(221,132,72,0.15);
+            color: #ffb07a;
+            border: 1px solid rgba(221,132,72,0.35);
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        .list { margin: 0; padding-left: 18px; color: #b0b0b0; }
+        .list li { margin-bottom: 6px; }
+        .split {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .callout {
+            background: #202020;
+            border: 1px dashed #3a3a3a;
+            border-radius: 10px;
+            padding: 14px;
+            color: #a9a9a9;
+        }
+        .kpi {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 10px;
+        }
+        .kpi .item {
+            background: #1c1c1c;
+            border: 1px solid #2a2a2a;
+            border-radius: 10px;
+            padding: 10px 12px;
+        }
+        .kpi .label { color: #8e8e8e; font-size: 12px; }
+        .kpi .value { color: #ffffff; font-weight: 700; font-size: 18px; }
+        .muted { color: #9a9a9a; }
+        .accent { color: #dd8448; }
+        .legend {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .legend .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #202020;
+            border: 1px solid #333;
+            border-radius: 999px;
+            padding: 6px 10px;
+            color: #cfcfcf;
+            font-size: 12px;
+        }
+        .chip .dot { width: 8px; height: 8px; border-radius: 100%; background: #dd8448; display: inline-block; }
+    </style>
+</head>
+<body>
+    <div class="sidebar"></div>
+    <div class="main-content">
+        <h1 class="title">Feature Bagging Overview <span class="badge">Guide</span></h1>
+        <div class="subtitle">Ensemble-based anomaly detection: combine multiple base detectors trained on random feature subsets — reduces sensitivity to irrelevant features and improves robustness in high dimensions.</div>
+
+        <div class="grid">
+            <div class="card">
+                <h3>Primary Uses</h3>
+                <p>High-dimensional anomaly detection, robust outlier identification, feature selection robustness, reducing sensitivity to irrelevant features, improving stability of base detectors, handling datasets with many features.</p>
+            </div>
+            <div class="card">
+                <h3>Strengths</h3>
+                <p>Reduces sensitivity to irrelevant features, improves robustness in high dimensions, provides more stable anomaly scores, can use any base detector (LOF, kNN, etc.), ensemble averaging reduces variance, handles curse of dimensionality better than single detectors.</p>
+            </div>
+            <div class="card">
+                <h3>Watch-outs</h3>
+                <p>Requires multiple base detectors (computationally expensive), sensitive to number of estimators, requires appropriate feature subset size, base detector parameters still need tuning, may lose some information by using subsets, combination method selection is important.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>How It Works <span class="badge">Mathematical Foundation</span></h2>
+            <div class="split">
+                <div>
+                    <p class="muted">The <span class="accent">Feature Bagging</span> method trains multiple base detectors (e.g., LOF, kNN) on random subsets of features. Each detector computes anomaly scores on its feature subset, and the scores are combined (averaged, maximum, or other aggregation) to produce the final ensemble score. This reduces sensitivity to irrelevant features and improves robustness.</p>
+                    <ul class="list">
+                        <li><strong>Base Detector</strong>: underlying anomaly detection algorithm (e.g., LOF, kNN)</li>
+                        <li><strong>Feature Subset Size</strong>: number of features randomly selected per detector (typically sqrt(n_features) to n_features)</li>
+                        <li><strong>n_estimators</strong>: number of base detectors in the ensemble (typically 10-50)</li>
+                        <li><strong>Combination Method</strong>: how to combine scores (average, maximum, median)</li>
+                        <li><strong>Ensemble Score</strong>: final anomaly score after combining all detector scores</li>
+                        <li><strong>Threshold</strong>: user-defined cutoff; points above threshold are anomalies</li>
+                    </ul>
+                </div>
+                <div class="callout">Tip: For 2D data, use feature subset size of 1-2 (randomly select 1 or both features). For 3D data, use 1-3 features. The combination method (average) typically provides the most stable results. Use more estimators (20-50) for better robustness.</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Anomaly Detection Statistics <span class="badge">Interpretation</span></h2>
+            <div class="kpi">
+                <div class="item"><div class="label">Ensemble Score</div><div class="value">Combined anomaly score from multiple detectors (higher = more anomalous)</div></div>
+                <div class="item"><div class="label">n_estimators</div><div class="value">Number of base detectors (user-defined)</div></div>
+                <div class="item"><div class="label">Anomaly Count</div><div class="value">Number of points exceeding threshold</div></div>
+                <div class="item"><div class="label">Anomaly Rate</div><div class="value">Percentage of data flagged as anomalies</div></div>
+            </div>
+            <p class="muted" style="margin-top: 12px;">Points with ensemble score > threshold are flagged as anomalies. Feature Bagging improves robustness by averaging results across multiple random feature subsets, reducing the impact of irrelevant or noisy features.</p>
+        </div>
+
+        <div class="section">
+            <h2>Reading the Graphs <span class="badge">2D</span></h2>
+            <ul class="list">
+                <li><strong>Data Visualization</strong>: points colored by ensemble score; red = anomalies (above threshold), blue/green = normal.</li>
+                <li><strong>Score Heatmap</strong>: color-coded ensemble scores across the space; brighter colors = higher score (more anomalous).</li>
+                <li><strong>Score Distribution</strong>: histogram of ensemble scores; helps identify natural threshold cutoff.</li>
+                <li><strong>Threshold Line</strong>: threshold visualized in distribution; adjust to change sensitivity.</li>
+                <li><strong>Base Detector Scores</strong>: visualization showing how individual detectors contribute to the ensemble score.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Reading the Graphs <span class="badge">3D</span></h2>
+            <ul class="list">
+                <li><strong>3D Scatter Plot</strong>: points colored by ensemble score; rotate to inspect anomalies in 3D space.</li>
+                <li><strong>Score Distribution</strong>: histogram helps set threshold; 3D typically shows different score patterns.</li>
+                <li><strong>Anomaly Points</strong>: clearly marked in red; inspect from different angles to understand feature space context.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Parameter Guidance <span class="badge">Best Practice</span></h2>
+            <ul class="list">
+                <li><strong>n_estimators</strong>: Number of base detectors. More = more stable but slower. Start with 10-20. For high-dimensional data, use 20-50. Typically 10-30 for 2D/3D.</li>
+                <li><strong>Feature Subset Size</strong>: Number of features per detector. For 2D: use 1-2 (randomly select 1 or both). For 3D: use 1-3. For high-dim: use sqrt(n_features) or n_features/2. Too small → loses information, too large → less diversity.</li>
+                <li><strong>Combination Method</strong>: Average (most stable), Maximum (most sensitive), Median (robust to outliers). Average is recommended for most cases.</li>
+                <li><strong>Base Detector Parameters</strong>: k for LOF/kNN still needs tuning. Use similar values as standalone detectors. k = 5-20 typically works well.</li>
+                <li><strong>Threshold</strong>: Set based on ensemble score distribution. Use percentile-based (e.g., top 5% or 1% as anomalies) or absolute threshold based on domain knowledge.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Data Preparation <span class="badge">Best Practice</span></h2>
+            <ul class="list">
+                <li>Normalize all features to the same scale (recommended for better feature balance).</li>
+                <li>Handle missing values before training (impute or remove).</li>
+                <li>Consider feature selection to remove obviously irrelevant features before applying Feature Bagging.</li>
+                <li>Ensure sufficient data points; works well even with moderate datasets (n > 50).</li>
+                <li>No need to remove outliers from training data.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Common Pitfalls <span class="badge">Avoid</span></h2>
+            <ul class="list">
+                <li>Too few estimators (n_estimators < 5) → unstable scores, high variance.</li>
+                <li>Too many estimators (n_estimators > 100) → diminishing returns, slower computation.</li>
+                <li>Feature subset too small → loses important feature interactions, misses patterns.</li>
+                <li>Feature subset too large → less diversity, approaches single detector performance.</li>
+                <li>Poor base detector parameters → ensemble inherits weaknesses of base detector.</li>
+                <li>Wrong combination method → may not capture anomalies effectively (e.g., maximum too sensitive, minimum too conservative).</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Feature Bagging vs Isolation Forest <span class="badge">Comparison</span></h2>
+            <ul class="list">
+                <li><strong>Base Detector</strong>: Feature Bagging uses external detectors (LOF, kNN); Isolation Forest uses its own isolation trees.</li>
+                <li><strong>Feature Selection</strong>: Feature Bagging uses random feature subsets; Isolation Forest uses random feature selection per split.</li>
+                <li><strong>Flexibility</strong>: Feature Bagging can use any base detector; Isolation Forest is a fixed algorithm.</li>
+                <li><strong>Computation</strong>: Feature Bagging depends on base detector (often O(n²)); Isolation Forest is more efficient (sub-linear).</li>
+                <li><strong>Use Case</strong>: Feature Bagging for high-dimensional data with many irrelevant features; Isolation Forest for efficient large-scale detection.</li>
+                <li><strong>Interpretability</strong>: Feature Bagging provides ensemble insights; Isolation Forest provides path length insights.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>When to Use <span class="badge">Application</span></h2>
+            <ul class="list">
+                <li><strong>High-dimensional Data</strong>: when you have many features (10+ dimensions) and suspect some are irrelevant.</li>
+                <li><strong>Feature Selection Robustness</strong>: when you want to reduce sensitivity to which features are included.</li>
+                <li><strong>Stable Detection</strong>: when you need more robust and stable anomaly scores than single detectors.</li>
+                <li><strong>Mixed Quality Features</strong>: when some features are more informative than others.</li>
+                <li><strong>Ensemble Improvement</strong>: when you want to improve the performance of base detectors (LOF, kNN) through ensembling.</li>
+                <li><strong>Noisy Features</strong>: when your dataset contains noisy or redundant features that might confuse single detectors.</li>
+            </ul>
+        </div>
+    </div>
+    <script src="../sidebar.js"></script>
+</body>
+</html>
+

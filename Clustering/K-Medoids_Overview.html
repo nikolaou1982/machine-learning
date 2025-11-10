@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Learn about K-Medoids, a clustering method. Comprehensive overview with theory, applications, and use cases for machine learning and data science.">
+  <link rel="canonical" href="https://yourdomain.com/Clustering/K-Medoids_Overview.html">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "name": "K-Medoids - Overview & Theory | Clustering | ML Tools",
+  "description": "Learn about K-Medoids, a clustering method. Comprehensive overview with theory, applications, and use cases for machine learning and data science.",
+  "url": "https://yourdomain.com/Clustering/K-Medoids_Overview.html",
+  "about": {
+    "@type": "Thing",
+    "name": "K-Medoids",
+    "description": "K-Medoids algorithm for clustering"
+  },
+  "headline": "K-Medoids",
+  "articleSection": "Clustering"
+}
+  </script>
+    <title>K-Medoids - Overview & Theory | Clustering | ML Tools</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            color: #cfcfcf;
+            background-color: #1e1e1e;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #171717;
+            padding: 30px 20px;
+            border-right: 1px solid #333;
+            overflow-y: auto;
+            height: 100vh;
+        }
+        /* Sidebar nav styles to match dashboard */
+        .sidebar h1 { color: white; font-size: 1.8rem; font-weight: bold; margin-bottom: 30px; text-align: center; }
+        .nav-section { margin-bottom: 30px; }
+        .nav-section h3 { color: #dd8448; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px; }
+        .nav-item { display: block; color: #676767; text-decoration: none; padding: 12px 15px; margin-bottom: 5px; border-radius: 8px; transition: all 0.3s ease; font-weight: 500; }
+        .nav-item:hover { background-color: #2d2d2d; color: white; transform: translateX(5px); }
+        .nav-item.active { background-color: #dd8448; color: white; }
+        .nav-category { margin-bottom: 20px; }
+        .nav-category-header { color: #dd8448; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; padding: 10px 15px; cursor: pointer; border-radius: 8px; transition: background-color 0.3s ease; display: flex; justify-content: space-between; align-items: center; letter-spacing: 1px; }
+        .nav-category-header:hover { background-color: #2d2d2d; }
+        .nav-category-header .arrow { transition: transform 0.3s ease; font-size: 0.7rem; }
+        .nav-category-header.collapsed .arrow { transform: rotate(-90deg); }
+        .nav-subcategory { margin-left: 15px; margin-top: 10px; overflow: hidden; max-height: 1200px; transition: max-height 0.3s ease; }
+        .nav-subcategory.collapsed { max-height: 0; }
+        .nav-subheader { color: #999; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; padding: 8px 15px; margin-top: 5px; letter-spacing: 0.5px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-radius: 6px; transition: background-color 0.3s ease; }
+        .nav-subheader:hover { background-color: #2d2d2d; }
+        .nav-subheader .arrow { font-size: 0.6rem; transition: transform 0.3s ease; }
+        .nav-subheader.collapsed .arrow { transform: rotate(-90deg); }
+        .nav-subheader.category-header { color: #dd8448; font-size: 0.85rem; font-weight: 700; padding: 10px 15px; margin-top: 8px; letter-spacing: 1px; border: 1px solid rgba(221,132,72,0.3); }
+        .nav-subheader.category-header:hover { background-color: rgba(221,132,72,0.15); border-color: rgba(221,132,72,0.5); }
+        .nav-subgroup { overflow: hidden; max-height: 200px; transition: max-height 0.3s ease; padding-bottom: 5px; }
+        .nav-subgroup.collapsed { max-height: 0; }
+        .nav-subgroup.category-group { max-height: 1000px; }
+        .nav-subgroup.category-group.collapsed { max-height: 0; }
+        .nav-subheader.nested { margin-left: 10px; font-size: 0.7rem; }
+        .nav-subgroup.nested { margin-left: 10px; max-height: 200px; }
+        .nav-subheader.subcategory-header { color: #999; font-size: 0.75rem; font-weight: 600; padding: 8px 15px; margin-left: 10px; margin-top: 5px; letter-spacing: 0.5px; border: 1px solid rgba(153, 153, 153, 0.2); }
+        .nav-subheader.subcategory-header:hover { background-color: rgba(45, 45, 45, 0.5); border-color: rgba(153, 153, 153, 0.4); }
+        .nav-subgroup.subcategory-group { margin-left: 10px; max-height: 800px; overflow: hidden; transition: max-height 0.3s ease; padding-bottom: 5px; }
+        .nav-subgroup.subcategory-group.collapsed { max-height: 0; }
+        .nav-item.sub { padding: 8px 15px; font-size: 0.9rem; margin-left: 10px; margin-bottom: 5px; }
+        .main-content {
+            flex: 1;
+            padding: 40px;
+        }
+        .title {
+            color: #ffffff;
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin: 0 0 8px 0;
+        }
+        .subtitle {
+            color: #8a8a8a;
+            font-size: 1rem;
+            margin-bottom: 28px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+        .card {
+            background-color: #171717;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 22px;
+            transition: border-color 0.3s ease, transform 0.3s ease;
+        }
+        .card:hover { border-color: #dd8448; transform: translateY(-3px); }
+        .card h3 { color: #ffffff; margin: 0 0 8px 0; font-size: 1.15rem; }
+        .card p { color: #9a9a9a; margin: 0; line-height: 1.6; }
+        .section {
+            background-color: #171717;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .section h2 {
+            color: #ffffff;
+            font-size: 1.5rem;
+            margin: 0 0 12px 0;
+        }
+        .badge {
+            display: inline-block;
+            background: rgba(221,132,72,0.15);
+            color: #ffb07a;
+            border: 1px solid rgba(221,132,72,0.35);
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        .list { margin: 0; padding-left: 18px; color: #b0b0b0; }
+        .list li { margin-bottom: 6px; }
+        .split {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .callout {
+            background: #202020;
+            border: 1px dashed #3a3a3a;
+            border-radius: 10px;
+            padding: 14px;
+            color: #a9a9a9;
+        }
+        .kpi {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 10px;
+        }
+        .kpi .item {
+            background: #1c1c1c;
+            border: 1px solid #2a2a2a;
+            border-radius: 10px;
+            padding: 10px 12px;
+        }
+        .kpi .label { color: #8e8e8e; font-size: 12px; }
+        .kpi .value { color: #ffffff; font-weight: 700; font-size: 18px; }
+        .muted { color: #9a9a9a; }
+        .accent { color: #dd8448; }
+        .legend {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .legend .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #202020;
+            border: 1px solid #333;
+            border-radius: 999px;
+            padding: 6px 10px;
+            color: #cfcfcf;
+            font-size: 12px;
+        }
+        .chip .dot { width: 8px; height: 8px; border-radius: 100%; background: #dd8448; display: inline-block; }
+    </style>
+</head>
+<body>
+    <div class="sidebar"></div>
+    <div class="main-content">
+        <h1 class="title">K-Medoids (PAM) Overview <span class="badge">Guide</span></h1>
+        <div class="subtitle">Partitioning Around Medoids: robust centroid-based clustering using actual data points as cluster centers.</div>
+
+        <div class="grid">
+            <div class="card">
+                <h3>Primary Uses</h3>
+                <p>Outlier-robust clustering, customer segmentation with noisy data, image compression with robustness, market research, any scenario where k-means fails due to outliers.</p>
+            </div>
+            <div class="card">
+                <h3>Strengths</h3>
+                <p>Robust to outliers, uses actual data points (interpretable medoids), works with any distance metric, more stable than k-means on noisy data.</p>
+            </div>
+            <div class="card">
+                <h3>Watch-outs</h3>
+                <p>Slower than k-means (O(n²) vs O(nk)), computationally expensive for large datasets, still assumes k is known, may struggle with very large k values.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>How It Works <span class="badge">Short</span></h2>
+            <div class="split">
+                <div>
+                    <p class="muted">Select <span class="accent">k</span> medoids (actual data points). Iterate: assign points to nearest medoid, swap medoids to reduce total distance. PAM algorithm finds optimal medoids through greedy swaps.</p>
+                    <ul class="list">
+                        <li><strong>k</strong>: number of clusters (use elbow method or domain knowledge)</li>
+                        <li><strong>Max Iterations</strong>: stop after N iterations even if not converged</li>
+                        <li><strong>Initialization</strong>: BUILD phase selects initial medoids via distance-based heuristics</li>
+                        <li><strong>PAM</strong>: SWAP phase iteratively improves medoids to minimize total dissimilarity</li>
+                    </ul>
+                </div>
+                <div class="callout">Tip: K-Medoids is preferable over k-means when outliers are present, as medoids are less affected by extreme values than centroids.</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Clustering Statistics <span class="badge">Interpretation</span></h2>
+            <div class="kpi">
+                <div class="item"><div class="label">Clusters Found</div><div class="value">k (user-specified)</div></div>
+                <div class="item"><div class="label">Total Cost</div><div class="value">Sum of distances to medoids (lower = tighter)</div></div>
+                <div class="item"><div class="label">Silhouette</div><div class="value">Separation quality (higher = better, compare across k)</div></div>
+                <div class="item"><div class="label">Total Points</div><div class="value">Dataset size context</div></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Reading the Graphs <span class="badge">2D</span></h2>
+            <ul class="list">
+                <li><strong>Original Data</strong>: raw geometry; identify potential clusters and their count; note any outliers.</li>
+                <li><strong>Clustering Results</strong>: color-coded assignments; medoids shown as larger markers (actual data points); validate separation and robustness.</li>
+                <li><strong>Total Cost vs k</strong>: elbow plot to find optimal k (look for diminishing returns); compare with k-means.</li>
+                <li><strong>Silhouette vs k</strong>: peaks indicate better k values; typically more stable than k-means on noisy data.</li>
+                <li><strong>Iteration Convergence</strong>: total cost decreases per iteration; flat line = converged (may take more iterations than k-means).</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Reading the Graphs <span class="badge">3D</span></h2>
+            <ul class="list">
+                <li><strong>Original 3D</strong>: spatial structure; rotate to inspect cluster shapes and overlap; identify outliers.</li>
+                <li><strong>Clustering 3D</strong>: depth reveals layering; medoids shown as larger 3D markers (actual data points).</li>
+                <li><strong>Total Cost vs k</strong>: same elbow method; expect higher cost values vs 2D for similar scales.</li>
+                <li><strong>Silhouette vs k</strong>: use peaks to validate k choices; 3D often needs more clusters than 2D.</li>
+                <li><strong>Iteration Convergence</strong>: monitor convergence rate; PAM may require more iterations than k-means due to swap complexity.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Parameter Guidance <span class="badge">Best Practice</span></h2>
+            <ul class="list">
+                <li><strong>k</strong>: Start with domain knowledge or use elbow method. Similar to k-means, try k = sqrt(n/2) as heuristic.</li>
+                <li><strong>Max Iterations</strong>: Default 300 usually sufficient; PAM may converge slower than k-means, so increase if needed.</li>
+                <li><strong>Initialization</strong>: BUILD phase uses distance-based selection; multiple random starts can help avoid poor local optima.</li>
+                <li><strong>When to Use</strong>: Prefer over k-means when outliers matter, data is noisy, or you need interpretable cluster centers (actual points).</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Data Preparation <span class="badge">Best Practice</span></h2>
+            <ul class="list">
+                <li>Standardize or normalize features for meaningful distances.</li>
+                <li>K-Medoids is more robust to outliers than k-means, but extreme outliers can still affect results.</li>
+                <li>Works best with spherical clusters; consider spectral clustering or GMM for non-spherical shapes.</li>
+                <li>For very large datasets, consider CLARA (Clustering Large Applications) variant of PAM.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>K-Medoids vs K-means <span class="badge">Comparison</span></h2>
+            <ul class="list">
+                <li><strong>Robustness</strong>: Medoids are actual data points, making PAM more robust to outliers than k-means centroids.</li>
+                <li><strong>Speed</strong>: K-means is faster (O(nk) per iteration) vs PAM (O(n²) for swaps).</li>
+                <li><strong>Cost Function</strong>: PAM minimizes sum of distances to medoids; k-means minimizes squared distances to centroids.</li>
+                <li><strong>Initialization</strong>: PAM BUILD phase is deterministic; k-means++ is probabilistic but faster.</li>
+                <li><strong>Interpretability</strong>: Medoids are real data points (interpretable); centroids may not correspond to actual data.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Common Pitfalls <span class="badge">Avoid</span></h2>
+            <ul class="list">
+                <li>Choosing k too high → overfitting, too low → underfitting (use validation metrics).</li>
+                <li>Using on very large datasets → slow convergence (consider CLARA variant or subsampling).</li>
+                <li>Not standardizing → features with larger scales dominate distance calculations.</li>
+                <li>Expecting spherical clusters → PAM still favors compact, well-separated clusters.</li>
+            </ul>
+        </div>
+    </div>
+    <script src="../sidebar.js"></script>
+</body>
+</html>
+

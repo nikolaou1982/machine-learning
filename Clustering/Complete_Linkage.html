@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Interactive Complete Linkage implementation in 2D. Visualize and experiment with this clustering algorithm using real-time charts and data analysis tools.">
+  <link rel="canonical" href="https://yourdomain.com/Clustering/Complete_Linkage.html">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Complete Linkage (2D) - Interactive Implementation | Clustering | ML Tools",
+  "description": "Interactive Complete Linkage implementation in 2D. Visualize and experiment with this clustering algorithm using real-time charts and data analysis tools.",
+  "url": "https://yourdomain.com/Clustering/Complete_Linkage.html",
+  "about": {
+    "@type": "Thing",
+    "name": "Complete Linkage",
+    "description": "Complete Linkage algorithm for clustering"
+  }
+}
+  </script>
+    <title>Complete Linkage (2D) - Interactive Implementation | Clustering | ML Tools</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            color: #676767;
+            background-color: #1e1e1e;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #171717;
+            padding: 30px 20px;
+            border-right: 1px solid #333;
+            overflow-y: auto;
+            height: 100vh;
+        }
+        .sidebar h1 { color: white; font-size: 1.8rem; font-weight: bold; margin-bottom: 30px; text-align: center; }
+        .nav-section { margin-bottom: 30px; }
+        .nav-section h3 { color: #dd8448; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px; }
+        .nav-item { display: block; color: #676767; text-decoration: none; padding: 12px 15px; margin-bottom: 5px; border-radius: 8px; transition: all 0.3s ease; font-weight: 500; }
+        .nav-item:hover { background-color: #2d2d2d; color: white; transform: translateX(5px); }
+        .nav-item.active { background-color: #dd8448; color: white; }
+        .nav-category { margin-bottom: 20px; }
+        .nav-category-header { color: #dd8448; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; padding: 10px 15px; cursor: pointer; border-radius: 8px; transition: background-color 0.3s ease; display: flex; justify-content: space-between; align-items: center; letter-spacing: 1px; }
+        .nav-category-header:hover { background-color: #2d2d2d; }
+        .nav-category-header .arrow { transition: transform 0.3s ease; font-size: 0.7rem; }
+        .nav-category-header.collapsed .arrow { transform: rotate(-90deg); }
+        .nav-subcategory { margin-left: 15px; margin-top: 10px; overflow: hidden; max-height: 1200px; transition: max-height 0.3s ease; }
+        .nav-subcategory.collapsed { max-height: 0; }
+        .nav-subheader { color: #999; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; padding: 8px 15px; margin-top: 5px; letter-spacing: 0.5px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-radius: 6px; transition: background-color 0.3s ease; }
+        .nav-subheader:hover { background-color: #2d2d2d; }
+        .nav-subheader .arrow { font-size: 0.6rem; transition: transform 0.3s ease; }
+        .nav-subheader.collapsed .arrow { transform: rotate(-90deg); }
+        .nav-subheader.category-header { color: #dd8448; font-size: 0.85rem; font-weight: 700; padding: 10px 15px; margin-top: 8px; letter-spacing: 1px; border: 1px solid rgba(221,132,72,0.3); }
+        .nav-subheader.category-header:hover { background-color: rgba(221,132,72,0.15); border-color: rgba(221,132,72,0.5); }
+        .nav-subgroup { overflow: hidden; max-height: 200px; transition: max-height 0.3s ease; padding-bottom: 5px; }
+        .nav-subgroup.collapsed { max-height: 0; }
+        .nav-subgroup.category-group { max-height: 1000px; }
+        .nav-subgroup.category-group.collapsed { max-height: 0; }
+        .nav-subheader.nested { margin-left: 10px; font-size: 0.7rem; }
+        .nav-subgroup.nested { margin-left: 10px; max-height: 200px; overflow: hidden; transition: max-height 0.3s ease; padding-bottom: 5px; }
+        .nav-subgroup.nested.collapsed { max-height: 0; }
+        .nav-subheader.subcategory-header { color: #999; font-size: 0.75rem; font-weight: 600; padding: 8px 15px; margin-left: 10px; margin-top: 5px; letter-spacing: 0.5px; border: 1px solid rgba(153, 153, 153, 0.2); }
+        .nav-subheader.subcategory-header:hover { background-color: rgba(45, 45, 45, 0.5); border-color: rgba(153, 153, 153, 0.4); }
+        .nav-subgroup.subcategory-group { margin-left: 10px; max-height: 800px; overflow: hidden; transition: max-height 0.3s ease; padding-bottom: 5px; }
+        .nav-subgroup.subcategory-group.collapsed { max-height: 0; }
+        .nav-item.sub { padding: 8px 15px; font-size: 0.9rem; margin-left: 10px; margin-bottom: 5px; }
+        .main-content { flex: 1; padding: 20px; }
+        .main-title { color: white; font-size: 2.5rem; font-weight: bold; margin-bottom: 10px; text-align: center; }
+        .subtitle { color: #676767; font-size: 1rem; margin-bottom: 30px; text-align: center; }
+        .controls-container { display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap; }
+        .control-group { background-color: #171717; padding: 20px; border-radius: 12px; border: 1px solid #333; min-width: 200px; box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset; }
+        .control-group h3 { color: white; font-size: 1.1rem; margin-bottom: 15px; font-weight: 600; margin-top: 0; padding-bottom: 8px; border-bottom: 1px solid #2a2a2a; }
+        .control-item { margin-bottom: 15px; }
+        .control-item label { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: #676767; margin-bottom: 5px; font-weight: 500; }
+        #k-value, #max-iter-value { display: inline-block; background: rgba(221,132,72,0.15); color: #ffb07a; border: 1px solid rgba(221,132,72,0.35); padding: 2px 8px; border-radius: 999px; font-size: 12px; line-height: 18px; }
+        input[type="range"]::-webkit-slider-thumb { background: #dd8448; }
+        input[type="range"] { accent-color: #dd8448; }
+        .control-item input[type="number"] { max-width: 110px; }
+        .toggle-btn { display: inline-flex; align-items: center; gap: 6px; background-color: #353535; color: white; border: 1px solid #555; border-radius: 4px; padding: 4px 8px; font-size: 12px; cursor: pointer; margin-left: 10px; }
+        .toggle-btn.active { background-color: #dd8448; border-color: #dd8448; }
+        .toggle-btn::after { content: 'custom'; font-size: 10px; opacity: 0.8; }
+        .control-item input, .control-item select { width: 100%; padding: 8px 12px; background-color: #2d2d2d; border: 1px solid #444; border-radius: 6px; color: white; font-family: 'Nunito', sans-serif; }
+        .control-item input:focus, .control-item select:focus { outline: none; border-color: #dd8448; }
+        .custom-input { width: 80px; margin-top: 5px; display: none; }
+        :root { --electric-border-color: #dd8448; --electric-light-color: #ff9f5a; --gradient-color: rgba(221, 132, 72, 0.4); --color-neutral-900: #2d2d2d; }
+        .control-group.csv-format { padding: 2px; background: linear-gradient(-30deg, var(--gradient-color), transparent, var(--gradient-color)), linear-gradient(to bottom, var(--color-neutral-900), var(--color-neutral-900)); position: relative; }
+        .control-group.csv-format::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border: 1px solid rgba(221, 132, 72, 0.5); border-radius: 12px; pointer-events: none; }
+        .control-group.csv-format::after { content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px; border: 1px solid var(--electric-border-color); border-radius: 12px; pointer-events: none; }
+        .csv-glow-1, .csv-glow-2 { position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 12px; pointer-events: none; }
+        .csv-glow-1 { border: 1px solid rgba(221,132,72,0.6); filter: blur(1px); }
+        .csv-glow-2 { border: 1px solid var(--electric-light-color); filter: blur(3px); }
+        .csv-info-card { background: #171717; border-radius: 10px; padding: 16px; margin: 2px; position: relative; z-index: 10; }
+        .csv-badge { background: rgba(255,255,255,0.1); border-radius: 8px; padding: 4px 8px; font-size: 10px; font-weight: bold; text-transform: uppercase; color: rgba(255,255,255,0.8); width: fit-content; border: 1px solid rgba(255,255,255,0.2); }
+        .csv-title { color: white; font-size: 16px; font-weight: 600; margin: 8px 0 4px 0; }
+        .csv-desc { color: rgba(255,255,255,0.6); font-size: 11px; line-height: 1.3; }
+        .stats-container { background-color: #171717; padding: 20px; border-radius: 12px; border: 1px solid #333; margin-bottom: 30px; }
+        .stats-container h3 { color: white; margin-bottom: 15px; font-weight: 600; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
+        .stat-item { background-color: #2d2d2d; padding: 15px; border-radius: 8px; text-align: center; }
+        .stat-value { color: #dd8448; font-size: 1.5rem; font-weight: bold; display: block; }
+        .stat-label { color: #676767; font-size: 0.9rem; margin-top: 5px; }
+        .plots-container { display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap; }
+        .plot-wrapper { background-color: #171717; border-radius: 12px; border: 1px solid #333; padding: 20px; flex: 1; min-width: 400px; }
+        .plot-wrapper h3 { color: white; margin-bottom: 15px; font-weight: 600; }
+        .plot-wrapper #original-plot, .plot-wrapper #clustered-plot, .plot-wrapper #dendrogram-plot, .plot-wrapper #distance-matrix-plot, .plot-wrapper #linkage-plot, .plot-wrapper #silhouette-plot { height: 500px; }
+        .plot-wrapper #dendrogram-plot { height: 600px; }
+        #n-clusters-value, #cutoff-value { display: inline-block; background: rgba(221,132,72,0.15); color: #ffb07a; border: 1px solid rgba(221,132,72,0.35); padding: 2px 8px; border-radius: 999px; font-size: 12px; line-height: 18px; }
+        .btn { background-color: #ffffff; color: #171717; border: 1px solid #444; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; font-family: 'Nunito', sans-serif; transition: background-color 0.2s ease, border-color 0.2s ease; display: inline-flex; align-items: center; gap: 8px; }
+        .btn:hover { background-color: #f0f0f0; border-color: #666; }
+        .control-group .btn { margin-right: 10px; }
+        .control-group.actions .btn { background-color: #dd8448; color: white; border: 1px solid #dd8448; display: block; width: 100%; margin-right: 0; margin-bottom: 10px; }
+        .control-group.actions .btn:hover { background-color: #c67339; }
+    </style>
+</head>
+<body>
+    <div class="sidebar"></div>
+    <div class="main-content">
+        <h1 class="main-title">2D Complete Linkage Clustering</h1>
+        <p class="subtitle">Hierarchical clustering using maximum distance linkage — create dendrograms and explore cluster hierarchies!</p>
+    
+    <div class="controls-container">
+        <div class="control-group">
+            <h3>Dataset</h3>
+            <div class="control-item">
+                <label for="dataset-select">Select Dataset:</label>
+                <select id="dataset-select">
+                    <option value="0">Blobs</option>
+                    <option value="1">Circles</option>
+                    <option value="2">Random</option>
+                    <option value="custom">Custom CSV Data</option>
+                </select>
+            </div>
+            <div class="control-item">
+                <input type="file" id="file-input" accept=".csv" style="display: none;" onchange="loadCSV(event)">
+                <label for="file-input" style="display: inline-block; background-color: #2d2d2d; color: white; padding: 10px 20px; border-radius: 6px; border: 2px dashed #444; cursor: pointer; transition: all 0.3s ease; font-weight: 500;">📁 Upload CSV</label>
+            </div>
+        </div>
+        
+        <div class="control-group csv-format">
+            <div class="csv-glow-1"></div>
+            <div class="csv-glow-2"></div>
+            <div class="csv-info-card">
+                <div class="csv-badge">Format</div>
+                <div class="csv-title">CSV Upload</div>
+                <div class="csv-desc">
+                    Two numeric columns required<br>
+                    Example: x,y<br>
+                    1.0,2.3<br>
+                    3.1,4.2
+                </div>
+            </div>
+        </div>
+        
+        <div class="control-group">
+            <h3>Complete Linkage Parameters</h3>
+            <div class="control-item">
+                <label for="n-clusters-slider">Number of Clusters: <span id="n-clusters-value">3</span></label>
+                <input type="range" id="n-clusters-slider" min="2" max="10" step="1" value="3">
+            </div>
+            <div class="control-item">
+                <label for="distance-metric">Distance Metric:</label>
+                <select id="distance-metric">
+                    <option value="euclidean">Euclidean</option>
+                    <option value="manhattan">Manhattan</option>
+                    <option value="cosine">Cosine</option>
+                </select>
+            </div>
+            <div class="control-item">
+                <label for="cutoff-slider">Dendrogram Cutoff: <span id="cutoff-value">0.5</span></label>
+                <input type="range" id="cutoff-slider" min="0.1" max="5.0" step="0.1" value="0.5">
+            </div>
+        </div>
+        
+        <div class="control-group actions">
+            <h3>Actions</h3>
+            <button class="btn" onclick="generateNewData()">Generate New Data</button>
+            <button class="btn" onclick="runCompleteLinkage()">Run Complete Linkage</button>
+            <button class="btn" onclick="exportResults()">Export Results</button>
+            <button class="btn" onclick="downloadPlot()">Download Plot</button>
+        </div>
+    </div>
+    
+    <div class="stats-container">
+        <h3>Clustering Statistics</h3>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <span class="stat-value" id="clusters-metric">-</span>
+                <div class="stat-label">Clusters Found</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="cophenetic-metric">-</span>
+                <div class="stat-label">Cophenetic Correlation</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="silhouette-metric">-</span>
+                <div class="stat-label">Silhouette Score</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="total-points-metric">-</span>
+                <div class="stat-label">Total Points</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="plots-container">
+        <div class="plot-wrapper">
+            <h3>Original Data</h3>
+            <div id="original-plot"></div>
+        </div>
+        <div class="plot-wrapper">
+            <h3>Clustering Results</h3>
+            <div id="clustered-plot"></div>
+        </div>
+    </div>
+
+    <div class="plots-container">
+        <div class="plot-wrapper">
+            <h3>Dendrogram</h3>
+            <div id="dendrogram-plot"></div>
+        </div>
+        <div class="plot-wrapper">
+            <h3>Distance Matrix</h3>
+            <div id="distance-matrix-plot"></div>
+        </div>
+    </div>
+
+    <div class="plots-container">
+        <div class="plot-wrapper">
+            <h3>Linkage Distance Evolution</h3>
+            <div id="linkage-plot"></div>
+        </div>
+        <div class="plot-wrapper">
+            <h3>Silhouette Analysis</h3>
+            <div id="silhouette-plot"></div>
+        </div>
+    </div>
+
+<script>
+    class CompleteLinkage {
+        constructor(distanceMetric = 'euclidean') {
+            this.distanceMetric = distanceMetric;
+            this.linkageMatrix = [];
+            this.dendrogram = null;
+            this.distanceMatrix = null;
+            this.labels = null;
+            this.copheneticCorrelation = null;
+        }
+
+        distance(a, b) {
+            if (this.distanceMetric === 'euclidean') {
+                return Math.hypot(a[0] - b[0], a[1] - b[1]);
+            } else if (this.distanceMetric === 'manhattan') {
+                return Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
+            } else if (this.distanceMetric === 'cosine') {
+                const dot = a[0] * b[0] + a[1] * b[1];
+                const normA = Math.sqrt(a[0] * a[0] + a[1] * a[1]);
+                const normB = Math.sqrt(b[0] * b[0] + b[1] * b[1]);
+                return 1 - (dot / (normA * normB || 1));
+            }
+            return Math.hypot(a[0] - b[0], a[1] - b[1]);
+        }
+
+        // Calculate distance matrix
+        computeDistanceMatrix(X) {
+            const n = X.length;
+            const distMatrix = Array.from({length: n}, () => new Array(n).fill(0));
+            
+            for (let i = 0; i < n; i++) {
+                for (let j = i + 1; j < n; j++) {
+                    const dist = this.distance(X[i], X[j]);
+                    distMatrix[i][j] = dist;
+                    distMatrix[j][i] = dist;
+                }
+            }
+            
+            return distMatrix;
+        }
+
+        // Complete linkage: maximum distance between clusters
+        completeLinkageDistance(cluster1, cluster2, distMatrix) {
+            let maxDist = -Infinity;
+            for (const i of cluster1) {
+                for (const j of cluster2) {
+                    if (i !== j) {
+                        maxDist = Math.max(maxDist, distMatrix[i][j]);
+                    }
+                }
+            }
+            return maxDist;
+        }
+
+        fit(X, nClusters = null) {
+            const n = X.length;
+            this.distanceMatrix = this.computeDistanceMatrix(X);
+            
+            // Initialize: each point is its own cluster
+            let clusters = Array.from({length: n}, (_, i) => [i]);
+            this.linkageMatrix = [];
+            
+            // Agglomerative clustering
+            while (clusters.length > 1) {
+                let minDist = Infinity;
+                let mergeI = -1, mergeJ = -1;
+                
+                // Find closest pair of clusters
+                for (let i = 0; i < clusters.length; i++) {
+                    for (let j = i + 1; j < clusters.length; j++) {
+                        const dist = this.completeLinkageDistance(clusters[i], clusters[j], this.distanceMatrix);
+                        if (dist < minDist) {
+                            minDist = dist;
+                            mergeI = i;
+                            mergeJ = j;
+                        }
+                    }
+                }
+                
+                if (mergeI === -1 || mergeJ === -1) break;
+                
+                // Record merge (store cluster contents)
+                const mergedSize = clusters[mergeI].length + clusters[mergeJ].length;
+                this.linkageMatrix.push({
+                    left: mergeI,
+                    right: mergeJ,
+                    distance: minDist,
+                    size: mergedSize,
+                    leftCluster: [...clusters[mergeI]],
+                    rightCluster: [...clusters[mergeJ]]
+                });
+                
+                // Merge clusters
+                const merged = [...clusters[mergeI], ...clusters[mergeJ]];
+                clusters.splice(Math.max(mergeI, mergeJ), 1);
+                clusters.splice(Math.min(mergeI, mergeJ), 1);
+                clusters.push(merged);
+                
+                // Stop if we have desired number of clusters
+                if (nClusters && clusters.length === nClusters) {
+                    break;
+                }
+            }
+            
+            // Build dendrogram structure
+            this.buildDendrogram(X.length);
+            
+            // Calculate cophenetic correlation
+            this.calculateCopheneticCorrelation();
+            
+            return this;
+        }
+
+        buildDendrogram(n) {
+            // Build tree structure for dendrogram visualization
+            const nodes = Array.from({length: n}, (_, i) => ({id: i, left: null, right: null, height: 0, size: 1}));
+            let nextNodeId = n;
+            
+            for (const merge of this.linkageMatrix) {
+                const leftNode = merge.left < n ? nodes[merge.left] : 
+                    (this.linkageMatrix.find(m => m.left === merge.left || m.right === merge.left) || nodes[merge.left]);
+                const rightNode = merge.right < n ? nodes[merge.right] : 
+                    (this.linkageMatrix.find(m => m.left === merge.right || m.right === merge.right) || nodes[merge.right]);
+                
+                const newNode = {
+                    id: nextNodeId++,
+                    left: leftNode,
+                    right: rightNode,
+                    height: merge.distance,
+                    size: merge.size
+                };
+                nodes.push(newNode);
+            }
+            
+            this.dendrogram = nodes[nodes.length - 1];
+        }
+
+        // Get labels by cutting dendrogram at specified distance
+        getLabelsAtDistance(cutoffDistance) {
+            const n = this.distanceMatrix.length;
+            
+            // Rebuild clusters up to cutoff distance
+            let clusters = Array.from({length: n}, (_, i) => new Set([i]));
+            
+            for (const merge of this.linkageMatrix) {
+                if (merge.distance > cutoffDistance) break;
+                
+                // Find clusters containing points from leftCluster and rightCluster
+                let leftClusterSet = null, rightClusterSet = null;
+                for (const cluster of clusters) {
+                    if (merge.leftCluster && merge.leftCluster.some(p => cluster.has(p))) {
+                        leftClusterSet = cluster;
+                    }
+                    if (merge.rightCluster && merge.rightCluster.some(p => cluster.has(p))) {
+                        rightClusterSet = cluster;
+                    }
+                    if (leftClusterSet && rightClusterSet && leftClusterSet !== rightClusterSet) break;
+                }
+                
+                if (leftClusterSet && rightClusterSet && leftClusterSet !== rightClusterSet) {
+                    // Merge the two clusters
+                    merge.rightCluster.forEach(p => leftClusterSet.add(p));
+                    clusters = clusters.filter(c => c !== rightClusterSet);
+                }
+            }
+            
+            // Assign labels
+            const labels = new Array(n).fill(-1);
+            let labelId = 0;
+            for (const cluster of clusters) {
+                for (const idx of cluster) {
+                    labels[idx] = labelId;
+                }
+                labelId++;
+            }
+            
+            return labels;
+        }
+
+        // Get labels by number of clusters
+        getLabelsAtNClusters(nClusters) {
+            const n = this.distanceMatrix.length;
+            if (nClusters >= n) {
+                return Array.from({length: n}, (_, i) => i);
+            }
+            
+            // Build clusters from linkage matrix (stop when we have nClusters)
+            let clusters = Array.from({length: n}, (_, i) => new Set([i]));
+            
+            for (let m = 0; m < this.linkageMatrix.length && clusters.length > nClusters; m++) {
+                const merge = this.linkageMatrix[m];
+                
+                // Find clusters containing the points from leftCluster and rightCluster
+                let leftClusterSet = null, rightClusterSet = null;
+                for (const cluster of clusters) {
+                    if (merge.leftCluster && merge.leftCluster.some(p => cluster.has(p))) {
+                        leftClusterSet = cluster;
+                    }
+                    if (merge.rightCluster && merge.rightCluster.some(p => cluster.has(p))) {
+                        rightClusterSet = cluster;
+                    }
+                    if (leftClusterSet && rightClusterSet && leftClusterSet !== rightClusterSet) break;
+                }
+                
+                if (leftClusterSet && rightClusterSet && leftClusterSet !== rightClusterSet) {
+                    // Merge the two clusters
+                    merge.rightCluster.forEach(p => leftClusterSet.add(p));
+                    clusters = clusters.filter(c => c !== rightClusterSet);
+                }
+            }
+            
+            // Assign labels
+            const labels = new Array(n).fill(-1);
+            let labelId = 0;
+            for (const cluster of clusters) {
+                for (const idx of cluster) {
+                    labels[idx] = labelId;
+                }
+                labelId++;
+            }
+            
+            return labels;
+        }
+
+        calculateCopheneticCorrelation() {
+            const n = this.distanceMatrix.length;
+            const originalDistances = [];
+            const copheneticDistances = [];
+            
+            // Build cophenetic distance matrix - distance at which each pair merged
+            for (let i = 0; i < n; i++) {
+                for (let j = i + 1; j < n; j++) {
+                    // Find when i and j were merged
+                    let mergeDistance = Infinity;
+                    for (const merge of this.linkageMatrix) {
+                        const leftHasI = merge.leftCluster && merge.leftCluster.includes(i);
+                        const leftHasJ = merge.leftCluster && merge.leftCluster.includes(j);
+                        const rightHasI = merge.rightCluster && merge.rightCluster.includes(i);
+                        const rightHasJ = merge.rightCluster && merge.rightCluster.includes(j);
+                        
+                        // If i and j are in different clusters that merge, record the distance
+                        if ((leftHasI && rightHasJ) || (rightHasI && leftHasJ)) {
+                            mergeDistance = merge.distance;
+                            break;
+                        }
+                    }
+                    
+                    if (mergeDistance === Infinity) mergeDistance = 0; // Same point or error
+                    
+                    originalDistances.push(this.distanceMatrix[i][j]);
+                    copheneticDistances.push(mergeDistance);
+                }
+            }
+            
+            // Calculate correlation coefficient
+            if (originalDistances.length === 0) {
+                this.copheneticCorrelation = 0;
+                return;
+            }
+            
+            const meanOrig = originalDistances.reduce((a, b) => a + b, 0) / originalDistances.length;
+            const meanCoph = copheneticDistances.reduce((a, b) => a + b, 0) / copheneticDistances.length;
+            
+            let numerator = 0, denomOrig = 0, denomCoph = 0;
+            for (let i = 0; i < originalDistances.length; i++) {
+                const diffOrig = originalDistances[i] - meanOrig;
+                const diffCoph = copheneticDistances[i] - meanCoph;
+                numerator += diffOrig * diffCoph;
+                denomOrig += diffOrig * diffOrig;
+                denomCoph += diffCoph * diffCoph;
+            }
+            
+            this.copheneticCorrelation = numerator / (Math.sqrt(denomOrig) * Math.sqrt(denomCoph) || 1);
+        }
+    }
+
+    function generateBlobs() {
+        const data = [], centers = [[2,2],[-2,-2],[2,-2]];
+        centers.forEach(c => {
+            for (let i = 0; i < 100; i++)
+                data.push([c[0] + (Math.random() - 0.5) * 1.5, c[1] + (Math.random() - 0.5) * 1.5]);
+        });
+        return data;
+    }
+
+    function generateCircles() {
+        const data = [];
+        for (let i = 0; i < 150; i++) {
+            const t = Math.random() * 2 * Math.PI;
+            const r = 2 + Math.random() * 0.5;
+            data.push([r * Math.cos(t), r * Math.sin(t)]);
+        }
+        for (let i = 0; i < 100; i++) {
+            const t = Math.random() * 2 * Math.PI;
+            const r = 0.5 + Math.random() * 0.3;
+            data.push([r * Math.cos(t), r * Math.sin(t)]);
+        }
+        return data;
+    }
+
+    function generateRandom() {
+        const data = [];
+        for (let i = 0; i < 300; i++) {
+            data.push([(Math.random() - 0.5) * 6, (Math.random() - 0.5) * 6]);
+        }
+        return data;
+    }
+
+    const datasets = [generateBlobs(), generateCircles(), generateRandom()];
+    const names = ["Blobs", "Circles", "Random"];
+    let customData = null;
+
+    function standardizeData(data) {
+        const n = data.length;
+        const meanX = data.reduce((s, p) => s + p[0], 0) / n;
+        const meanY = data.reduce((s, p) => s + p[1], 0) / n;
+        const stdX = Math.sqrt(data.reduce((s, p) => s + Math.pow(p[0]-meanX,2), 0) / n);
+        const stdY = Math.sqrt(data.reduce((s, p) => s + Math.pow(p[1]-meanY,2), 0) / n);
+        return data.map(p => [(p[0]-meanX)/stdX, (p[1]-meanY)/stdY]);
+    }
+
+    function calculateSilhouetteScore(data, labels) {
+        const uniqueLabels = [...new Set(labels)];
+        if (uniqueLabels.length < 2) return 0;
+        let total = 0, count = 0;
+        for (let i = 0; i < data.length; i++) {
+            const same = data.filter((_, j) => labels[j] === labels[i] && j !== i);
+            if (!same.length) continue;
+            const a = same.reduce((s, p) => s + Math.hypot(data[i][0]-p[0], data[i][1]-p[1]), 0)/same.length;
+            let b = Infinity;
+            for (const l of uniqueLabels) {
+                if (l === labels[i]) continue;
+                const other = data.filter((_, j) => labels[j] === l);
+                if (!other.length) continue;
+                const d = other.reduce((s, p) => s + Math.hypot(data[i][0]-p[0], data[i][1]-p[1]), 0)/other.length;
+                b = Math.min(b, d);
+            }
+            if (b !== Infinity) {
+                total += (b - a) / Math.max(a, b);
+                count++;
+            }
+        }
+        return count ? total / count : 0;
+    }
+
+    function updateMetrics(data, labels, cophenetic) {
+        const clusters = [...new Set(labels)].length;
+        const silhouette = calculateSilhouetteScore(data, labels);
+        document.getElementById('clusters-metric').textContent = clusters;
+        document.getElementById('cophenetic-metric').textContent = cophenetic !== null ? cophenetic.toFixed(3) : '-';
+        document.getElementById('silhouette-metric').textContent = silhouette.toFixed(3);
+        document.getElementById('total-points-metric').textContent = data.length;
+    }
+
+    function getNClusters() {
+        return parseInt(document.getElementById('n-clusters-slider').value);
+    }
+
+    function getCutoff() {
+        return parseFloat(document.getElementById('cutoff-slider').value);
+    }
+
+    function getDistanceMetric() {
+        return document.getElementById('distance-metric').value;
+    }
+
+    let currentCompleteLinkage = null;
+
+    function runCompleteLinkage() {
+        const datasetIndex = document.getElementById('dataset-select').value;
+        const nClusters = getNClusters();
+        const distanceMetric = getDistanceMetric();
+        let data = datasetIndex === 'custom' ? customData : datasets[parseInt(datasetIndex)];
+        if (!data) return;
+        data = standardizeData(data);
+        
+        currentCompleteLinkage = new CompleteLinkage(distanceMetric);
+        currentCompleteLinkage.fit(data);
+        
+        const labels = currentCompleteLinkage.getLabelsAtNClusters(nClusters);
+        currentCompleteLinkage.labels = labels;
+        
+        updateMetrics(data, labels, currentCompleteLinkage.copheneticCorrelation);
+        plotAll(data, currentCompleteLinkage, labels, datasetIndex === 'custom' ? 'Custom Data' : names[parseInt(datasetIndex)]);
+    }
+
+    function plotAll(data, cl, labels, title) {
+        plotOriginalData(data, title);
+        plotClusteredData(data, labels, title);
+        plotDendrogram(cl);
+        plotDistanceMatrix(cl.distanceMatrix);
+        plotLinkageEvolution(cl.linkageMatrix);
+        plotSilhouetteAnalysis(data, labels);
+    }
+
+    function plotOriginalData(data, title) {
+        Plotly.newPlot('original-plot', [{
+            x: data.map(p => p[0]),
+            y: data.map(p => p[1]),
+            mode: 'markers',
+            type: 'scatter',
+            marker: {color: 'lightblue', size: 6}
+        }], {
+            title: `Original Data: ${title}`,
+            paper_bgcolor: '#171717',
+            plot_bgcolor: '#171717',
+            font: {color: 'white'},
+            xaxis: {title: 'X'},
+            yaxis: {title: 'Y'}
+        });
+    }
+
+    function plotClusteredData(data, labels, title) {
+        const colors = ['red', 'blue', 'green', 'orange', 'purple', 'brown', 'pink', 'gray', 'olive', 'cyan', 'magenta', 'yellow', 'teal', 'navy', 'maroon'];
+        const traces = [];
+        const unique = [...new Set(labels)];
+        
+        unique.forEach(l => {
+            const d = data.filter((_, i) => labels[i] === l);
+            traces.push({
+                x: d.map(p => p[0]),
+                y: d.map(p => p[1]),
+                mode: 'markers',
+                type: 'scatter',
+                marker: {color: colors[l % colors.length], size: 6},
+                name: `Cluster ${l + 1}`
+            });
+        });
+        
+        Plotly.newPlot('clustered-plot', traces, {
+            title: `Complete Linkage Results: ${title}`,
+            paper_bgcolor: '#171717',
+            plot_bgcolor: '#171717',
+            font: {color: 'white'},
+            xaxis: {title: 'X'},
+            yaxis: {title: 'Y'}
+        });
+    }
+
+    function plotDendrogram(cl) {
+        if (!cl.linkageMatrix || cl.linkageMatrix.length === 0) return;
+        
+        const n = cl.distanceMatrix.length;
+        const traces = [];
+        
+        // Build tree structure for dendrogram
+        const nodePositions = new Map(); // node ID -> {x, y}
+        let nextX = 0;
+        
+        // Assign initial x positions to leaves (original points)
+        for (let i = 0; i < n; i++) {
+            nodePositions.set(i, {x: nextX++, y: 0});
+        }
+        
+        // Process merges to build tree
+        let nextNodeId = n;
+        const mergeNodes = new Map(); // merge index -> node ID
+        
+        for (let m = 0; m < cl.linkageMatrix.length; m++) {
+            const merge = cl.linkageMatrix[m];
+            
+            // Get x positions of merged clusters
+            let leftX = 0, rightX = 0;
+            
+            // Find x positions by looking at which original points are in each cluster
+            if (merge.leftCluster && merge.leftCluster.length > 0) {
+                const leftPositions = merge.leftCluster.map(p => nodePositions.get(p)?.x || 0);
+                leftX = leftPositions.reduce((a, b) => a + b, 0) / leftPositions.length;
+            }
+            
+            if (merge.rightCluster && merge.rightCluster.length > 0) {
+                const rightPositions = merge.rightCluster.map(p => nodePositions.get(p)?.x || 0);
+                rightX = rightPositions.reduce((a, b) => a + b, 0) / rightPositions.length;
+            }
+            
+            const midX = (leftX + rightX) / 2;
+            const height = merge.distance;
+            
+            // Create lines for this merge
+            traces.push({
+                x: [leftX, leftX, midX],
+                y: [0, height, height],
+                mode: 'lines',
+                type: 'scatter',
+                line: {color: '#dd8448', width: 2},
+                showlegend: false,
+                hoverinfo: 'skip'
+            });
+            
+            traces.push({
+                x: [rightX, rightX, midX],
+                y: [0, height, height],
+                mode: 'lines',
+                type: 'scatter',
+                line: {color: '#dd8448', width: 2},
+                showlegend: false,
+                hoverinfo: 'skip'
+            });
+            
+            // Update positions for merged points
+            const mergedPoints = [...merge.leftCluster, ...merge.rightCluster];
+            mergedPoints.forEach(p => {
+                const pos = nodePositions.get(p);
+                if (pos) {
+                    pos.y = height;
+                }
+            });
+            
+            // Store merge node position
+            mergeNodes.set(m, {x: midX, y: height});
+        }
+        
+        // Add cutoff line
+        const cutoff = getCutoff();
+        traces.push({
+            x: [0, n - 1],
+            y: [cutoff, cutoff],
+            mode: 'lines',
+            type: 'scatter',
+            line: {color: '#4caf50', width: 2, dash: 'dash'},
+            name: 'Cutoff',
+            hoverinfo: 'skip'
+        });
+        
+        Plotly.newPlot('dendrogram-plot', traces, {
+            title: 'Dendrogram',
+            paper_bgcolor: '#171717',
+            plot_bgcolor: '#171717',
+            font: {color: 'white'},
+            xaxis: {title: 'Sample Index', showticklabels: false},
+            yaxis: {title: 'Linkage Distance'}
+        });
+    }
+
+    function plotDistanceMatrix(distMatrix) {
+        const n = distMatrix.length;
+        const z = [];
+        const x = Array.from({length: n}, (_, i) => i);
+        const y = Array.from({length: n}, (_, i) => i);
+        
+        for (let i = 0; i < n; i++) {
+            z.push(distMatrix[i]);
+        }
+        
+        Plotly.newPlot('distance-matrix-plot', [{
+            z: z,
+            x: x,
+            y: y,
+            type: 'heatmap',
+            colorscale: 'Viridis',
+            showscale: true
+        }], {
+            title: 'Distance Matrix',
+            paper_bgcolor: '#171717',
+            plot_bgcolor: '#171717',
+            font: {color: 'white'},
+            xaxis: {title: 'Point Index'},
+            yaxis: {title: 'Point Index'}
+        });
+    }
+
+    function plotLinkageEvolution(linkageMatrix) {
+        if (!linkageMatrix || linkageMatrix.length === 0) return;
+        
+        const steps = linkageMatrix.map((_, i) => i + 1);
+        const distances = linkageMatrix.map(m => m.distance);
+        
+        Plotly.newPlot('linkage-plot', [{
+            x: steps,
+            y: distances,
+            mode: 'lines+markers',
+            type: 'scatter',
+            line: {color: '#dd8448'},
+            marker: {color: '#dd8448', size: 8},
+            name: 'Linkage Distance'
+        }], {
+            title: 'Linkage Distance Evolution',
+            paper_bgcolor: '#171717',
+            plot_bgcolor: '#171717',
+            font: {color: 'white'},
+            xaxis: {title: 'Merge Step'},
+            yaxis: {title: 'Distance'}
+        });
+    }
+
+    function plotSilhouetteAnalysis(data, labels) {
+        const uniqueLabels = [...new Set(labels)];
+        if (uniqueLabels.length < 2) return;
+        
+        const silhouetteScores = [];
+        const pointLabels = [];
+        
+        for (let i = 0; i < data.length; i++) {
+            const same = data.filter((_, j) => labels[j] === labels[i] && j !== i);
+            if (!same.length) continue;
+            
+            const a = same.reduce((s, p) => s + Math.hypot(data[i][0] - p[0], data[i][1] - p[1]), 0) / same.length;
+            let b = Infinity;
+            
+            for (const l of uniqueLabels) {
+                if (l === labels[i]) continue;
+                const other = data.filter((_, j) => labels[j] === l);
+                if (!other.length) continue;
+                const d = other.reduce((s, p) => s + Math.hypot(data[i][0] - p[0], data[i][1] - p[1]), 0) / other.length;
+                b = Math.min(b, d);
+            }
+            
+            if (b !== Infinity) {
+                const score = (b - a) / Math.max(a, b);
+                silhouetteScores.push(score);
+                pointLabels.push(i);
+            }
+        }
+        
+        Plotly.newPlot('silhouette-plot', [{
+            x: pointLabels,
+            y: silhouetteScores,
+            type: 'bar',
+            marker: {color: silhouetteScores.map(s => s >= 0 ? '#4caf50' : '#f44336')}
+        }], {
+            title: 'Silhouette Analysis',
+            paper_bgcolor: '#171717',
+            plot_bgcolor: '#171717',
+            font: {color: 'white'},
+            xaxis: {title: 'Sample Index'},
+            yaxis: {title: 'Silhouette Score', range: [-1, 1]}
+        });
+    }
+
+    // Complete Linkage controls
+    document.getElementById('n-clusters-slider').addEventListener('input', e => {
+        document.getElementById('n-clusters-value').textContent = e.target.value;
+        if (currentCompleteLinkage) runCompleteLinkage();
+    });
+    
+    document.getElementById('cutoff-slider').addEventListener('input', e => {
+        document.getElementById('cutoff-value').textContent = parseFloat(e.target.value).toFixed(1);
+        if (currentCompleteLinkage) {
+            const labels = currentCompleteLinkage.getLabelsAtDistance(getCutoff());
+            currentCompleteLinkage.labels = labels;
+            const datasetIndex = document.getElementById('dataset-select').value;
+            let data = datasetIndex === 'custom' ? customData : datasets[parseInt(datasetIndex)];
+            if (data) {
+                data = standardizeData(data);
+                updateMetrics(data, labels, currentCompleteLinkage.copheneticCorrelation);
+                plotClusteredData(data, labels, datasetIndex === 'custom' ? 'Custom Data' : names[parseInt(datasetIndex)]);
+            }
+        }
+    });
+    
+    document.getElementById('distance-metric').addEventListener('change', () => {
+        if (currentCompleteLinkage) runCompleteLinkage();
+    });
+    
+    document.getElementById('dataset-select').addEventListener('change', () => {
+        if (currentCompleteLinkage) runCompleteLinkage();
+    });
+    
+    function loadCSV(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const csv = e.target.result;
+            const lines = csv.split('\n').filter(line => line.trim());
+            const data = [];
+            
+            for (let i = 0; i < lines.length; i++) {
+                const values = lines[i].split(',').map(v => parseFloat(v.trim()));
+                if (values.length >= 2 && !isNaN(values[0]) && !isNaN(values[1])) {
+                    data.push([values[0], values[1]]);
+                }
+            }
+            
+            if (data.length > 0) {
+                customData = data;
+                document.getElementById('dataset-select').value = 'custom';
+                runCompleteLinkage();
+            }
+        };
+        reader.readAsText(file);
+    }
+    
+    function generateNewData() {
+        const datasetIndex = parseInt(document.getElementById('dataset-select').value);
+        if (datasetIndex >= 0 && datasetIndex < 3) {
+            datasets[datasetIndex] = datasetIndex === 0 ? generateBlobs() : 
+                                     datasetIndex === 1 ? generateCircles() : generateRandom();
+            runCompleteLinkage();
+        }
+    }
+    
+    function exportResults() {
+        if (!currentCompleteLinkage || !currentCompleteLinkage.labels) return;
+        const datasetIndex = document.getElementById('dataset-select').value;
+        let data = datasetIndex === 'custom' ? customData : datasets[parseInt(datasetIndex)];
+        if (!data) return;
+        data = standardizeData(data);
+        
+        let csv = 'x,y,cluster\n';
+        data.forEach((point, i) => {
+            csv += `${point[0]},${point[1]},${currentCompleteLinkage.labels[i]}\n`;
+        });
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'complete_linkage_results.csv';
+        a.click();
+    }
+    
+    function downloadPlot() {
+        Plotly.downloadImage('clustered-plot', {
+            format: 'png',
+            width: 1200,
+            height: 800,
+            filename: 'complete_linkage_clustering'
+        });
+    }
+    
+    runCompleteLinkage();
+</script>
+    </div>
+<script src="../sidebar.js"></script>
+</body>
+</html>
+

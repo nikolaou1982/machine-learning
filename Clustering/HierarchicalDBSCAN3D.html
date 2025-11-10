@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Interactive HDBSCAN implementation in 3D. Visualize and experiment with this clustering algorithm using real-time charts and data analysis tools.">
+  <link rel="canonical" href="https://yourdomain.com/Clustering/HierarchicalDBSCAN3D.html">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "HDBSCAN (3D) - Interactive Implementation | Clustering | ML Tools",
+  "description": "Interactive HDBSCAN implementation in 3D. Visualize and experiment with this clustering algorithm using real-time charts and data analysis tools.",
+  "url": "https://yourdomain.com/Clustering/HierarchicalDBSCAN3D.html",
+  "about": {
+    "@type": "Thing",
+    "name": "HDBSCAN",
+    "description": "HDBSCAN algorithm for clustering"
+  }
+}
+  </script>
+    <title>HDBSCAN (3D) - Interactive Implementation | Clustering | ML Tools</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            color: #676767;
+            background-color: #1e1e1e;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: #171717;
+            padding: 30px 20px;
+            border-right: 1px solid #333;`n            overflow-y: auto;`n            height: 100vh;
+        }
+        
+        .sidebar h1 {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .nav-section {
+            margin-bottom: 30px;
+        }
+        
+        .nav-section h3 {
+            color: #dd8448;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+        
+        .nav-item {
+            display: block;
+            color: #676767;
+            text-decoration: none;
+            padding: 12px 15px;
+            margin-bottom: 5px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .nav-item:hover {
+            background-color: #2d2d2d;
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .nav-item.active {
+            background-color: #dd8448;
+            color: white;
+        }
+        
+        .nav-category {
+            margin-bottom: 20px;
+        }
+        
+        .nav-category-header {
+            color: #dd8448;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            letter-spacing: 1px;
+        }
+        
+        .nav-category-header:hover {
+            background-color: #2d2d2d;
+        }
+        
+        .nav-category-header .arrow {
+            transition: transform 0.3s ease;
+            font-size: 0.7rem;
+        }
+        
+        .nav-category-header.collapsed .arrow {
+            transform: rotate(-90deg);
+        }
+        
+        .nav-subcategory {
+            margin-left: 15px;
+            margin-top: 10px;
+            overflow: hidden;
+            max-height: 1200px;
+            transition: max-height 0.3s ease;
+        }
+        
+        .nav-subcategory.collapsed {
+            max-height: 0;
+        }
+        
+        .nav-subheader {
+            color: #999;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            padding: 8px 15px;
+            margin-top: 5px;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .nav-subheader:hover {
+            background-color: #2d2d2d;
+        }
+        
+        .nav-subheader .arrow {
+            font-size: 0.6rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .nav-subheader.collapsed .arrow {
+            transform: rotate(-90deg);
+        }
+        
+        .nav-subheader.category-header {
+            color: #dd8448;
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 10px 15px;
+            margin-top: 8px;
+            letter-spacing: 1px;
+            border: 1px solid rgba(221,132,72,0.3);
+        }
+        
+        .nav-subheader.category-header:hover {
+            background-color: rgba(221,132,72,0.15);
+            border-color: rgba(221,132,72,0.5);
+        }
+        
+        .nav-subgroup {
+            overflow: hidden;
+            max-height: 200px;
+            transition: max-height 0.3s ease;
+            padding-bottom: 5px;
+        }
+        
+        .nav-subgroup.collapsed {
+            max-height: 0;
+        }
+        
+        .nav-subgroup.category-group {
+            max-height: 1000px;
+        }
+        
+        .nav-subgroup.category-group.collapsed {
+            max-height: 0;
+        }
+        
+        .nav-subheader.nested {
+            margin-left: 10px;
+            font-size: 0.7rem;
+        }
+        
+        .nav-subgroup.nested {
+            margin-left: 10px;
+            max-height: 200px;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding-bottom: 5px;
+        }
+        
+        .nav-subgroup.nested.collapsed {
+            max-height: 0;
+        }
+        
+        .nav-subheader.subcategory-header {
+            color: #999;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 8px 15px;
+            margin-left: 10px;
+            margin-top: 5px;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(153, 153, 153, 0.2);
+        }
+        
+        .nav-subheader.subcategory-header:hover {
+            background-color: rgba(45, 45, 45, 0.5);
+            border-color: rgba(153, 153, 153, 0.4);
+        }
+        
+        .nav-subgroup.subcategory-group {
+            margin-left: 10px;
+            max-height: 800px;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding-bottom: 5px;
+        }
+        
+        .nav-subgroup.subcategory-group.collapsed {
+            max-height: 0;
+        }
+        
+        .nav-item.sub {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            margin-left: 10px;
+            margin-bottom: 5px;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 40px;
+        }
+        
+        .header {
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: white;
+            font-size: 2.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #676767;
+            font-size: 1.1rem;
+        }
+        
+        .controls-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .control-group {
+            background-color: #171717;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            min-width: 200px;
+        }
+        
+        .control-group h3 {
+            color: white;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .control-item {
+            margin-bottom: 15px;
+        }
+        
+        .control-item label {
+            display: block;
+            color: #676767;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        /* Professional form styling to match 2D HDBSCAN */
+        .control-group { box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset; }
+        .control-group h3 { margin-top: 0; padding-bottom: 8px; border-bottom: 1px solid #2a2a2a; }
+        .control-item label { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .value-chip { display: inline-block; background: rgba(221,132,72,0.15); color: #ffb07a; border: 1px solid rgba(221,132,72,0.35); padding: 2px 8px; border-radius: 999px; font-size: 12px; line-height: 18px; }
+        input[type="range"]::-webkit-slider-thumb { background: #dd8448; }
+        input[type="range"] { accent-color: #dd8448; }
+        .toggle-btn { background-color: #353535; color: white; border: 1px solid #555; border-radius: 4px; padding: 4px 8px; font-size: 12px; cursor: pointer; margin-left: 10px; display:inline-flex; align-items:center; gap:6px; }
+        .toggle-btn.active { background-color: #dd8448; border-color: #dd8448; }
+        .toggle-btn::after { content: 'custom'; font-size: 10px; opacity: 0.8; }
+        .custom-input { width: 110px; margin-top: 5px; display: none; }
+        
+        .control-item input, .control-item select {
+            width: 100%;
+            padding: 8px 12px;
+            background-color: #2d2d2d;
+            border: 1px solid #444;
+            border-radius: 6px;
+            color: white;
+            font-family: 'Nunito', sans-serif;
+        }
+        
+        .control-item input:focus, .control-item select:focus {
+            outline: none;
+            border-color: #dd8448;
+        }
+        
+        .btn {
+            background-color: #ffffff;
+            color: #171717;
+            border: 1px solid #444;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Nunito', sans-serif;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn:hover { background-color: #f0f0f0; border-color: #666; }
+        .control-group .btn { margin-right: 10px; }
+        /* Restore original style for Actions card */
+        .control-group.actions .btn {
+            background-color: #dd8448;
+            color: white;
+            border: 1px solid #dd8448;
+            display: block;
+            width: 100%;
+            margin-right: 0;
+            margin-bottom: 10px;
+        }
+        .control-group.actions .btn:hover { background-color: #c67339; }
+        
+        .plots-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .plot-wrapper {
+            background-color: #171717;
+            border-radius: 12px;
+            border: 1px solid #333;
+            padding: 20px;
+            flex: 1;
+            min-width: 400px;
+        }
+        
+        .plot-wrapper h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .stats-container {
+            background-color: #171717;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #333;
+        }
+        
+        .stats-container h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .stat-item {
+            background-color: #2d2d2d;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            color: #dd8448;
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: block;
+        }
+        
+        .stat-label {
+            color: #676767;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        .csv-upload {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .csv-upload input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .csv-upload-label {
+            display: inline-block;
+            background-color: #2d2d2d;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: 2px dashed #444;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .csv-upload-label:hover {
+            border-color: #dd8448;
+            background-color: #3d3d3d;
+        }
+        
+        :root {
+            --electric-border-color: #dd8448;
+            --electric-light-color: #ff9f5a;
+            --gradient-color: rgba(221, 132, 72, 0.4);
+            --color-neutral-900: #2d2d2d;
+        }
+        
+        .control-group.csv-format {
+            padding: 2px;
+            background: linear-gradient(-30deg, var(--gradient-color), transparent, var(--gradient-color)),
+                        linear-gradient(to bottom, var(--color-neutral-900), var(--color-neutral-900));
+            position: relative;
+        }
+        
+        .control-group.csv-format::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 1px solid rgba(221, 132, 72, 0.5);
+            border-radius: 12px;
+            pointer-events: none;
+        }
+        
+        .control-group.csv-format::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border: 1px solid var(--electric-border-color);
+            border-radius: 12px;
+            pointer-events: none;
+        }
+        
+        .csv-glow-1, .csv-glow-2 {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 12px;
+            pointer-events: none;
+        }
+        .csv-glow-1 { border: 1px solid rgba(221,132,72,0.6); filter: blur(1px); }
+        .csv-glow-2 { border: 1px solid var(--electric-light-color); filter: blur(3px); }
+        
+        .csv-info-card {
+            background: #171717;
+            border-radius: 10px;
+            padding: 16px;
+            margin: 2px;
+            position: relative;
+            z-index: 10;
+        }
+        .csv-badge {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 4px 8px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.8);
+            width: fit-content;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .csv-title { color: white; font-size: 16px; font-weight: 600; margin: 8px 0 4px 0; }
+        .csv-desc { color: rgba(255,255,255,0.6); font-size: 11px; line-height: 1.3; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h1>ML Tools</h1>
+        
+        <div class="nav-section">
+            <h3>Dashboard</h3>
+            <a href="main.html" class="nav-item">Overview</a>
+        </div>
+        
+        <div class="nav-section">
+            <h3>Clustering Methods</h3>
+            <div class="nav-category">
+                <div class="nav-category-header collapsed" onclick="toggleCategory(this)">
+                    <span>Density-Based</span>
+                    <span class="arrow">▼</span>
+                </div>
+                <div class="nav-subcategory collapsed">
+                    <div class="nav-subheader collapsed" onclick="toggleSubgroup(this)">
+                        <span>DBSCAN</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="nav-subgroup collapsed">
+                        <a href="DBSCAN.html" class="nav-item sub">2D</a>
+                        <a href="DBSCAN3D.html" class="nav-item sub">3D</a>
+                    </div>
+                    
+                    <div class="nav-subheader collapsed" onclick="toggleSubgroup(this)">
+                        <span>HDBSCAN</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="nav-subgroup collapsed">
+                        <a href="HierarchicalDBSCAN.html" class="nav-item sub">2D</a>
+                        <a href="HierarchicalDBSCAN3D.html" class="nav-item sub active">3D</a>
+                    </div>
+                    
+                    <div class="nav-subheader collapsed" onclick="toggleSubgroup(this)">
+                        <span>OPTICS</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="nav-subgroup collapsed">
+                        <a href="OPTICS.html" class="nav-item sub">2D</a>
+                        <a href="OPTICS3D.html" class="nav-item sub">3D</a>
+                    </div>
+                    
+                    <div class="nav-subheader collapsed" onclick="toggleSubgroup(this)">
+                        <span>DENCLUE</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="nav-subgroup collapsed">
+                        <a href="DENCLUE.html" class="nav-item sub">2D</a>
+                        <a href="DENCLUE3D.html" class="nav-item sub">3D</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        {
+            const saved = localStorage.getItem('sidebarState');
+            if (saved) {
+                const state = JSON.parse(saved);
+                const categoryHeader = document.querySelector('.nav-category-header');
+                const subcategory = categoryHeader.nextElementSibling;
+                const subheaders = document.querySelectorAll('.nav-subheader');
+                
+                if (state.category) {
+                    categoryHeader.classList.remove('collapsed');
+                    subcategory.classList.remove('collapsed');
+                }
+                if (state.dbscan) {
+                    subheaders[0].classList.remove('collapsed');
+                    subheaders[0].nextElementSibling.classList.remove('collapsed');
+                }
+                if (state.hdbscan) {
+                    subheaders[1].classList.remove('collapsed');
+                    subheaders[1].nextElementSibling.classList.remove('collapsed');
+                }
+                if (state.optics) {
+                    subheaders[2].classList.remove('collapsed');
+                    subheaders[2].nextElementSibling.classList.remove('collapsed');
+                }
+            }
+        }
+        
+        restoreSidebarState();
+    </script>
+    
+    <div class="main-content">
+        <div class="header">
+            <h1>3D Hierarchical DBSCAN Clustering</h1>
+            <p>Multi-level density-based clustering with 3D hierarchical structure visualization</p>
+        </div>
+        
+        <div class="controls-container">
+            <div class="control-group">
+                <h3>Dataset</h3>
+                <div class="control-item">
+                    <label for="dataset">Select Dataset:</label>
+                    <select id="dataset" onchange="generateData()">
+                        <option value="blobs">3D Blobs</option>
+                        <option value="spheres">Concentric Spheres</option>
+                        <option value="helix">Double Helix</option>
+                        <option value="uneven">Uneven Density</option>
+                    </select>
+                </div>
+                <div class="control-item">
+                    <div class="csv-upload">
+                        <input type="file" id="csvFile" accept=".csv" onchange="loadCSV(event)">
+                        <label for="csvFile" class="csv-upload-label">📁 Upload CSV</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="control-group csv-format">
+                <div class="csv-glow-1"></div>
+                <div class="csv-glow-2"></div>
+                <div class="csv-info-card">
+                    <div class="csv-badge">Format</div>
+                    <div class="csv-title">3D CSV Upload</div>
+                    <div class="csv-desc">
+                        Three numeric columns required<br>
+                        Example: x,y,z<br>
+                        1.0,2.3,0.5<br>
+                        3.1,4.2,1.8
+                    </div>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <h3>HDBSCAN Parameters</h3>
+                <div class="control-item">
+                    <label>Min Cluster Size <span id="mcs3d-value" class="value-chip">5</span>
+                        <button type="button" class="toggle-btn" id="mcs3d-toggle">✏️</button>
+                    </label>
+                    <input type="range" id="minClusterSize" min="2" max="50" step="1" value="5">
+                    <input type="number" id="minClusterSize-input" class="custom-input" min="2" max="500" step="1" value="5">
+                </div>
+                <div class="control-item">
+                    <label>Min Samples <span id="ms3d-value" class="value-chip">5</span>
+                        <button type="button" class="toggle-btn" id="ms3d-toggle">✏️</button>
+                    </label>
+                    <input type="range" id="minSamples" min="1" max="30" step="1" value="5">
+                    <input type="number" id="minSamples-input" class="custom-input" min="1" max="200" step="1" value="5">
+                </div>
+                <div class="control-item">
+                    <label>Selection Threshold <span id="sel3d-value" class="value-chip">0.30</span>
+                        <button type="button" class="toggle-btn" id="sel3d-toggle">✏️</button>
+                    </label>
+                    <input type="range" id="selectionThreshold" min="0.05" max="0.95" step="0.05" value="0.30">
+                    <input type="number" id="selectionThreshold-input" class="custom-input" min="0.01" max="0.99" step="0.01" value="0.30">
+                </div>
+            </div>
+            
+            <div class="control-group actions">
+                <h3>Actions</h3>
+                <button class="btn" onclick="generateData()">Generate New Data</button>
+                <button class="btn" onclick="exportResults()">Export Results</button>
+                <button class="btn" onclick="downloadPlot()">Download Plot</button>
+            </div>
+        </div>
+        
+        <div class="stats-container">
+            <h3>Clustering Statistics</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-value" id="numClusters">0</span>
+                    <div class="stat-label">Clusters</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="numNoise">0</span>
+                    <div class="stat-label">Noise Points</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="silhouetteScore">0.00</span>
+                    <div class="stat-label">Silhouette Score</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="totalPoints">0</span>
+                    <div class="stat-label">Total Points</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="plots-container">
+            <div class="plot-wrapper">
+                <h3>3D Clustering Results</h3>
+                <div id="clusterPlot" style="width: 100%; height: 500px;"></div>
+            </div>
+            <div class="plot-wrapper">
+                <h3>Cluster Hierarchy</h3>
+                <div id="dendrogramPlot" style="width: 100%; height: 500px;"></div>
+            </div>
+        </div>
+
+        <div class="plots-container">
+            <div class="plot-wrapper">
+                <h3>Membership Probability (3D)</h3>
+                <div id="probabilityPlot3D" style="width: 100%; height: 500px;"></div>
+            </div>
+            <div class="plot-wrapper">
+                <h3>Cluster Stability (proxy)</h3>
+                <div id="stabilityBars3D" style="width: 100%; height: 400px;"></div>
+            </div>
+        </div>
+        
+        <div class="plot-wrapper">
+            <h3>Condensed Tree (proxy)</h3>
+            <div id="condensedTree3D" style="width: 100%; height: 300px;"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentData = [];
+        let clusterLabels = [];
+        let linkageMatrix = [];
+        
+        function generateData() {
+            const dataset = document.getElementById('dataset').value;
+            const n = 300;
+            
+            switch(dataset) {
+                case 'blobs':
+                    currentData = generate3DBlobs(n);
+                    break;
+                case 'spheres':
+                    currentData = generateConcentricSpheres(n);
+                    break;
+                case 'helix':
+                    currentData = generateDoubleHelix(n);
+                    break;
+                case 'uneven':
+                    currentData = generate3DUnevenDensity(n);
+                    break;
+            }
+            
+            runHDBSCAN();
+        }
+        
+        function generate3DBlobs(n) {
+            const data = [];
+            const centers = [[2, 2, 2], [-2, -2, -2], [2, -2, 0], [-2, 2, 0]];
+            const pointsPerCenter = Math.floor(n / centers.length);
+            
+            centers.forEach(center => {
+                for(let i = 0; i < pointsPerCenter; i++) {
+                    data.push([
+                        center[0] + (Math.random() - 0.5) * 2,
+                        center[1] + (Math.random() - 0.5) * 2,
+                        center[2] + (Math.random() - 0.5) * 2
+                    ]);
+                }
+            });
+            
+            return data;
+        }
+        
+        function generateConcentricSpheres(n) {
+            const data = [];
+            const halfN = Math.floor(n / 2);
+            
+            for(let i = 0; i < halfN; i++) {
+                const theta = Math.random() * 2 * Math.PI;
+                const phi = Math.random() * Math.PI;
+                const r = 1 + (Math.random() - 0.5) * 0.2;
+                
+                data.push([
+                    r * Math.sin(phi) * Math.cos(theta),
+                    r * Math.sin(phi) * Math.sin(theta),
+                    r * Math.cos(phi)
+                ]);
+            }
+            
+            for(let i = 0; i < halfN; i++) {
+                const theta = Math.random() * 2 * Math.PI;
+                const phi = Math.random() * Math.PI;
+                const r = 3 + (Math.random() - 0.5) * 0.4;
+                
+                data.push([
+                    r * Math.sin(phi) * Math.cos(theta),
+                    r * Math.sin(phi) * Math.sin(theta),
+                    r * Math.cos(phi)
+                ]);
+            }
+            
+            return data;
+        }
+        
+        function generateDoubleHelix(n) {
+            const data = [];
+            const halfN = Math.floor(n / 2);
+            
+            for(let i = 0; i < halfN; i++) {
+                const t = (i / halfN) * 4 * Math.PI;
+                data.push([
+                    Math.cos(t) + (Math.random() - 0.5) * 0.2,
+                    Math.sin(t) + (Math.random() - 0.5) * 0.2,
+                    t * 0.3 + (Math.random() - 0.5) * 0.2
+                ]);
+                data.push([
+                    -Math.cos(t) + (Math.random() - 0.5) * 0.2,
+                    -Math.sin(t) + (Math.random() - 0.5) * 0.2,
+                    t * 0.3 + (Math.random() - 0.5) * 0.2
+                ]);
+            }
+            
+            return data;
+        }
+        
+        function generate3DUnevenDensity(n) {
+            const data = [];
+            const dense = Math.floor(n * 0.6);
+            const medium = Math.floor(n * 0.3);
+            const sparse = n - dense - medium;
+            
+            for(let i = 0; i < dense; i++) {
+                data.push([
+                    (Math.random() - 0.5) * 2,
+                    (Math.random() - 0.5) * 2,
+                    (Math.random() - 0.5) * 2
+                ]);
+            }
+            
+            for(let i = 0; i < medium; i++) {
+                data.push([
+                    4 + (Math.random() - 0.5) * 3,
+                    4 + (Math.random() - 0.5) * 3,
+                    (Math.random() - 0.5) * 2
+                ]);
+            }
+            
+            for(let i = 0; i < sparse; i++) {
+                data.push([
+                    (Math.random() - 0.5) * 12,
+                    (Math.random() - 0.5) * 12,
+                    (Math.random() - 0.5) * 8
+                ]);
+            }
+            
+            return data;
+        }
+        
+        function euclideanDistance3D(p1, p2) {
+            return Math.sqrt(
+                Math.pow(p1[0] - p2[0], 2) + 
+                Math.pow(p1[1] - p2[1], 2) + 
+                Math.pow(p1[2] - p2[2], 2)
+            );
+        }
+        
+        function percentile(arr, p) {
+            if (!arr.length) return 0;
+            const a = [...arr].sort((x,y)=>x-y);
+            const idx = Math.min(a.length-1, Math.max(0, Math.floor(p * a.length)));
+            return a[idx];
+        }
+
+        function runHDBSCAN() {
+            if(currentData.length === 0) return;
+            
+            const minClusterSize = getMinClusterSize();
+            const minSamples = getMinSamples();
+            
+            const mst = buildMST3D(currentData);
+            linkageMatrix = buildHierarchy3D(mst, minSamples);
+            const sel = getSelectionThreshold();
+            clusterLabels = extractClusters3D(linkageMatrix, minClusterSize, minSamples, sel);
+            
+            updateVisualization();
+            updateStats();
+        }
+        
+        function buildMST3D(data) {
+            const n = data.length;
+            const edges = [];
+            
+            for(let i = 0; i < n; i++) {
+                for(let j = i + 1; j < n; j++) {
+                    edges.push({
+                        i: i,
+                        j: j,
+                        weight: euclideanDistance3D(data[i], data[j])
+                    });
+                }
+            }
+            
+            edges.sort((a, b) => a.weight - b.weight);
+            
+            const parent = Array.from({length: n}, (_, i) => i);
+            const mst = [];
+            
+            function find(x) {
+                if(parent[x] !== x) {
+                    parent[x] = find(parent[x]);
+                }
+                return parent[x];
+            }
+            
+            function union(x, y) {
+                const px = find(x);
+                const py = find(y);
+                if(px !== py) {
+                    parent[px] = py;
+                    return true;
+                }
+                return false;
+            }
+            
+            for(const edge of edges) {
+                if(union(edge.i, edge.j)) {
+                    mst.push(edge);
+                    if(mst.length === n - 1) break;
+                }
+            }
+            
+            return mst;
+        }
+        
+        function buildHierarchy3D(mst, minSamples) {
+            const sortedEdges = [...mst].sort((a, b) => b.weight - a.weight);
+            const n = currentData.length;
+            const parent = Array.from({length: n}, (_, i) => i);
+            const size = Array(n).fill(1);
+            const linkage = [];
+            
+            function find(x) {
+                if(parent[x] !== x) {
+                    parent[x] = find(parent[x]);
+                }
+                return parent[x];
+            }
+            
+            function union(x, y, weight) {
+                const px = find(x);
+                const py = find(y);
+                
+                if(px !== py) {
+                    const newSize = size[px] + size[py];
+                    linkage.push({
+                        cluster1: px,
+                        cluster2: py,
+                        distance: weight,
+                        size: newSize
+                    });
+                    
+                    if(size[px] < size[py]) {
+                        parent[px] = py;
+                        size[py] = newSize;
+                    } else {
+                        parent[py] = px;
+                        size[px] = newSize;
+                    }
+                }
+            }
+            
+            for(const edge of sortedEdges) {
+                union(edge.i, edge.j, edge.weight);
+            }
+            
+            return linkage;
+        }
+        
+        function extractClusters3D(linkage, minClusterSize, minSamples, selectionThreshold) {
+            const n = currentData.length;
+            const labels = Array(n).fill(-1);
+            
+            const distances = linkage.map(l=>l.distance);
+            const threshold = distances.length ? percentile(distances, selectionThreshold) : 0.8;
+            
+            const visited = Array(n).fill(false);
+            const neighborLists = Array.from({length:n}, ()=>[]);
+            for (let i=0;i<n;i++) {
+                for (let j=0;j<n;j++) {
+                    if (euclideanDistance3D(currentData[i], currentData[j]) <= threshold) neighborLists[i].push(j);
+                }
+            }
+            const isCore = neighborLists.map(nei => nei.length >= minSamples);
+            let clusterId = 0;
+            
+            for(let i = 0; i < n; i++) {
+                if(visited[i]) continue;
+                
+                const neighbors = neighborLists[i].slice();
+                
+                if(isCore[i] && neighbors.length >= minClusterSize) {
+                    const queue = [...neighbors];
+                    
+                    while(queue.length > 0) {
+                        const point = queue.shift();
+                        if(visited[point]) continue;
+                        
+                        visited[point] = true;
+                        labels[point] = clusterId;
+                        
+                        const pointNeighbors = neighborLists[point];
+                        if(isCore[point] && pointNeighbors.length >= minClusterSize) queue.push(...pointNeighbors.filter(p => !visited[p]));
+                    }
+                    
+                    clusterId++;
+                }
+            }
+            
+            return labels;
+        }
+
+        function getMinClusterSize() {
+            const slider = document.getElementById('minClusterSize');
+            const input = document.getElementById('minClusterSize-input');
+            return input.style.display === 'block' ? parseInt(input.value) : parseInt(slider.value);
+        }
+        function getMinSamples() {
+            const slider = document.getElementById('minSamples');
+            const input = document.getElementById('minSamples-input');
+            return input.style.display === 'block' ? parseInt(input.value) : parseInt(slider.value);
+        }
+        function getSelectionThreshold() {
+            const slider = document.getElementById('selectionThreshold');
+            const input = document.getElementById('selectionThreshold-input');
+            return input.style.display === 'block' ? parseFloat(input.value) : parseFloat(slider.value);
+        }
+
+        // Wire controls
+        document.getElementById('minClusterSize').addEventListener('input', e=>{ document.getElementById('mcs3d-value').textContent = e.target.value; runHDBSCAN(); });
+        document.getElementById('minClusterSize-input').addEventListener('input', e=>{ const v=Math.max(2,parseInt(e.target.value)||2); document.getElementById('mcs3d-value').textContent = v; runHDBSCAN(); });
+        document.getElementById('mcs3d-toggle').addEventListener('click', ()=>{ const s=document.getElementById('minClusterSize'); const i=document.getElementById('minClusterSize-input'); const t=document.getElementById('mcs3d-toggle'); if (i.style.display==='block'){ i.style.display='none'; s.style.display='block'; t.classList.remove('active'); } else { s.style.display='none'; i.style.display='block'; i.value=s.value; t.classList.add('active'); }});
+
+        document.getElementById('minSamples').addEventListener('input', e=>{ document.getElementById('ms3d-value').textContent = e.target.value; runHDBSCAN(); });
+        document.getElementById('minSamples-input').addEventListener('input', e=>{ const v=Math.max(1,parseInt(e.target.value)||1); document.getElementById('ms3d-value').textContent = v; runHDBSCAN(); });
+        document.getElementById('ms3d-toggle').addEventListener('click', ()=>{ const s=document.getElementById('minSamples'); const i=document.getElementById('minSamples-input'); const t=document.getElementById('ms3d-toggle'); if (i.style.display==='block'){ i.style.display='none'; s.style.display='block'; t.classList.remove('active'); } else { s.style.display='none'; i.style.display='block'; i.value=s.value; t.classList.add('active'); }});
+
+        document.getElementById('selectionThreshold').addEventListener('input', e=>{ document.getElementById('sel3d-value').textContent = parseFloat(e.target.value).toFixed(2); runHDBSCAN(); });
+        document.getElementById('selectionThreshold-input').addEventListener('input', e=>{ const v=Math.min(0.99,Math.max(0.01,parseFloat(e.target.value)||0.3)); document.getElementById('sel3d-value').textContent = v.toFixed(2); runHDBSCAN(); });
+        document.getElementById('sel3d-toggle').addEventListener('click', ()=>{ const s=document.getElementById('selectionThreshold'); const i=document.getElementById('selectionThreshold-input'); const t=document.getElementById('sel3d-toggle'); if (i.style.display==='block'){ i.style.display='none'; s.style.display='block'; t.classList.remove('active'); } else { s.style.display='none'; i.style.display='block'; i.value=s.value; t.classList.add('active'); }});
+        
+        function updateVisualization() {
+            const colors = ['#dd8448', '#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#F44336', '#00BCD4', '#FFEB3B'];
+            const traces = [];
+            
+            const clusters = [...new Set(clusterLabels)];
+            
+            clusters.forEach(cluster => {
+                const indices = clusterLabels.map((label, i) => label === cluster ? i : -1).filter(i => i !== -1);
+                const x = indices.map(i => currentData[i][0]);
+                const y = indices.map(i => currentData[i][1]);
+                const z = indices.map(i => currentData[i][2]);
+                
+                traces.push({
+                    x: x,
+                    y: y,
+                    z: z,
+                    mode: 'markers',
+                    type: 'scatter3d',
+                    name: cluster === -1 ? 'Noise' : `Cluster ${cluster}`,
+                    marker: {
+                        color: cluster === -1 ? '#666666' : colors[cluster % colors.length],
+                        size: 4,
+                        opacity: 0.8
+                    }
+                });
+            });
+            
+            const layout = {
+                title: '3D HDBSCAN Clustering Results',
+                paper_bgcolor: '#171717',
+                plot_bgcolor: '#171717',
+                font: { color: 'white' },
+                scene: {
+                    xaxis: { gridcolor: '#333', zerolinecolor: '#333' },
+                    yaxis: { gridcolor: '#333', zerolinecolor: '#333' },
+                    zaxis: { gridcolor: '#333', zerolinecolor: '#333' },
+                    bgcolor: '#171717'
+                },
+                showlegend: true,
+                legend: { bgcolor: 'rgba(0,0,0,0)' }
+            };
+            
+            Plotly.newPlot('clusterPlot', traces, layout, {responsive: true});
+            updateDendrogram();
+
+            // Additional analytics
+            updateMembershipProbabilities3D();
+            updateStabilityBars3D();
+            updateCondensedTree3D();
+        }
+        
+        function updateDendrogram() {
+            if(linkageMatrix.length === 0) return;
+            
+            const trace = {
+                x: linkageMatrix.map((_, i) => i),
+                y: linkageMatrix.map(link => link.distance),
+                type: 'scatter',
+                mode: 'lines+markers',
+                name: 'Hierarchy',
+                line: { color: '#dd8448', width: 2 },
+                marker: { color: '#dd8448', size: 6 }
+            };
+            
+            const layout = {
+                title: '3D Cluster Hierarchy',
+                paper_bgcolor: '#171717',
+                plot_bgcolor: '#171717',
+                font: { color: 'white' },
+                xaxis: { 
+                    title: 'Merge Step',
+                    gridcolor: '#333', 
+                    zerolinecolor: '#333' 
+                },
+                yaxis: { 
+                    title: 'Distance',
+                    gridcolor: '#333', 
+                    zerolinecolor: '#333' 
+                },
+                showlegend: false
+            };
+            
+            Plotly.newPlot('dendrogramPlot', [trace], layout, {responsive: true});
+        }
+
+        function clusterCentroids3D() {
+            const map = new Map();
+            for (let i = 0; i < currentData.length; i++) {
+                const l = clusterLabels[i]; if (l === -1) continue;
+                if (!map.has(l)) map.set(l, {sum:[0,0,0], n:0});
+                const m = map.get(l); m.sum[0]+=currentData[i][0]; m.sum[1]+=currentData[i][1]; m.sum[2]+=currentData[i][2]; m.n++;
+            }
+            const centroids = new Map();
+            map.forEach((v,k)=>{ centroids.set(k, [v.sum[0]/v.n, v.sum[1]/v.n, v.sum[2]/v.n]); });
+            return centroids;
+        }
+
+        function updateMembershipProbabilities3D() {
+            const centroids = clusterCentroids3D();
+            const xs=[], ys=[], zs=[], probs=[], labels=[];
+            const distsByCluster = new Map();
+            for (let i=0;i<currentData.length;i++) {
+                const l = clusterLabels[i]; labels.push(l);
+                xs.push(currentData[i][0]); ys.push(currentData[i][1]); zs.push(currentData[i][2]);
+                if (l === -1 || !centroids.has(l)) { probs.push(0.1); continue; }
+                const c = centroids.get(l);
+                const d = Math.sqrt((currentData[i][0]-c[0])**2 + (currentData[i][1]-c[1])**2 + (currentData[i][2]-c[2])**2);
+                if (!distsByCluster.has(l)) distsByCluster.set(l, []);
+                distsByCluster.get(l).push(d); probs.push(d);
+            }
+            const maxByCluster = new Map(); distsByCluster.forEach((arr,k)=>{ maxByCluster.set(k, Math.max(...arr,1e-6)); });
+            for (let i=0;i<probs.length;i++) { const l=labels[i]; if (!maxByCluster.has(l)) { probs[i]=0.1; } else { const inv=1-Math.min(1, probs[i]/maxByCluster.get(l)); probs[i]=0.2+0.8*inv; } }
+            const trace = { x:xs,y:ys,z:zs, mode:'markers', type:'scatter3d', marker:{size:3, color:probs, colorscale:'Viridis', cmin:0, cmax:1, colorbar:{title:'Prob.'}}, name:'Membership Probability' };
+            const layout = {title:'Membership Probability', paper_bgcolor:'#171717', plot_bgcolor:'#171717', font:{color:'white'}, scene:{xaxis:{gridcolor:'#333',color:'white'}, yaxis:{gridcolor:'#333',color:'white'}, zaxis:{gridcolor:'#333',color:'white'}, bgcolor:'#171717'}};
+            Plotly.newPlot('probabilityPlot3D', [trace], layout, {responsive:true});
+        }
+
+        function updateStabilityBars3D() {
+            const centroids = clusterCentroids3D();
+            const stats = new Map();
+            for (let i=0;i<currentData.length;i++) {
+                const l = clusterLabels[i]; if (l===-1 || !centroids.has(l)) continue;
+                const c = centroids.get(l);
+                const d = Math.sqrt((currentData[i][0]-c[0])**2 + (currentData[i][1]-c[1])**2 + (currentData[i][2]-c[2])**2);
+                if (!stats.has(l)) stats.set(l,{sum:0,n:0}); const s=stats.get(l); s.sum+=d; s.n++;
+            }
+            const clusters = Array.from(stats.keys()).sort((a,b)=>a-b);
+            const values = clusters.map(k=>{ const s=stats.get(k); const mean=s.sum/Math.max(1,s.n); return (s.n/currentData.length)*(1/(1+mean)); });
+            Plotly.newPlot('stabilityBars3D', [{x:clusters.map(c=>`C${c}`), y:values, type:'bar', marker:{color:'#dd8448'}}], {paper_bgcolor:'#171717', plot_bgcolor:'#171717', font:{color:'white'}, yaxis:{title:'Stability (proxy)'}}, {responsive:true});
+        }
+
+        function updateCondensedTree3D() {
+            if (linkageMatrix.length === 0) return;
+            const x = linkageMatrix.map((_,i)=>i);
+            const y = linkageMatrix.map(l=>l.distance);
+            const size = linkageMatrix.map(l=>10+Math.sqrt(Math.max(1,l.size))*2);
+            const trace = {x,y, mode:'markers+lines', type:'scatter', marker:{size, color:'#ffb07a'}, line:{color:'#444'}};
+            const layout = {paper_bgcolor:'#171717', plot_bgcolor:'#171717', font:{color:'white'}, xaxis:{title:'Step', gridcolor:'#333'}, yaxis:{title:'Distance', gridcolor:'#333'}};
+            Plotly.newPlot('condensedTree3D', [trace], layout, {responsive:true});
+        }
+        
+        function updateStats() {
+            const clusters = [...new Set(clusterLabels.filter(label => label !== -1))];
+            const noisePoints = clusterLabels.filter(label => label === -1).length;
+            
+            document.getElementById('numClusters').textContent = clusters.length;
+            document.getElementById('numNoise').textContent = noisePoints;
+            document.getElementById('totalPoints').textContent = currentData.length;
+            
+            const silhouette = calculateSilhouetteScore3D();
+            document.getElementById('silhouetteScore').textContent = silhouette.toFixed(3);
+        }
+        
+        function calculateSilhouetteScore3D() {
+            if(clusterLabels.filter(label => label !== -1).length < 2) return 0;
+            
+            let totalScore = 0;
+            let validPoints = 0;
+            
+            for(let i = 0; i < currentData.length; i++) {
+                if(clusterLabels[i] === -1) continue;
+                
+                const sameCluster = clusterLabels.map((label, idx) => 
+                    label === clusterLabels[i] && idx !== i ? idx : -1
+                ).filter(idx => idx !== -1);
+                
+                if(sameCluster.length === 0) continue;
+                
+                const a = sameCluster.reduce((sum, idx) => 
+                    sum + euclideanDistance3D(currentData[i], currentData[idx]), 0
+                ) / sameCluster.length;
+                
+                const otherClusters = [...new Set(clusterLabels.filter(label => label !== -1 && label !== clusterLabels[i]))];
+                
+                if(otherClusters.length === 0) continue;
+                
+                const b = Math.min(...otherClusters.map(cluster => {
+                    const clusterPoints = clusterLabels.map((label, idx) => 
+                        label === cluster ? idx : -1
+                    ).filter(idx => idx !== -1);
+                    
+                    return clusterPoints.reduce((sum, idx) => 
+                        sum + euclideanDistance3D(currentData[i], currentData[idx]), 0
+                    ) / clusterPoints.length;
+                }));
+                
+                const s = (b - a) / Math.max(a, b);
+                totalScore += s;
+                validPoints++;
+            }
+            
+            return validPoints > 0 ? totalScore / validPoints : 0;
+        }
+        
+        function loadCSV(event) {
+            const file = event.target.files[0];
+            if(!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const csv = e.target.result;
+                const lines = csv.split('\n').filter(line => line.trim());
+                const data = [];
+                
+                for(let i = 1; i < lines.length; i++) {
+                    const values = lines[i].split(',').map(v => parseFloat(v.trim()));
+                    if(values.length >= 3 && !isNaN(values[0]) && !isNaN(values[1]) && !isNaN(values[2])) {
+                        data.push([values[0], values[1], values[2]]);
+                    }
+                }
+                
+                if(data.length > 0) {
+                    currentData = data;
+                    runHDBSCAN();
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        function downloadPlot() {
+            Plotly.downloadImage('clusterPlot', {
+                format: 'png',
+                width: 1200,
+                height: 800,
+                filename: 'hdbscan_3d_clustering'
+            });
+        }
+        
+        function exportResults() {
+            if(currentData.length === 0) {
+                alert('No data to export!');
+                return;
+            }
+            
+            let csv = 'X,Y,Z,Cluster\n';
+            for(let i = 0; i < currentData.length; i++) {
+                csv += `${currentData[i][0]},${currentData[i][1]},${currentData[i][2]},${clusterLabels[i]}\n`;
+            }
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'hdbscan_3d_results.csv';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+        
+        generateData();
+</script>
+<script src="../sidebar.js"></script>
+</body>
+</html>
+
+
+

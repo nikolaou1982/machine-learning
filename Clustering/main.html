@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Comprehensive guide to clustering algorithms including K-means, DBSCAN, hierarchical clustering, and more. Interactive visualizations and implementations for machine learning.">
+  <link rel="canonical" href="https://yourdomain.com/Clustering/main.html">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Clustering Methods - Interactive ML Tools & Algorithms",
+  "description": "Comprehensive guide to clustering algorithms including K-means, DBSCAN, hierarchical clustering, and more. Interactive visualizations and implementations for machine learning.",
+  "url": "https://yourdomain.com/Clustering/main.html",
+  "about": {
+    "@type": "Thing",
+    "name": "Main",
+    "description": "Main algorithm for clustering"
+  }
+}
+  </script>
+    <title>Clustering Methods - Interactive ML Tools & Algorithms</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            color: #676767;
+            background-color: #1e1e1e;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: #171717;
+            padding: 30px 20px;
+            border-right: 1px solid #333;
+            overflow-y: auto;
+            height: 100vh;
+        }
+        
+        .sidebar h1 {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .nav-section {
+            margin-bottom: 30px;
+        }
+        
+        .nav-section h3 {
+            color: #dd8448;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+        
+        .nav-item {
+            display: block;
+            color: #676767;
+            text-decoration: none;
+            padding: 12px 15px;
+            margin-bottom: 5px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .nav-item:hover {
+            background-color: #2d2d2d;
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .nav-item.active {
+            background-color: #dd8448;
+            color: white;
+        }
+        
+        .nav-category {
+            margin-bottom: 20px;
+        }
+        
+        .nav-category-header {
+            color: #dd8448;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            letter-spacing: 1px;
+        }
+        
+        .nav-category-header:hover {
+            background-color: #2d2d2d;
+        }
+        
+        .nav-category-header .arrow {
+            transition: transform 0.3s ease;
+            font-size: 0.7rem;
+        }
+        
+        .nav-category-header.collapsed .arrow {
+            transform: rotate(-90deg);
+        }
+        
+        .nav-subcategory {
+            margin-left: 15px;
+            margin-top: 10px;
+            overflow: hidden;
+            max-height: 1200px;
+            transition: max-height 0.3s ease;
+        }
+        
+        .nav-subcategory.collapsed {
+            max-height: 0;
+        }
+        
+        .nav-subheader {
+            color: #999;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            padding: 8px 15px;
+            margin-top: 5px;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .nav-subheader:hover {
+            background-color: #2d2d2d;
+        }
+        
+        .nav-subheader .arrow {
+            font-size: 0.6rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .nav-subheader.collapsed .arrow {
+            transform: rotate(-90deg);
+        }
+        
+        .nav-subheader.category-header {
+            color: #dd8448;
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 10px 15px;
+            margin-top: 8px;
+            letter-spacing: 1px;
+            border: 1px solid rgba(221,132,72,0.3);
+        }
+        
+        .nav-subheader.category-header:hover {
+            background-color: rgba(221,132,72,0.15);
+            border-color: rgba(221,132,72,0.5);
+        }
+        
+        .nav-subgroup {
+            overflow: hidden;
+            max-height: 200px;
+            transition: max-height 0.3s ease;
+            padding-bottom: 5px;
+        }
+        
+        .nav-subgroup.collapsed {
+            max-height: 0;
+        }
+        
+        .nav-subgroup.category-group {
+            max-height: 1000px;
+        }
+        
+        .nav-subgroup.category-group.collapsed {
+            max-height: 0;
+        }
+        
+        .nav-subheader.nested {
+            margin-left: 10px;
+            font-size: 0.7rem;
+        }
+        
+        .nav-subgroup.nested {
+            margin-left: 10px;
+            max-height: 200px;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding-bottom: 5px;
+        }
+        
+        .nav-subgroup.nested.collapsed {
+            max-height: 0;
+        }
+        
+        .nav-subheader.subcategory-header {
+            color: #999;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 8px 15px;
+            margin-left: 10px;
+            margin-top: 5px;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(153, 153, 153, 0.2);
+        }
+        
+        .nav-subheader.subcategory-header:hover {
+            background-color: rgba(45, 45, 45, 0.5);
+            border-color: rgba(153, 153, 153, 0.4);
+        }
+        
+        .nav-subgroup.subcategory-group {
+            margin-left: 10px;
+            max-height: 800px;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding-bottom: 5px;
+        }
+        
+        .nav-subgroup.subcategory-group.collapsed {
+            max-height: 0;
+        }
+        
+        .nav-item.sub {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            margin-left: 10px;
+            margin-bottom: 5px;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 40px;
+        }
+        
+        .main-title {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #676767;
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+        }
+        
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            background-color: #171717;
+            border-radius: 12px;
+            padding: 30px;
+            border: 1px solid #333;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: #dd8448;
+        }
+        
+        .card h3 {
+            color: white;
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .card p {
+            color: #676767;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .card-button {
+            display: inline-block;
+            background-color: #dd8448;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+        
+        .card-button:hover {
+            background-color: #c67339;
+        }
+        
+        .category-section {
+            margin-bottom: 60px;
+        }
+        
+        .category-title {
+            color: white;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            margin-top: 40px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #dd8448;
+        }
+        
+        .category-description {
+            color: #676767;
+            font-size: 1rem;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+        
+        .subcategory-title {
+            color: #dd8448;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            padding-left: 15px;
+            border-left: 4px solid #dd8448;
+        }
+        
+        /* Clustering Overview Section */
+        .clustering-overview {
+            background-color: #171717;
+            border-radius: 12px;
+            padding: 40px;
+            border: 1px solid #333;
+            margin-bottom: 50px;
+        }
+        
+        .overview-intro {
+            color: #676767;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 40px;
+            text-align: center;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .clustering-diagram {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 60px 0 40px 0;
+        }
+        
+        .diagram-center {
+            position: absolute;
+            width: 240px;
+            height: 240px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(221,132,72,0.2), rgba(221,132,72,0.05));
+            border: 3px solid #dd8448;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            box-shadow: 0 0 30px rgba(221,132,72,0.3);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .diagram-center-text {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-align: center;
+        }
+        
+        .diagram-branch {
+            position: absolute;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(91,163,245,0.2), rgba(91,163,245,0.05));
+            border: 2px solid #5ba3f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+            box-shadow: 0 0 20px rgba(91,163,245,0.2);
+        }
+        
+        .diagram-branch-text {
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-align: center;
+            padding: 10px;
+        }
+        
+        .branch-top {
+            top: calc(50% - 120px - 70px);
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .branch-left {
+            left: calc(50% - 120px - 70px);
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .branch-right {
+            left: calc(50% + 120px + 70px);
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .diagram-connections {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        .connection-line {
+            stroke: #5ba3f5;
+            stroke-width: 2;
+            opacity: 0.4;
+        }
+        
+        .features-section {
+            background-color: #171717;
+            border-radius: 12px;
+            padding: 30px;
+            border: 1px solid #333;
+            margin-top: 60px;
+        }
+        
+        .features-section h2 {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .feature-item {
+            padding: 20px;
+            background-color: #2d2d2d;
+            border-radius: 8px;
+        }
+        
+        .feature-item h4 {
+            color: #dd8448;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .feature-item p {
+            color: #676767;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+    </style>
+    <script>
+        function toggleCategory(category) {
+            const content = document.getElementById(category + '-content');
+            const header = event.currentTarget;
+            content.classList.toggle('collapsed');
+            header.classList.toggle('collapsed');
+            localStorage.setItem('sidebar-' + category, content.classList.contains('collapsed') ? 'collapsed' : 'expanded');
+        }
+        
+        function toggleSubcategory(subcategory) {
+            const content = document.getElementById(subcategory + '-content');
+            const header = event.currentTarget;
+            content.classList.toggle('collapsed');
+            header.classList.toggle('collapsed');
+            localStorage.setItem('sidebar-' + subcategory, content.classList.contains('collapsed') ? 'collapsed' : 'expanded');
+        }
+        
+        window.addEventListener('DOMContentLoaded', function() {
+            ['category', 'dbscan', 'hdbscan', 'optics', 'denclue'].forEach(function(key) {
+                const state = localStorage.getItem('sidebar-' + key);
+                if (state === 'collapsed') {
+                    const content = document.getElementById(key + '-content');
+                    const header = content.previousElementSibling;
+                    content.classList.add('collapsed');
+                    header.classList.add('collapsed');
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="sidebar">
+        <a href="../index.html" class="nav-item" style="display: block; margin-bottom: 20px; background-color: rgba(221,132,72,0.15); border: 1px solid rgba(221,132,72,0.4); color: #ffb07a; text-align: center; font-weight: 600;">
+            ← Back to Unsupervised Learning
+        </a>
+        
+        <div class="nav-category">
+            <div class="nav-category-header" onclick="toggleCategory('category')">
+                <span>Clustering Methods</span>
+                <span class="arrow">▼</span>
+            </div>
+            <div class="nav-subcategory" id="category-content">
+                <div class="nav-subheader" onclick="toggleSubcategory('dbscan')">
+                    <span>DBSCAN</span>
+                    <span class="arrow">▼</span>
+                </div>
+                <div class="nav-subgroup" id="dbscan-content">
+                    <a href="DBSCAN.html" class="nav-item sub">2D DBSCAN</a>
+                    <a href="DBSCAN3D.html" class="nav-item sub">3D DBSCAN</a>
+                </div>
+                
+                <div class="nav-subheader" onclick="toggleSubcategory('hdbscan')">
+                    <span>Hierarchical DBSCAN</span>
+                    <span class="arrow">▼</span>
+                </div>
+                <div class="nav-subgroup" id="hdbscan-content">
+                    <a href="HierarchicalDBSCAN.html" class="nav-item sub">2D HDBSCAN</a>
+                    <a href="HierarchicalDBSCAN3D.html" class="nav-item sub">3D HDBSCAN</a>
+                </div>
+                
+                <div class="nav-subheader" onclick="toggleSubcategory('optics')">
+                    <span>OPTICS</span>
+                    <span class="arrow">▼</span>
+                </div>
+                <div class="nav-subgroup" id="optics-content">
+                    <a href="OPTICS.html" class="nav-item sub">2D OPTICS</a>
+                    <a href="OPTICS3D.html" class="nav-item sub">3D OPTICS</a>
+                </div>
+                
+                <div class="nav-subheader" onclick="toggleSubcategory('denclue')">
+                    <span>DENCLUE</span>
+                    <span class="arrow">▼</span>
+                </div>
+                <div class="nav-subgroup" id="denclue-content">
+                    <a href="DENCLUE.html" class="nav-item sub">2D DENCLUE</a>
+                    <a href="DENCLUE3D.html" class="nav-item sub">3D DENCLUE</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="main-content">
+        <h1 class="main-title">Clustering Methods Suite</h1>
+        <p class="subtitle">Comprehensive collection of clustering algorithms organized by approach</p>
+        
+        <!-- Clustering Overview Section -->
+        <div class="clustering-overview">
+            <div class="overview-intro">
+                <p><strong>Clustering</strong> is an unsupervised machine learning technique that groups similar data points together based on their characteristics, without requiring prior knowledge of the groups. It helps identify patterns, structures, and relationships in data by organizing it into meaningful clusters where points within the same cluster are more similar to each other than to points in other clusters.</p>
+                <p style="margin-top: 20px;">Clustering algorithms are broadly categorized into three main approaches, each with its own strengths and use cases:</p>
+            </div>
+            
+            <!-- Clustering Diagram -->
+            <div class="clustering-diagram">
+                <svg class="diagram-connections" viewBox="0 0 600 400" preserveAspectRatio="xMidYMid meet">
+                    <!-- Line from center to top branch (center at 300,200 to branch center at 300,10) -->
+                    <line x1="300" y1="200" x2="300" y2="10" class="connection-line"/>
+                    <!-- Line from center to left branch (center at 300,200 to branch center at 10,200) -->
+                    <line x1="300" y1="200" x2="10" y2="200" class="connection-line"/>
+                    <!-- Line from center to right branch (center at 300,200 to branch center at 590,200) -->
+                    <line x1="300" y1="200" x2="590" y2="200" class="connection-line"/>
+                </svg>
+                
+                <!-- Center: Clustering -->
+                <div class="diagram-center">
+                    <div class="diagram-center-text">Clustering</div>
+                </div>
+                
+                <!-- Branch: Partitioning -->
+                <div class="diagram-branch branch-top">
+                    <div class="diagram-branch-text">Partitioning</div>
+                </div>
+                
+                <!-- Branch: Density-Based -->
+                <div class="diagram-branch branch-left">
+                    <div class="diagram-branch-text">Density-Based</div>
+                </div>
+                
+                <!-- Branch: Hierarchical -->
+                <div class="diagram-branch branch-right">
+                    <div class="diagram-branch-text">Hierarchical</div>
+                </div>
+            </div>
+            
+            <div class="overview-intro" style="margin-top: 40px;">
+                <p><strong>Partitioning methods</strong> divide data into k clusters by optimizing a criterion function. They include centroid-based approaches (K-means, K-Medoids), model-based methods (GMM, EM), and graph-based techniques (Spectral, Louvain).</p>
+                <p style="margin-top: 15px;"><strong>Density-based methods</strong> identify clusters as dense regions of data points separated by sparse regions. They excel at finding clusters of arbitrary shapes and handling noise, including DBSCAN, HDBSCAN, OPTICS, and DENCLUE.</p>
+                <p style="margin-top: 15px;"><strong>Hierarchical methods</strong> build a tree-like structure (dendrogram) representing cluster relationships. They can be agglomerative (bottom-up) or divisive (top-down), with different linkage criteria like Single, Complete, Average, and Ward's Method.</p>
+            </div>
+        </div>
+    </div>
+<script src="../sidebar.js"></script>
+</body>
+</html>
+
+

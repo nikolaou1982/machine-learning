@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Learn about Non-metric MDS, a dimensionality reduction method. Comprehensive overview with theory, applications, and use cases for machine learning and data science.">
+  <link rel="canonical" href="https://yourdomain.com/Dimensionality_Reduction/Non_metric_MDS_Overview.html">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "name": "Non-metric MDS - Overview & Theory | Dimensionality Reduction | ML Tools",
+  "description": "Learn about Non-metric MDS, a dimensionality reduction method. Comprehensive overview with theory, applications, and use cases for machine learning and data science.",
+  "url": "https://yourdomain.com/Dimensionality_Reduction/Non_metric_MDS_Overview.html",
+  "about": {
+    "@type": "Thing",
+    "name": "Non-metric MDS",
+    "description": "Non-metric MDS algorithm for dimensionality reduction"
+  },
+  "headline": "Non-metric MDS",
+  "articleSection": "Dimensionality Reduction"
+}
+  </script>
+    <title>Non-metric MDS - Overview & Theory | Dimensionality Reduction | ML Tools</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            color: #cfcfcf;
+            background-color: #1e1e1e;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #171717;
+            padding: 30px 20px;
+            border-right: 1px solid #333;
+            overflow-y: auto;
+            height: 100vh;
+        }
+        .sidebar h1 { color: white; font-size: 1.8rem; font-weight: bold; margin-bottom: 30px; text-align: center; }
+        .nav-section { margin-bottom: 30px; }
+        .nav-section h3 { color: #dd8448; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px; }
+        .nav-item { display: block; color: #676767; text-decoration: none; padding: 12px 15px; margin-bottom: 5px; border-radius: 8px; transition: all 0.3s ease; font-weight: 500; }
+        .nav-item:hover { background-color: #2d2d2d; color: white; transform: translateX(5px); }
+        .nav-item.active { background-color: #dd8448; color: white; }
+        .nav-category { margin-bottom: 20px; }
+        .nav-category-header { color: #dd8448; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; padding: 10px 15px; cursor: pointer; border-radius: 8px; transition: background-color 0.3s ease; display: flex; justify-content: space-between; align-items: center; letter-spacing: 1px; }
+        .nav-category-header:hover { background-color: #2d2d2d; }
+        .nav-category-header .arrow { transition: transform 0.3s ease; font-size: 0.7rem; }
+        .nav-category-header.collapsed .arrow { transform: rotate(-90deg); }
+        .nav-subcategory { margin-left: 15px; margin-top: 10px; overflow: hidden; max-height: 1200px; transition: max-height 0.3s ease; }
+        .nav-subcategory.collapsed { max-height: 0; }
+        .nav-subheader { color: #999; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; padding: 8px 15px; margin-top: 5px; letter-spacing: 0.5px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-radius: 6px; transition: background-color 0.3s ease; }
+        .nav-subheader:hover { background-color: #2d2d2d; }
+        .nav-subheader .arrow { font-size: 0.6rem; transition: transform 0.3s ease; }
+        .nav-subheader.collapsed .arrow { transform: rotate(-90deg); }
+        .nav-subheader.category-header { color: #dd8448; font-size: 0.85rem; font-weight: 700; padding: 10px 15px; margin-top: 8px; letter-spacing: 1px; border: 1px solid rgba(221,132,72,0.3); }
+        .nav-subheader.category-header:hover { background-color: rgba(221,132,72,0.15); border-color: rgba(221,132,72,0.5); }
+        .nav-subgroup { overflow: hidden; max-height: 200px; transition: max-height 0.3s ease; padding-bottom: 5px; }
+        .nav-subgroup.collapsed { max-height: 0; }
+        .nav-subgroup.category-group { max-height: 1000px; }
+        .nav-subgroup.category-group.collapsed { max-height: 0; }
+        .nav-subheader.nested { margin-left: 10px; font-size: 0.7rem; }
+        .nav-subgroup.nested { margin-left: 10px; max-height: 200px; }
+        .nav-subheader.subcategory-header { color: #999; font-size: 0.75rem; font-weight: 600; padding: 8px 15px; margin-left: 10px; margin-top: 5px; letter-spacing: 0.5px; border: 1px solid rgba(153, 153, 153, 0.2); }
+        .nav-subheader.subcategory-header:hover { background-color: rgba(45, 45, 45, 0.5); border-color: rgba(153, 153, 153, 0.4); }
+        .nav-subgroup.subcategory-group { margin-left: 10px; max-height: 2000px; overflow: hidden; transition: max-height 0.3s ease; padding-bottom: 5px; }
+        .nav-subgroup.subcategory-group.collapsed { max-height: 0; }
+        .nav-item.sub { padding: 8px 15px; font-size: 0.9rem; margin-left: 10px; margin-bottom: 5px; }
+        .main-content {
+            flex: 1;
+            padding: 40px;
+        }
+        .title {
+            color: #ffffff;
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin: 0 0 8px 0;
+        }
+        .subtitle {
+            color: #8a8a8a;
+            font-size: 1rem;
+            margin-bottom: 28px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+        .card {
+            background-color: #171717;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 22px;
+            transition: border-color 0.3s ease, transform 0.3s ease;
+        }
+        .card:hover { border-color: #dd8448; transform: translateY(-3px); }
+        .card h3 { color: #ffffff; margin: 0 0 8px 0; font-size: 1.15rem; }
+        .card p { color: #9a9a9a; margin: 0; line-height: 1.6; }
+        .section {
+            background-color: #171717;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .section h2 {
+            color: #ffffff;
+            font-size: 1.5rem;
+            margin: 0 0 12px 0;
+        }
+        .badge {
+            display: inline-block;
+            background: rgba(221,132,72,0.15);
+            color: #ffb07a;
+            border: 1px solid rgba(221,132,72,0.35);
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        .list { margin: 0; padding-left: 18px; color: #b0b0b0; }
+        .list li { margin-bottom: 6px; }
+        .split {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .callout {
+            background: #202020;
+            border: 1px dashed #3a3a3a;
+            border-radius: 10px;
+            padding: 14px;
+            color: #a9a9a9;
+        }
+        .kpi {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 10px;
+        }
+        .kpi .item {
+            background: #1c1c1c;
+            border: 1px solid #2a2a2a;
+            border-radius: 10px;
+            padding: 10px 12px;
+        }
+        .kpi .label { color: #8e8e8e; font-size: 12px; }
+        .kpi .value { color: #ffffff; font-weight: 700; font-size: 18px; }
+        .muted { color: #9a9a9a; }
+        .accent { color: #dd8448; }
+    </style>
+</head>
+<body>
+    <div class="sidebar"></div>
+    <div class="main-content">
+        <h1 class="title">Non-metric Multidimensional Scaling (MDS) Overview <span class="badge">Guide</span></h1>
+        <div class="subtitle">A dimensionality reduction technique that preserves rank order of distances rather than exact distances — ideal for ordinal data and when only relative distances matter.</div>
+
+        <div class="grid">
+            <div class="card">
+                <h3>Primary Uses</h3>
+                <p>Dimensionality reduction, data visualization, preserving pairwise distances, exploratory data analysis, understanding data structure, distance-based analysis, psychological scaling, market research.</p>
+            </div>
+            <div class="card">
+                <h3>Strengths</h3>
+                <p>Preserves geodesic distances (intrinsic geometry), handles non-linear manifolds, global structure preservation, deterministic results, works well with curved manifolds, interpretable embedding.</p>
+            </div>
+            <div class="card">
+                <h3>Watch-outs</h3>
+                <p>Sensitive to k (number of neighbors), computationally expensive (O(n²) for geodesic distances), requires connected graph, may fail on disconnected manifolds, sensitive to noise, memory intensive for large datasets.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>How It Works <span class="badge">Mathematical Foundation</span></h2>
+            <div class="split">
+                <div>
+                    <p class="muted"><span class="accent">Non-metric Multidimensional Scaling (MDS)</span> is a technique that finds a low-dimensional embedding of data points such that the rank order of distances in the embedding space matches the rank order of distances in the original space. Unlike Classical MDS, it preserves ordinal relationships rather than exact distances, making it more flexible for non-metric distance data.</p>
+                    <ul class="list">
+                        <li><strong>Rank Order Preservation</strong>: Non-metric MDS preserves the rank order of distances: if d(i,j) < d(k,l) in original space, then d'(i,j) < d'(k,l) in embedding space. Exact distance values don't need to match.</li>
+                        <li><strong>Monotonic Transformation</strong>: Uses a monotonic transformation (disparities) to convert original distances to target distances that preserve rank order while minimizing stress.</li>
+                        <li><strong>SMACOF Algorithm</strong>: Uses iterative optimization (Scaling by MAjorizing a COmplicated Function) to minimize stress. Each iteration updates both the embedding and the disparities.</li>
+                        <li><strong>Stress Function</strong>: Minimizes normalized stress = √(Σ(d_disparity(i,j) - d_embedding(i,j))² / Σ(d_disparity(i,j))²), where d_disparity = monotonic transformation of original distances</li>
+                        <li><strong>Iterative Process</strong>: Alternates between: (1) updating disparities to be monotonic with original distances, (2) updating embedding to minimize stress with current disparities</li>
+                        <li><strong>Initialization</strong>: Typically initialized with Classical MDS result for faster convergence</li>
+                        <li><strong>Convergence</strong>: Stops when stress improvement falls below threshold or maximum iterations reached</li>
+                    </ul>
+                </div>
+                <div class="callout">Tip: Non-metric MDS is ideal when you have ordinal/ranked distance data (e.g., "A is more similar to B than C is to D") rather than exact distances. It's more flexible than Classical MDS but slower due to iterative optimization. Use Classical MDS initialization for better convergence.</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Dimensionality Reduction Statistics <span class="badge">Interpretation</span></h2>
+            <div class="kpi">
+                <div class="item"><div class="label">Original Dimensions</div><div class="value">Number of input features</div></div>
+                <div class="item"><div class="label">Reduced Dimensions</div><div class="value">Target dimensionality (typically 2-3)</div></div>
+                <div class="item"><div class="label">Stress</div><div class="value">MDS stress (lower = better distance preservation)</div></div>
+                <div class="item"><div class="label">Distance Correlation</div><div class="value">Correlation between original and embedded distances</div></div>
+                <div class="item"><div class="label">Compression Ratio</div><div class="value">Original dimensions / Reduced dimensions</div></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Reading the Visualizations <span class="badge">Analysis</span></h2>
+            <ul class="list">
+                <li><strong>2D/3D Embedding</strong>: Low-dimensional projection preserving pairwise distances. Should show clear structure and clusters if present in the data.</li>
+                <li><strong>Distance Preservation Plot</strong>: Comparison of original vs embedded distances. Good preservation = points lie close to diagonal line (y=x).</li>
+                <li><strong>Stress Plot</strong>: Shows how well distances are preserved. Lower stress = better preservation. Stress < 0.1 is excellent, < 0.2 is good.</li>
+                <li><strong>Shepard Diagram</strong>: Scatter plot of original distances vs embedded distances. Tight clustering around diagonal indicates good preservation.</li>
+                <li><strong>Distance Correlation</strong>: Correlation coefficient between original and embedded distances. Higher correlation (closer to 1) = better preservation.</li>
+                <li><strong>Data Structure</strong>: Embedding should reveal the underlying structure of the data (clusters, gradients, patterns) based on distance relationships.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Parameter Guidance <span class="badge">Best Practice</span></h2>
+            <ul class="list">
+                <li><strong>Reduced Dimensions</strong>: Typically 2-3 for visualization. Can use more dimensions if needed. Use stress plot to choose optimal dimensions (elbow method).</li>
+                <li><strong>Distance Metric</strong>: Euclidean distance is standard. Can use Manhattan, cosine, or custom distance metrics depending on data type.</li>
+                <li><strong>Max Iterations</strong>: Use 100-500 iterations. Monitor stress to check convergence. More iterations = better solution but slower.</li>
+                <li><strong>Convergence Tolerance</strong>: Stop when stress improvement < 1e-6. Lower tolerance = more iterations but better solution.</li>
+                <li><strong>Initialization</strong>: Use Classical MDS result as initialization for faster convergence. Random initialization works but may require more iterations.</li>
+                <li><strong>Disparity Update</strong>: Update disparities using isotonic regression (pool-adjacent-violators algorithm) to ensure monotonicity with original distances.</li>
+                <li><strong>Stress Calculation</strong>: Normalized stress (Kruskal's stress) is used. Stress < 0.1 is excellent, < 0.2 is good, > 0.3 may indicate poor fit.</li>
+                <li><strong>Handling Disconnected Graphs</strong>: If graph is disconnected, increase k or use largest connected component. May need to preprocess data.</li>
+                <li><strong>Computational Considerations</strong>: O(n²) complexity for geodesic distances. For large datasets (n > 1000), consider sampling or approximate methods.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Data Preparation <span class="badge">Best Practice</span></h2>
+            <ul class="list">
+                <li><strong>Normalization</strong>: Normalize features to [0,1] or standardize. Critical for distance calculations. Use MinMaxScaler or StandardScaler.</li>
+                <li><strong>Handle Missing Values</strong>: Remove or impute missing values. MDS requires complete distance matrices.</li>
+                <li><strong>Feature Scaling</strong>: If using feature vectors, ensure all features are on similar scales. Features with larger ranges will dominate distance calculations.</li>
+                <li><strong>Sample Size</strong>: Works best with moderate datasets (n = 50-500). Very large datasets (n > 1000) may be computationally expensive (O(n²) or O(n³)).</li>
+                <li><strong>Distance Matrix Quality</strong>: Ensure distance matrix is symmetric and non-negative. Check for metric properties if using classical MDS.</li>
+                <li><strong>Distance Metric Choice</strong>: Choose appropriate distance metric for your data type (Euclidean, Manhattan, cosine, etc.).</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Common Pitfalls <span class="badge">Avoid</span></h2>
+            <ul class="list">
+                <li><strong>Not Normalizing Data</strong>: Features on different scales cause distance calculations to be dominated by large-scale features. Always normalize!</li>
+                <li><strong>Too Many Dimensions</strong>: High-dimensional data may not preserve distances well in very low dimensions. Use stress plot to find optimal dimensions.</li>
+                <li><strong>Ignoring Stress</strong>: High stress means distances are not well preserved. May need to increase dimensions or use non-metric MDS.</li>
+                <li><strong>Computational Cost</strong>: O(n²) or O(n³) complexity can be prohibitive for large datasets. Consider sampling or approximate methods.</li>
+                <li><strong>Non-Metric Distances</strong>: Using classical MDS with non-metric distances can give poor results. Use non-metric MDS instead.</li>
+                <li><strong>Missing Distances</strong>: MDS requires complete distance matrix. Handle missing values before computing distances.</li>
+                <li><strong>Poor Initialization</strong>: For non-metric MDS, poor initialization can lead to local minima. Use classical MDS result as initialization.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>When to Use <span class="badge">Application</span></h2>
+            <ul class="list">
+                <li><strong>Distance-Based Analysis</strong>: When you have distance/similarity data rather than feature vectors (e.g., psychological experiments, market research).</li>
+                <li><strong>Preserving Pairwise Distances</strong>: When you need to preserve pairwise distances between data points in the embedding.</li>
+                <li><strong>Data Visualization</strong>: When you want to visualize high-dimensional data in 2D/3D while preserving distance relationships.</li>
+                <li><strong>Exploratory Analysis</strong>: When you want to discover the underlying structure of data based on distance relationships.</li>
+                <li><strong>Preprocessing</strong>: When you want to reduce dimensionality before applying other algorithms that work better in lower dimensions.</li>
+                <li><strong>Ordinal Data</strong>: When you have rank-order information about distances (use non-metric MDS).</li>
+                <li><strong>Similarity Matrices</strong>: When you have similarity/dissimilarity matrices from experiments or surveys.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Alternatives to Consider <span class="badge">Comparison</span></h2>
+            <ul class="list">
+                <li><strong>vs Classical MDS</strong>: Non-metric MDS preserves rank order; Classical MDS preserves exact distances. Use Non-metric MDS for ordinal data or when only relative distances matter.</li>
+                <li><strong>vs PCA</strong>: Non-metric MDS preserves rank order of distances; PCA preserves variance. Use Non-metric MDS when ordinal distance relationships are important.</li>
+                <li><strong>vs t-SNE</strong>: Non-metric MDS preserves global rank order; t-SNE emphasizes local structure. Use Non-metric MDS when global ordinal relationships are important.</li>
+                <li><strong>vs UMAP</strong>: Non-metric MDS is deterministic and preserves rank order; UMAP uses probabilistic embeddings. Use Non-metric MDS when you need deterministic ordinal preservation.</li>
+                <li><strong>vs Classical MDS</strong>: Non-metric MDS is slower but more flexible. Use Classical MDS when distances are metric, Non-metric MDS when distances are ordinal/non-metric.</li>
+            </ul>
+        </div>
+    </div>
+    <script src="../sidebar.js"></script>
+</body>
+</html>
+

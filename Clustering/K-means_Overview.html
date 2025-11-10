@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Learn about K-means, a clustering method. Comprehensive overview with theory, applications, and use cases for machine learning and data science.">
+  <link rel="canonical" href="https://yourdomain.com/Clustering/K-means_Overview.html">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "name": "K-means - Overview & Theory | Clustering | ML Tools",
+  "description": "Learn about K-means, a clustering method. Comprehensive overview with theory, applications, and use cases for machine learning and data science.",
+  "url": "https://yourdomain.com/Clustering/K-means_Overview.html",
+  "about": {
+    "@type": "Thing",
+    "name": "K-means",
+    "description": "K-means algorithm for clustering"
+  },
+  "headline": "K-means",
+  "articleSection": "Clustering"
+}
+  </script>
+    <title>K-means - Overview & Theory | Clustering | ML Tools</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            color: #cfcfcf;
+            background-color: #1e1e1e;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #171717;
+            padding: 30px 20px;
+            border-right: 1px solid #333;
+            overflow-y: auto;
+            height: 100vh;
+        }
+        /* Sidebar nav styles to match dashboard */
+        .sidebar h1 { color: white; font-size: 1.8rem; font-weight: bold; margin-bottom: 30px; text-align: center; }
+        .nav-section { margin-bottom: 30px; }
+        .nav-section h3 { color: #dd8448; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px; }
+        .nav-item { display: block; color: #676767; text-decoration: none; padding: 12px 15px; margin-bottom: 5px; border-radius: 8px; transition: all 0.3s ease; font-weight: 500; }
+        .nav-item:hover { background-color: #2d2d2d; color: white; transform: translateX(5px); }
+        .nav-item.active { background-color: #dd8448; color: white; }
+        .nav-category { margin-bottom: 20px; }
+        .nav-category-header { color: #dd8448; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; padding: 10px 15px; cursor: pointer; border-radius: 8px; transition: background-color 0.3s ease; display: flex; justify-content: space-between; align-items: center; letter-spacing: 1px; }
+        .nav-category-header:hover { background-color: #2d2d2d; }
+        .nav-category-header .arrow { transition: transform 0.3s ease; font-size: 0.7rem; }
+        .nav-category-header.collapsed .arrow { transform: rotate(-90deg); }
+        .nav-subcategory { margin-left: 15px; margin-top: 10px; overflow: hidden; max-height: 1200px; transition: max-height 0.3s ease; }
+        .nav-subcategory.collapsed { max-height: 0; }
+        .nav-subheader { color: #999; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; padding: 8px 15px; margin-top: 5px; letter-spacing: 0.5px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-radius: 6px; transition: background-color 0.3s ease; }
+        .nav-subheader:hover { background-color: #2d2d2d; }
+        .nav-subheader .arrow { font-size: 0.6rem; transition: transform 0.3s ease; }
+        .nav-subheader.collapsed .arrow { transform: rotate(-90deg); }
+        .nav-subheader.category-header { color: #dd8448; font-size: 0.85rem; font-weight: 700; padding: 10px 15px; margin-top: 8px; letter-spacing: 1px; border: 1px solid rgba(221,132,72,0.3); }
+        .nav-subheader.category-header:hover { background-color: rgba(221,132,72,0.15); border-color: rgba(221,132,72,0.5); }
+        .nav-subgroup { overflow: hidden; max-height: 200px; transition: max-height 0.3s ease; padding-bottom: 5px; }
+        .nav-subgroup.collapsed { max-height: 0; }
+        .nav-subgroup.category-group { max-height: 1000px; }
+        .nav-subgroup.category-group.collapsed { max-height: 0; }
+        .nav-subheader.nested { margin-left: 10px; font-size: 0.7rem; }
+        .nav-subgroup.nested { margin-left: 10px; max-height: 200px; }
+        .nav-subheader.subcategory-header { color: #999; font-size: 0.75rem; font-weight: 600; padding: 8px 15px; margin-left: 10px; margin-top: 5px; letter-spacing: 0.5px; border: 1px solid rgba(153, 153, 153, 0.2); }
+        .nav-subheader.subcategory-header:hover { background-color: rgba(45, 45, 45, 0.5); border-color: rgba(153, 153, 153, 0.4); }
+        .nav-subgroup.subcategory-group { margin-left: 10px; max-height: 800px; overflow: hidden; transition: max-height 0.3s ease; padding-bottom: 5px; }
+        .nav-subgroup.subcategory-group.collapsed { max-height: 0; }
+        .nav-item.sub { padding: 8px 15px; font-size: 0.9rem; margin-left: 10px; margin-bottom: 5px; }
+        .main-content {
+            flex: 1;
+            padding: 40px;
+        }
+        .title {
+            color: #ffffff;
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin: 0 0 8px 0;
+        }
+        .subtitle {
+            color: #8a8a8a;
+            font-size: 1rem;
+            margin-bottom: 28px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+        .card {
+            background-color: #171717;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 22px;
+            transition: border-color 0.3s ease, transform 0.3s ease;
+        }
+        .card:hover { border-color: #dd8448; transform: translateY(-3px); }
+        .card h3 { color: #ffffff; margin: 0 0 8px 0; font-size: 1.15rem; }
+        .card p { color: #9a9a9a; margin: 0; line-height: 1.6; }
+        .section {
+            background-color: #171717;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .section h2 {
+            color: #ffffff;
+            font-size: 1.5rem;
+            margin: 0 0 12px 0;
+        }
+        .badge {
+            display: inline-block;
+            background: rgba(221,132,72,0.15);
+            color: #ffb07a;
+            border: 1px solid rgba(221,132,72,0.35);
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        .list { margin: 0; padding-left: 18px; color: #b0b0b0; }
+        .list li { margin-bottom: 6px; }
+        .split {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .callout {
+            background: #202020;
+            border: 1px dashed #3a3a3a;
+            border-radius: 10px;
+            padding: 14px;
+            color: #a9a9a9;
+        }
+        .kpi {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 10px;
+        }
+        .kpi .item {
+            background: #1c1c1c;
+            border: 1px solid #2a2a2a;
+            border-radius: 10px;
+            padding: 10px 12px;
+        }
+        .kpi .label { color: #8e8e8e; font-size: 12px; }
+        .kpi .value { color: #ffffff; font-weight: 700; font-size: 18px; }
+        .muted { color: #9a9a9a; }
+        .accent { color: #dd8448; }
+        .legend {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .legend .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #202020;
+            border: 1px solid #333;
+            border-radius: 999px;
+            padding: 6px 10px;
+            color: #cfcfcf;
+            font-size: 12px;
+        }
+        .chip .dot { width: 8px; height: 8px; border-radius: 100%; background: #dd8448; display: inline-block; }
+    </style>
+</head>
+<body>
+    <div class="sidebar"></div>
+    <div class="main-content">
+        <h1 class="title">K-means Overview <span class="badge">Guide</span></h1>
+        <div class="subtitle">Centroid-based clustering: partition data into k spherical clusters by minimizing within-cluster variance.</div>
+
+        <div class="grid">
+            <div class="card">
+                <h3>Primary Uses</h3>
+                <p>Customer segmentation, image compression, market research, document clustering, color quantization, vector quantization.</p>
+            </div>
+            <div class="card">
+                <h3>Strengths</h3>
+                <p>Fast and scalable, works well with spherical clusters, simple interpretation, good for large datasets.</p>
+            </div>
+            <div class="card">
+                <h3>Watch-outs</h3>
+                <p>Assumes spherical clusters, requires knowing k, sensitive to initialization, struggles with varying cluster sizes/densities.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>How It Works <span class="badge">Short</span></h2>
+            <div class="split">
+                <div>
+                    <p class="muted">Initialize <span class="accent">k</span> centroids randomly. Iterate: assign points to nearest centroid, update centroids to cluster means. Converges when assignments stabilize.</p>
+                    <ul class="list">
+                        <li><strong>k</strong>: number of clusters (use elbow method or domain knowledge)</li>
+                        <li><strong>Max Iterations</strong>: stop after N iterations even if not converged (prevents infinite loops)</li>
+                        <li><strong>Initialization</strong>: k-means++ improves convergence vs random (used by default)</li>
+                    </ul>
+                </div>
+                <div class="callout">Tip: Run multiple times with different seeds and pick the best result (lowest inertia/sse).</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Clustering Statistics <span class="badge">Interpretation</span></h2>
+            <div class="kpi">
+                <div class="item"><div class="label">Clusters Found</div><div class="value">k (user-specified)</div></div>
+                <div class="item"><div class="label">Inertia (SSE)</div><div class="value">Within-cluster sum of squares (lower = tighter)</div></div>
+                <div class="item"><div class="label">Silhouette</div><div class="value">Separation quality (higher = better, compare across k)</div></div>
+                <div class="item"><div class="label">Total Points</div><div class="value">Dataset size context</div></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Reading the Graphs <span class="badge">2D</span></h2>
+            <ul class="list">
+                <li><strong>Original Data</strong>: raw geometry; identify potential clusters and their count.</li>
+                <li><strong>Clustering Results</strong>: color-coded assignments; centroids shown as larger markers; validate separation.</li>
+                <li><strong>Inertia vs k</strong>: elbow plot to find optimal k (look for diminishing returns).</li>
+                <li><strong>Silhouette vs k</strong>: peaks indicate better k values; negative scores suggest poor fit.</li>
+                <li><strong>Iteration Convergence</strong>: inertia decreases per iteration; flat line = converged.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Reading the Graphs <span class="badge">3D</span></h2>
+            <ul class="list">
+                <li><strong>Original 3D</strong>: spatial structure; rotate to inspect cluster shapes and overlap.</li>
+                <li><strong>Clustering 3D</strong>: depth reveals layering; centroids shown as larger 3D markers.</li>
+                <li><strong>Inertia vs k</strong>: same elbow method; expect higher inertia values vs 2D for similar scales.</li>
+                <li><strong>Silhouette vs k</strong>: use peaks to validate k choices; 3D often needs more clusters than 2D.</li>
+                <li><strong>Iteration Convergence</strong>: monitor convergence rate; may need more iterations in 3D.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Parameter Guidance <span class="badge">Best Practice</span></h2>
+            <ul class="list">
+                <li><strong>k</strong>: Start with domain knowledge or use elbow method. Try k = sqrt(n/2) as heuristic.</li>
+                <li><strong>Max Iterations</strong>: Default 300 usually sufficient; increase if convergence fails.</li>
+                <li><strong>Multiple Runs</strong>: Run 10+ times and select lowest inertia to avoid local minima.</li>
+                <li><strong>Initialization</strong>: k-means++ (default) better than random; k-means|| for very large datasets.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Data Preparation <span class="badge">Best Practice</span></h2>
+            <ul class="list">
+                <li>Standardize or normalize features; remove outliers that distort centroids.</li>
+                <li>Works best with spherical clusters; consider spectral clustering or GMM for non-spherical shapes.</li>
+                <li>For varying sizes/densities, consider k-medoids or hierarchical methods.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Common Pitfalls <span class="badge">Avoid</span></h2>
+            <ul class="list">
+                <li>Choosing k too high → overfitting, too low → underfitting (use validation metrics).</li>
+                <li>Poor initialization → local minima (run multiple times, use k-means++).</li>
+                <li>Non-spherical data → poor results (try alternative algorithms).</li>
+                <li>Not standardizing → features with larger scales dominate distance calculations.</li>
+            </ul>
+        </div>
+    </div>
+    <script src="../sidebar.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Explore dimensionality reduction techniques including PCA, t-SNE, UMAP, and more. Interactive implementations for visualizing and reducing high-dimensional data.">
+  <link rel="canonical" href="https://yourdomain.com/Dimensionality_Reduction/Dimensionality_Reduction.html">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Dimensionality Reduction Methods - PCA, t-SNE, UMAP & More",
+  "description": "Explore dimensionality reduction techniques including PCA, t-SNE, UMAP, and more. Interactive implementations for visualizing and reducing high-dimensional data.",
+  "url": "https://yourdomain.com/Dimensionality_Reduction/Dimensionality_Reduction.html",
+  "about": {
+    "@type": "Thing",
+    "name": "Dimensionality Reduction",
+    "description": "Dimensionality Reduction algorithm for dimensionality reduction"
+  }
+}
+  </script>
+    <title>Dimensionality Reduction Methods - PCA, t-SNE, UMAP & More</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            color: #676767;
+            background-color: #1e1e1e;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: #171717;
+            padding: 30px 20px;
+            border-right: 1px solid #333;
+            overflow-y: auto;
+            height: 100vh;
+        }
+        
+        .nav-item {
+            display: block;
+            color: #676767;
+            text-decoration: none;
+            padding: 12px 15px;
+            margin-bottom: 5px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .nav-item:hover {
+            background-color: #2d2d2d;
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .nav-item.active {
+            background-color: #dd8448;
+            color: white;
+        }
+        
+        .nav-category {
+            margin-bottom: 20px;
+        }
+        
+        .nav-category-header {
+            color: #dd8448;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            letter-spacing: 1px;
+        }
+        
+        .nav-category-header:hover {
+            background-color: #2d2d2d;
+        }
+        
+        .nav-category-header .arrow {
+            transition: transform 0.3s ease;
+            font-size: 0.7rem;
+        }
+        
+        .nav-category-header.collapsed .arrow {
+            transform: rotate(-90deg);
+        }
+        
+        .nav-subheader {
+            color: #999;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            padding: 8px 15px;
+            margin-top: 5px;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .nav-subheader:hover {
+            background-color: #2d2d2d;
+        }
+        
+        .nav-subheader .arrow {
+            font-size: 0.6rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .nav-subheader.collapsed .arrow {
+            transform: rotate(-90deg);
+        }
+        
+        .nav-subheader.category-header {
+            color: #dd8448;
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 10px 15px;
+            margin-top: 8px;
+            letter-spacing: 1px;
+            border: 1px solid rgba(221,132,72,0.3);
+        }
+        
+        .nav-subheader.category-header:hover {
+            background-color: rgba(221,132,72,0.15);
+            border-color: rgba(221,132,72,0.5);
+        }
+        
+        .nav-subgroup {
+            overflow: hidden;
+            max-height: 200px;
+            transition: max-height 0.3s ease;
+            padding-bottom: 5px;
+        }
+        
+        .nav-subgroup.collapsed {
+            max-height: 0;
+        }
+        
+        .nav-subgroup.category-group {
+            max-height: 1000px;
+        }
+        
+        .nav-subgroup.category-group.collapsed {
+            max-height: 0;
+        }
+        
+        .nav-subcategory {
+            margin-left: 15px;
+            margin-top: 10px;
+            overflow: hidden;
+            max-height: 1200px;
+            transition: max-height 0.3s ease;
+        }
+        
+        .nav-subcategory.collapsed {
+            max-height: 0;
+        }
+        
+        .nav-item.sub {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            margin-left: 10px;
+            margin-bottom: 5px;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 40px;
+        }
+        
+        .main-title {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #676767;
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+        }
+        
+        /* Dimensionality Reduction Overview Section */
+        .dimension-overview {
+            background-color: #171717;
+            border-radius: 12px;
+            padding: 40px;
+            border: 1px solid #333;
+            margin-bottom: 50px;
+        }
+        
+        .overview-intro {
+            color: #676767;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 40px;
+            text-align: center;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .dimension-diagram {
+            position: relative;
+            width: 100%;
+            height: 550px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 60px 0 40px 0;
+        }
+        
+        .diagram-center {
+            position: absolute;
+            width: 240px;
+            height: 240px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(221,132,72,0.2), rgba(221,132,72,0.05));
+            border: 3px solid #dd8448;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            box-shadow: 0 0 30px rgba(221,132,72,0.3);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .diagram-center-text {
+            color: white;
+            font-size: 1.6rem;
+            font-weight: 700;
+            text-align: center;
+            padding: 10px;
+        }
+        
+        .diagram-branch {
+            position: absolute;
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(91,163,245,0.2), rgba(91,163,245,0.05));
+            border: 2px solid #5ba3f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+            box-shadow: 0 0 20px rgba(91,163,245,0.2);
+        }
+        
+        .diagram-branch-text {
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-align: center;
+            padding: 8px;
+            line-height: 1.2;
+        }
+        
+        /* 7-point arrangement for branches - evenly spaced in a circle */
+        /* Using radius of 220px, angle between branches = 360/7 ≈ 51.43° */
+        .branch-top {
+            top: calc(50% - 220px);
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .branch-top-right {
+            top: calc(50% - 137px);
+            left: calc(50% + 172px);
+            transform: translate(-50%, -50%);
+        }
+        
+        .branch-right {
+            top: 50%;
+            left: calc(50% + 220px);
+            transform: translate(-50%, -50%);
+        }
+        
+        .branch-bottom-right {
+            top: calc(50% + 137px);
+            left: calc(50% + 172px);
+            transform: translate(-50%, -50%);
+        }
+        
+        .branch-bottom {
+            top: calc(50% + 220px);
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .branch-bottom-left {
+            top: calc(50% + 137px);
+            left: calc(50% - 172px);
+            transform: translate(-50%, -50%);
+        }
+        
+        .branch-top-left {
+            top: calc(50% - 137px);
+            left: calc(50% - 172px);
+            transform: translate(-50%, -50%);
+        }
+        
+        .diagram-connections {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        .connection-line {
+            stroke: #5ba3f5;
+            stroke-width: 2;
+            opacity: 0.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar"></div>
+    <div class="main-content">
+        <h1 class="main-title">Dimensionality Reduction Methods Suite</h1>
+        <p class="subtitle">Comprehensive collection of dimensionality reduction algorithms organized by approach</p>
+        
+        <!-- Dimensionality Reduction Overview Section -->
+        <div class="dimension-overview">
+            <div class="overview-intro">
+                <p><strong>Dimensionality Reduction</strong> is an unsupervised machine learning technique that reduces the number of features (dimensions) in a dataset while preserving the most important information. It helps with visualization, noise reduction, computational efficiency, and can reveal hidden patterns in high-dimensional data.</p>
+                <p style="margin-top: 20px;">Dimensionality reduction algorithms are broadly categorized into seven main approaches, each with its own strengths and use cases:</p>
+            </div>
+            
+            <!-- Dimensionality Reduction Diagram -->
+            <div class="dimension-diagram">
+                <svg class="diagram-connections" viewBox="0 0 600 550" preserveAspectRatio="xMidYMid meet">
+                    <!-- Lines from center to branches - updated to match new positions -->
+                    <line x1="300" y1="275" x2="300" y2="55" class="connection-line"/>
+                    <line x1="300" y1="275" x2="472" y2="138" class="connection-line"/>
+                    <line x1="300" y1="275" x2="520" y2="275" class="connection-line"/>
+                    <line x1="300" y1="275" x2="472" y2="412" class="connection-line"/>
+                    <line x1="300" y1="275" x2="300" y2="495" class="connection-line"/>
+                    <line x1="300" y1="275" x2="128" y2="412" class="connection-line"/>
+                    <line x1="300" y1="275" x2="128" y2="138" class="connection-line"/>
+                </svg>
+                
+                <!-- Center: Dimensionality Reduction -->
+                <div class="diagram-center">
+                    <div class="diagram-center-text">Dimensionality Reduction</div>
+                </div>
+                
+                <!-- Branch: Linear Methods -->
+                <div class="diagram-branch branch-top">
+                    <div class="diagram-branch-text">Linear Methods</div>
+                </div>
+                
+                <!-- Branch: Non-Linear Methods -->
+                <div class="diagram-branch branch-top-right">
+                    <div class="diagram-branch-text">Non-Linear Methods</div>
+                </div>
+                
+                <!-- Branch: Probabilistic Methods -->
+                <div class="diagram-branch branch-right">
+                    <div class="diagram-branch-text">Probabilistic Methods</div>
+                </div>
+                
+                <!-- Branch: Feature Selection Methods -->
+                <div class="diagram-branch branch-bottom-right">
+                    <div class="diagram-branch-text">Feature Selection</div>
+                </div>
+                
+                <!-- Branch: Geometric & Topological Methods -->
+                <div class="diagram-branch branch-bottom">
+                    <div class="diagram-branch-text">Geometric & Topological</div>
+                </div>
+                
+                <!-- Branch: Supervised Dimensionality Reduction -->
+                <div class="diagram-branch branch-bottom-left">
+                    <div class="diagram-branch-text">Supervised DR</div>
+                </div>
+                
+                <!-- Branch: Sparse Methods -->
+                <div class="diagram-branch branch-top-left">
+                    <div class="diagram-branch-text">Sparse Methods</div>
+                </div>
+            </div>
+            
+            <div class="overview-intro" style="margin-top: 40px;">
+                <p><strong>Linear Methods</strong> use linear transformations to project high-dimensional data onto lower-dimensional subspaces. They preserve linear relationships and are computationally efficient, making them ideal for large datasets with linear structures.</p>
+                <p style="margin-top: 15px;"><strong>Non-Linear Methods</strong> capture complex, non-linear relationships in data by learning non-linear manifolds. They excel at preserving local neighborhoods and can reveal intricate patterns that linear methods miss.</p>
+                <p style="margin-top: 15px;"><strong>Probabilistic Methods</strong> model the probability distribution of data in both high and low dimensions. They provide uncertainty estimates and can handle missing data, making them robust for real-world applications.</p>
+                <p style="margin-top: 15px;"><strong>Feature Selection Methods</strong> identify and retain the most informative features while discarding redundant or irrelevant ones. They maintain interpretability and can improve model performance by reducing noise.</p>
+                <p style="margin-top: 15px;"><strong>Geometric & Topological Methods</strong> preserve geometric and topological properties of data, such as distances, angles, and connectivity. They are particularly useful for understanding the intrinsic structure of complex datasets.</p>
+                <p style="margin-top: 15px;"><strong>Supervised Dimensionality Reduction</strong> uses class labels or target information to guide the reduction process. They optimize for separability between classes, making them ideal for classification tasks.</p>
+                <p style="margin-top: 15px;"><strong>Sparse Methods</strong> produce sparse representations where most coefficients are zero. They promote interpretability, enable feature selection, and can handle high-dimensional data efficiently.</p>
+            </div>
+        </div>
+    </div>
+<script src="../sidebar.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,2280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Interactive UMAP implementation in 2D. Visualize and experiment with this dimensionality reduction algorithm using real-time charts and data analysis tools.">
+  <link rel="canonical" href="https://yourdomain.com/Dimensionality_Reduction/UMAP_DR.html">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "UMAP (2D) - Interactive Implementation | Dimensionality Reduction | ML Tools",
+  "description": "Interactive UMAP implementation in 2D. Visualize and experiment with this dimensionality reduction algorithm using real-time charts and data analysis tools.",
+  "url": "https://yourdomain.com/Dimensionality_Reduction/UMAP_DR.html",
+  "about": {
+    "@type": "Thing",
+    "name": "UMAP",
+    "description": "UMAP algorithm for dimensionality reduction"
+  }
+}
+  </script>
+    <title>UMAP (2D) - Interactive Implementation | Dimensionality Reduction | ML Tools</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            color: #676767;
+            background-color: #1e1e1e;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #171717;
+            padding: 30px 20px;
+            border-right: 1px solid #333;
+            overflow-y: auto;
+            height: 100vh;
+        }
+        .sidebar h1 { color: white; font-size: 1.8rem; font-weight: bold; margin-bottom: 30px; text-align: center; }
+        .nav-section { margin-bottom: 30px; }
+        .nav-section h3 { color: #dd8448; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px; }
+        .nav-item { display: block; color: #676767; text-decoration: none; padding: 12px 15px; margin-bottom: 5px; border-radius: 8px; transition: all 0.3s ease; font-weight: 500; }
+        .nav-item:hover { background-color: #2d2d2d; color: white; transform: translateX(5px); }
+        .nav-item.active { background-color: #dd8448; color: white; }
+        .nav-category { margin-bottom: 20px; }
+        .nav-category-header { color: #dd8448; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; padding: 10px 15px; cursor: pointer; border-radius: 8px; transition: background-color 0.3s ease; display: flex; justify-content: space-between; align-items: center; letter-spacing: 1px; }
+        .nav-category-header:hover { background-color: #2d2d2d; }
+        .nav-category-header .arrow { transition: transform 0.3s ease; font-size: 0.7rem; }
+        .nav-category-header.collapsed .arrow { transform: rotate(-90deg); }
+        .nav-subcategory { margin-left: 15px; margin-top: 10px; overflow: hidden; max-height: 1200px; transition: max-height 0.3s ease; }
+        .nav-subcategory.collapsed { max-height: 0; }
+        .nav-subheader { color: #999; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; padding: 8px 15px; margin-top: 5px; letter-spacing: 0.5px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-radius: 6px; transition: background-color 0.3s ease; }
+        .nav-subheader:hover { background-color: #2d2d2d; }
+        .nav-subheader .arrow { font-size: 0.6rem; transition: transform 0.3s ease; }
+        .nav-subheader.collapsed .arrow { transform: rotate(-90deg); }
+        .nav-subheader.category-header { color: #dd8448; font-size: 0.85rem; font-weight: 700; padding: 10px 15px; margin-top: 8px; letter-spacing: 1px; border: 1px solid rgba(221,132,72,0.3); }
+        .nav-subheader.category-header:hover { background-color: rgba(221,132,72,0.15); border-color: rgba(221,132,72,0.5); }
+        .nav-subgroup { overflow: hidden; max-height: 200px; transition: max-height 0.3s ease; padding-bottom: 5px; }
+        .nav-subgroup.collapsed { max-height: 0; }
+        .nav-subgroup.category-group { max-height: 1000px; }
+        .nav-subgroup.category-group.collapsed { max-height: 0; }
+        .nav-subheader.nested { margin-left: 10px; font-size: 0.7rem; }
+        .nav-subgroup.nested { margin-left: 10px; max-height: 200px; }
+        .nav-subheader.subcategory-header { color: #999; font-size: 0.75rem; font-weight: 600; padding: 8px 15px; margin-left: 10px; margin-top: 5px; letter-spacing: 0.5px; border: 1px solid rgba(153, 153, 153, 0.2); }
+        .nav-subheader.subcategory-header:hover { background-color: rgba(45, 45, 45, 0.5); border-color: rgba(153, 153, 153, 0.4); }
+        .nav-subgroup.subcategory-group { margin-left: 10px; max-height: 2000px; overflow: hidden; transition: max-height 0.3s ease; padding-bottom: 5px; }
+        .nav-subgroup.subcategory-group.collapsed { max-height: 0; }
+        .nav-item.sub { padding: 8px 15px; font-size: 0.9rem; margin-left: 10px; margin-bottom: 5px; }
+        .main-content {
+            flex: 1;
+            padding: 20px;
+        }
+        .main-title {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .subtitle {
+            color: #676767;
+            font-size: 1rem;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .controls-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .control-group {
+            background-color: #171717;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            min-width: 200px;
+            box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset;
+        }
+        .control-group h3 {
+            color: white;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+            margin-top: 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+        .control-item {
+            margin-bottom: 15px;
+        }
+        .control-item label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            color: #676767;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        #k-neighbors-value, #stress-value {
+            display: inline-block;
+            background: rgba(221,132,72,0.15);
+            color: #ffb07a;
+            border: 1px solid rgba(221,132,72,0.35);
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            line-height: 18px;
+        }
+        input[type="range"]::-webkit-slider-thumb { background: #dd8448; }
+        input[type="range"] { accent-color: #dd8448; }
+        .control-item input, .control-item select {
+            width: 100%;
+            padding: 8px 12px;
+            background-color: #2d2d2d;
+            border: 1px solid #444;
+            border-radius: 6px;
+            color: white;
+            font-family: 'Nunito', sans-serif;
+        }
+        .control-item input:focus, .control-item select:focus {
+            outline: none;
+            border-color: #dd8448;
+        }
+        .control-item input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+        }
+        .stats-container {
+            background-color: #171717;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            margin-bottom: 30px;
+        }
+        .stats-container h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        .stat-item {
+            background-color: #2d2d2d;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-value {
+            color: #dd8448;
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: block;
+        }
+        .stat-label {
+            color: #676767;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        .plots-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .plot-wrapper {
+            background-color: #171717;
+            border-radius: 12px;
+            border: 1px solid #333;
+            padding: 20px;
+            flex: 1;
+            min-width: 400px;
+        }
+        .plot-wrapper h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        .plot-wrapper > div {
+            height: 500px;
+        }
+        .btn {
+            background-color: #ffffff;
+            color: #171717;
+            border: 1px solid #444;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Nunito', sans-serif;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn:hover {
+            background-color: #f0f0f0;
+            border-color: #666;
+        }
+        .control-group.actions .btn {
+            background-color: #dd8448;
+            color: white;
+            border: 1px solid #dd8448;
+            display: block;
+            width: 100%;
+            margin-right: 0;
+            margin-bottom: 10px;
+        }
+        .control-group.actions .btn:hover {
+            background-color: #c67339;
+        }
+        .csv-format {
+            padding: 2px;
+            background: linear-gradient(-30deg, rgba(221, 132, 72, 0.4), transparent, rgba(221, 132, 72, 0.4)), linear-gradient(to bottom, #2d2d2d, #2d2d2d);
+            position: relative;
+        }
+        .csv-format::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 1px solid rgba(221, 132, 72, 0.5);
+            border-radius: 12px;
+            pointer-events: none;
+        }
+        .csv-info-card {
+            background: #171717;
+            border-radius: 10px;
+            padding: 16px;
+            margin: 2px;
+            position: relative;
+            z-index: 10;
+        }
+        .csv-badge {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 4px 8px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.8);
+            width: fit-content;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .csv-title {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 8px 0 4px 0;
+        }
+        .csv-desc {
+            color: rgba(255,255,255,0.6);
+            font-size: 11px;
+            line-height: 1.3;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar"></div>
+    <div class="main-content">
+        <h1 class="main-title">UMAP (Uniform Manifold Approximation and Projection)</h1>
+        <p class="subtitle">Fast dimensionality reduction preserving both local and global structure using Riemannian geometry.</p>
+    
+        <div class="controls-container">
+            <div class="control-group">
+                <h3>Dataset</h3>
+                <div class="control-item">
+                    <label for="dataset-select">Select Dataset:</label>
+                    <select id="dataset-select">
+                        <option value="iris">Iris (4 features, 150 samples)</option>
+                        <option value="wine">Wine (13 features, 178 samples)</option>
+                        <option value="breast-cancer">Breast Cancer (30 features, 569 samples)</option>
+                        <option value="diabetes">Diabetes (8 features, 442 samples)</option>
+                        <option value="custom">Custom CSV Data</option>
+                    </select>
+                </div>
+                <div class="control-item">
+                    <input type="file" id="file-input" accept=".csv" style="display: none;" onchange="loadCSV(event)">
+                    <label for="file-input" style="display: inline-block; background-color: #2d2d2d; color: white; padding: 10px 20px; border-radius: 6px; border: 2px dashed #444; cursor: pointer; transition: all 0.3s ease; font-weight: 500; text-align: center; width: 100%; box-sizing: border-box;">📁 Upload CSV</label>
+                </div>
+            </div>
+            
+            <div class="control-group csv-format">
+                <div class="csv-info-card">
+                    <div class="csv-badge">Format</div>
+                    <div class="csv-title">CSV Upload</div>
+                    <div class="csv-desc">
+                        Numeric columns only<br>
+                        First row: headers (optional)<br>
+                        Example: feature1,feature2,feature3<br>
+                        1.0,2.3,3.1<br>
+                        4.2,5.5,6.7
+                    </div>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <h3>UMAP Parameters</h3>
+                <div class="control-item">
+                    <label for="n-neighbors-slider">n_neighbors: <span id="n-neighbors-value">15</span></label>
+                    <input type="range" id="n-neighbors-slider" min="5" max="50" step="1" value="15">
+                </div>
+                <div class="control-item">
+                    <label for="min-dist-slider">min_dist: <span id="min-dist-value">0.1</span></label>
+                    <input type="range" id="min-dist-slider" min="0.01" max="1.0" step="0.01" value="0.1">
+                </div>
+                <div class="control-item">
+                    <label for="dimensions-slider">Embedding Dimensions: <span id="dimensions-value">2</span></label>
+                    <input type="range" id="dimensions-slider" min="1" max="10" step="1" value="2">
+                </div>
+                <div class="control-item">
+                    <label>
+                        <input type="checkbox" id="normalize-check" checked>
+                        Normalize Features
+                    </label>
+                </div>
+                <div class="control-item">
+                    <label style="color: #999; font-size: 0.85rem;">Cross-Entropy Loss: <span id="cross-entropy-value">-</span></label>
+                </div>
+            </div>
+            
+            <div class="control-group actions">
+                <h3>Actions</h3>
+                <button class="btn" onclick="runUMAP()">Run UMAP</button>
+                <button class="btn" onclick="exportResults()">Export Results</button>
+                <button class="btn" onclick="downloadPlot()">Download Plot</button>
+            </div>
+        </div>
+
+        <div class="control-group" style="background: rgba(221,132,72,0.1); border: 1px solid rgba(221,132,72,0.4);">
+            <h3 style="color: #dd8448;">Computation Notice</h3>
+            <p style="color: #cfcfcf; font-size: 0.9rem; margin: 0;">
+                UMAP is faster than t-SNE and can handle larger datasets. Computation time depends on dataset size and n_neighbors parameter.
+            </p>
+        </div>
+        
+        <div class="stats-container">
+            <h3>UMAP Statistics</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-value" id="original-dims">-</span>
+                    <div class="stat-label">Original Dimensions</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="reduced-dims">-</span>
+                    <div class="stat-label">Reduced Dimensions</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="cross-entropy">-</span>
+                    <div class="stat-label">Cross-Entropy Loss</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="compression-ratio">-</span>
+                    <div class="stat-label">Compression Ratio</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="total-samples">-</span>
+                    <div class="stat-label">Total Samples</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="plots-container">
+            <div class="plot-wrapper">
+                <h3>Cross-Entropy Loss Plot</h3>
+                <div id="stress-plot"></div>
+            </div>
+            <div class="plot-wrapper">
+                <h3>Cross-Entropy Loss Explained</h3>
+                <div id="distance-preservation-plot"></div>
+            </div>
+        </div>
+
+        <div class="plots-container">
+            <div class="plot-wrapper">
+                <h3>UMAP Embedding (2D)</h3>
+                <div id="isomap-plot"></div>
+            </div>
+        </div>
+
+<script>
+    class MinHeap {
+        constructor() {
+            this.heap = [];
+        }
+
+        push(item) {
+            this.heap.push(item);
+            this.bubbleUp(this.heap.length - 1);
+        }
+
+        pop() {
+            if (this.heap.length === 0) return null;
+            if (this.heap.length === 1) return this.heap.pop();
+            const min = this.heap[0];
+            this.heap[0] = this.heap.pop();
+            this.bubbleDown(0);
+            return min;
+        }
+
+        bubbleUp(index) {
+            while (index > 0) {
+                const parent = Math.floor((index - 1) / 2);
+                if (this.heap[parent].dist <= this.heap[index].dist) break;
+                [this.heap[parent], this.heap[index]] = [this.heap[index], this.heap[parent]];
+                index = parent;
+            }
+        }
+
+        bubbleDown(index) {
+            const length = this.heap.length;
+            while (true) {
+                const left = index * 2 + 1;
+                const right = index * 2 + 2;
+                let smallest = index;
+
+                if (left < length && this.heap[left].dist < this.heap[smallest].dist) {
+                    smallest = left;
+                }
+                if (right < length && this.heap[right].dist < this.heap[smallest].dist) {
+                    smallest = right;
+                }
+                if (smallest === index) break;
+                [this.heap[index], this.heap[smallest]] = [this.heap[smallest], this.heap[index]];
+                index = smallest;
+            }
+        }
+
+        isEmpty() {
+            return this.heap.length === 0;
+        }
+    }
+
+    // UMAP Implementation
+    class UMAP {
+        constructor() {
+            this.embedding = null;
+            this.pij = null; // High-dimensional probabilities (dense, for compatibility)
+            this.qij = null; // Low-dimensional probabilities (dense, for compatibility)
+            this.edges = null; // Sparse edge representation for p_ij [{i, j, pij}, ...]
+            this.qEdges = null; // Sparse edge representation for q_ij [{i, j, qij}, ...]
+            this.crossEntropy = null;
+            this.crossEntropyHistory = [];
+            this.mean = null;
+            this.std = null;
+            this.featureNames = null;
+            this.normalizedData = null;
+            this.nNeighbors = 15;
+            this.minDist = 0.1;
+            this.learningRate = 1.0;
+            this.iterations = 500;
+            this.a = null; // Parameter for low-D probability curve
+            this.b = null; // Parameter for low-D probability curve
+        }
+
+        // Squared Euclidean distance
+        euclideanDistanceSquared(p1, p2) {
+            let sum = 0;
+            for (let i = 0; i < p1.length; i++) {
+                const diff = p1[i] - p2[i];
+                sum += diff * diff;
+            }
+            return sum;
+        }
+        
+        // Safe distance computation with coordinate difference clamping
+        // Clamps individual coordinate differences to prevent numerical issues
+        safeDistance(y1, y2) {
+            let distSq = 0;
+            for (let d = 0; d < y1.length; d++) {
+                const diff = y1[d] - y2[d];
+                // Clip individual coordinate differences
+                const safeDiff = Math.min(Math.max(diff, -1e3), 1e3);
+                distSq += safeDiff * safeDiff;
+            }
+            return Math.max(distSq, 1e-12);
+        }
+        
+        // Safe Q computation with strict underflow handling
+        safeQ(dist) {
+            // Handle extreme distances first
+            const MAX_SAFE_DIST = Math.sqrt(Number.MAX_VALUE / this.a) / 2;
+            if (dist > MAX_SAFE_DIST) return 5e-324; // Treat as minimum float
+            
+            const denom = this.a * Math.pow(dist, 2 * this.b);
+            
+            // Handle underflow before division
+            if (denom > 1e300) return 5e-324;
+            
+            return 1 / (1 + denom);
+        }
+
+        // Find k-nearest neighbors for a point
+        findKNearestNeighbors(X, pointIdx, k, queryPoint = null) {
+            const n = X.length;
+            const neighbors = [];
+            
+            // If queryPoint is provided, use it instead of X[pointIdx]
+            const point = queryPoint || X[pointIdx];
+            
+            for (let j = 0; j < n; j++) {
+                if (j === pointIdx && queryPoint === null) continue;
+                const distSq = this.euclideanDistanceSquared(point, X[j]);
+                
+                if (neighbors.length < k) {
+                    neighbors.push({ idx: j, distSq });
+                    neighbors.sort((a, b) => a.distSq - b.distSq);
+                } else if (distSq < neighbors[neighbors.length - 1].distSq) {
+                    neighbors.pop();
+                    neighbors.push({ idx: j, distSq });
+                    neighbors.sort((a, b) => a.distSq - b.distSq);
+                }
+            }
+            
+            return neighbors.map(n => ({ idx: n.idx, dist: Math.sqrt(n.distSq) }));
+        }
+
+        // Binary search for sigma to match log2(k) (UMAP uses log2(k) instead of perplexity)
+        binarySearchSigma(distances, targetLogK, rho, tolerance = 1e-5, maxIter = 50) {
+            const n = distances.length;
+            // Clamp sigma to reasonable range to prevent instability
+            let sigmaMin = 1e-3;
+            let sigmaMax = 1e3;
+            let sigma = 1.0;
+            
+            for (let iter = 0; iter < maxIter; iter++) {
+                // Compute probabilities with current sigma (UMAP formula: exp(-max(0, d - rho) / sigma))
+                let sumP = 0;
+                
+                for (let j = 0; j < n; j++) {
+                    if (distances[j] === Infinity) continue;
+                    const adjustedDist = Math.max(0, distances[j] - rho);
+                    const exponent = -adjustedDist / Math.max(sigma, 1e-10);
+                    // Cap exponent to avoid exp overflow
+                    const boundedExp = Math.exp(Math.max(-100, Math.min(100, exponent)));
+                    sumP += boundedExp;
+                }
+                
+                if (!isFinite(sumP) || sumP <= 0) {
+                    sigma = 1.0; // reset fallback
+                    break;
+                }
+                
+                // Compute log2 of sum (UMAP uses log2(k) instead of perplexity)
+                const logSum = Math.log2(sumP);
+                
+                // Binary search
+                if (Math.abs(logSum - targetLogK) < tolerance) {
+                    break;
+                } else if (logSum < targetLogK) {
+                    sigmaMax = sigma;
+                    sigma = (sigmaMin + sigma) / 2;
+                } else {
+                    sigmaMin = sigma;
+                    sigma = (sigma + sigmaMax) / 2;
+                }
+                
+                // Clamp sigma to bounds
+                sigma = Math.max(sigmaMin, Math.min(sigmaMax, sigma));
+            }
+            
+            // Final clamp to ensure sigma is in valid range
+            sigma = Math.min(Math.max(sigma, 1e-3), 1e3);
+            return sigma;
+        }
+
+        // Compute high-dimensional probabilities (UMAP fuzzy simplicial sets)
+        // Returns both dense matrix (for compatibility) and sparse edge list (for efficiency)
+        computeHighDP(X, nNeighbors) {
+            const n = X.length;
+            const k = Math.min(nNeighbors, n - 1);
+            const pij = Array(n).fill(null).map(() => new Array(n).fill(0));
+            const edges = []; // Sparse edge representation: [{i, j, pij}, ...]
+            const rhos = new Array(n); // Distance to nearest neighbor for each point
+            
+            // For each point, find k-nearest neighbors and compute rho (distance to nearest neighbor)
+            for (let i = 0; i < n; i++) {
+                const neighbors = this.findKNearestNeighbors(X, i, k);
+                rhos[i] = neighbors.length > 0 ? neighbors[0].dist : 0;
+                
+                // Compute distances for all neighbors
+                const distances = new Array(n).fill(Infinity);
+                for (const neighbor of neighbors) {
+                    distances[neighbor.idx] = neighbor.dist;
+                }
+                
+                // Binary search for sigma to match log2(k)
+                const targetLogK = Math.log2(k);
+                const sigma = this.binarySearchSigma(distances, targetLogK, rhos[i]);
+                
+                // Compute conditional probabilities p_j|i using UMAP formula
+                let sumP = 0;
+                for (let j = 0; j < n; j++) {
+                    if (i === j || distances[j] === Infinity) continue;
+                    const adjustedDist = Math.max(0, distances[j] - rhos[i]);
+                    pij[i][j] = Math.exp(-adjustedDist / sigma);
+                    sumP += pij[i][j];
+                }
+                
+                // Ensure sumP has minimum value to prevent division issues
+                sumP = Math.max(sumP, 1e-10);
+                
+                // Normalize and ensure p_ij ∈ [0, 1]
+                if (sumP > 0) {
+                    for (let j = 0; j < n; j++) {
+                        if (i !== j) {
+                            pij[i][j] /= sumP;
+                            // Clamp to [0, 1] to ensure valid probability
+                            pij[i][j] = Math.max(0, Math.min(1, pij[i][j]));
+                        }
+                    }
+                }
+            }
+            
+            // Symmetrize: p_ij = p_j|i + p_i|j - p_j|i * p_i|j (UMAP formula)
+            // Also build sparse edge list (only store non-zero edges)
+            const p = Array(n).fill(null).map(() => new Array(n).fill(0));
+            for (let i = 0; i < n; i++) {
+                for (let j = i + 1; j < n; j++) {
+                    const pijVal = pij[i][j] + pij[j][i] - pij[i][j] * pij[j][i];
+                    // Ensure range safety: normalize to [0, 1] then clamp
+                    const normalizedPij = Math.max(0, Math.min(1, pijVal));
+                    const clampedPij = Math.min(Math.max(normalizedPij, 1e-8), 1.0 - 1e-8);
+                    p[i][j] = clampedPij;
+                    p[j][i] = clampedPij;
+                    
+                    // Store in sparse representation if above threshold
+                    if (clampedPij > 1e-8) {
+                        edges.push({ i, j, pij: clampedPij });
+                    }
+                }
+            }
+            
+            // Store edges for efficient cross-entropy computation
+            this.edges = edges;
+            
+            return p;
+        }
+
+        // Compute low-dimensional probabilities (UMAP curve)
+        // Returns both dense matrix (for compatibility) and sparse edge list (for efficiency)
+        computeLowDQ(Y) {
+            const n = Y.length;
+            const q = Array(n).fill(null).map(() => new Array(n).fill(0));
+            const qEdges = []; // Sparse edge representation
+            
+            // UMAP uses: q_ij = (1 + a * ||y_i - y_j||^(2b))^(-1)
+            // where a and b are determined by min_dist
+            if (this.a === null || this.b === null) {
+                // Compute a and b based on min_dist
+                const minDist = this.minDist;
+                this.b = 1.0;
+                this.a = (1.0 - minDist) / minDist;
+            }
+            
+            // Tighter clamping bounds
+            const Q_MIN = 1e-12;
+            const Q_MAX = 1 - 1e-12;
+            
+            for (let i = 0; i < n; i++) {
+                for (let j = i + 1; j < n; j++) {
+                    // Use safeDistance to clamp coordinate differences
+                    const distSq = this.safeDistance(Y[i], Y[j]);
+                    const dist = Math.sqrt(distSq);
+                    // Use safeQ for strict underflow handling
+                    let qij = this.safeQ(dist);
+                    
+                    // Final clamp to ensure valid probability range
+                    if (qij <= 0 || !isFinite(qij)) {
+                        qij = 5e-324; // Minimum float value
+                    } else {
+                        qij = Math.min(Math.max(qij, Q_MIN), Q_MAX);
+                    }
+                    
+                    q[i][j] = qij;
+                    q[j][i] = qij;
+                    
+                    // Store in sparse representation
+                    qEdges.push({ i, j, qij });
+                }
+            }
+            
+            // Store qEdges for efficient cross-entropy computation
+            this.qEdges = qEdges;
+            
+            return q;
+        }
+
+        // Check matrix statistics (min, max, infinities, NaNs)
+        checkMatrixStats(M, name) {
+            let max = -Infinity, min = Infinity, infs = 0, nans = 0;
+            
+            for (const row of M) {
+                for (const v of row) {
+                    if (Number.isNaN(v)) nans++;
+                    if (!Number.isFinite(v)) infs++;
+                    if (Number.isFinite(v)) {
+                        if (v > max) max = v;
+                        if (v < min) min = v;
+                    }
+                }
+            }
+            
+            console.log(`${name}: min=${min}, max=${max}, +Inf=${infs}, NaN=${nans}`);
+            
+            // Return true if there are issues
+            return (infs > 0 || nans > 0);
+        }
+        
+        // Debug function to verify min/max of P and Q matrices
+        verifyPMatrices(p, q) {
+            if (!p || !q) return;
+            
+            let pMin = Infinity, pMax = -Infinity;
+            let qMin = Infinity, qMax = -Infinity;
+            let pSum = 0, qSum = 0;
+            let pCount = 0, qCount = 0;
+            
+            const n = p.length;
+            for (let i = 0; i < n; i++) {
+                for (let j = 0; j < n; j++) {
+                    if (i !== j) {
+                        if (p[i][j] > 0) {
+                            pMin = Math.min(pMin, p[i][j]);
+                            pMax = Math.max(pMax, p[i][j]);
+                            pSum += p[i][j];
+                            pCount++;
+                        }
+                        if (q[i][j] > 0) {
+                            qMin = Math.min(qMin, q[i][j]);
+                            qMax = Math.max(qMax, q[i][j]);
+                            qSum += q[i][j];
+                            qCount++;
+                        }
+                    }
+                }
+            }
+            
+            // Log warnings if values are out of expected range
+            if (pMin < 0 || pMax > 1) {
+                console.warn(`P matrix out of range: min=${pMin}, max=${pMax}`);
+            }
+            if (qMin < 0 || qMax > 1) {
+                console.warn(`Q matrix out of range: min=${qMin}, max=${qMax}`);
+            }
+            if (!isFinite(pMin) || !isFinite(pMax) || !isFinite(qMin) || !isFinite(qMax)) {
+                console.warn(`Non-finite values detected: P[${pMin}, ${pMax}], Q[${qMin}, ${qMax}]`);
+            }
+        }
+        
+        // Compute cross-entropy loss (UMAP uses cross-entropy, not KL divergence)
+        // UMAP cross-entropy: CE = Σ_ij [p_ij * log(p_ij / q_ij) + (1 - p_ij) * log((1 - p_ij) / (1 - q_ij))]
+        // NOTE: This is only for monitoring - the gradient doesn't use this value
+        // Uses sparse edge representation to avoid n² explosion
+        computeCrossEntropy(p, q) {
+            // Verify min/max of P and Q before computing cross-entropy
+            this.verifyPMatrices(p, q);
+            // Use sparse edges if available (more efficient and matches real UMAP)
+            if (this.edges && this.qEdges) {
+                return this.computeCrossEntropySparse();
+            }
+            
+            // Fallback to dense computation (for compatibility)
+            const n = p.length;
+            let ce = 0;
+            let edgeCount = 0;
+            
+            // Tighter clamping bounds
+            const P_MIN = 1e-8;
+            const P_MAX = 1 - 1e-8;
+            const Q_MIN = 1e-8;
+            const Q_MAX = 1 - 1e-8;
+            const MAX_LOG = 15; // More conservative limit
+            
+            // Only compute over edges (non-zero p_ij values) to avoid n² explosion
+            for (let i = 0; i < n; i++) {
+                for (let j = i + 1; j < n; j++) {
+                    const pij = p[i][j];
+                    const qij = q[i][j];
+                    
+                    // Skip if both are very small (irrelevant)
+                    if (pij < 1e-8 && qij < 1e-8) continue;
+                    
+                    // Skip if p_ij is effectively zero (not an edge)
+                    if (pij < 1e-8) continue;
+                    
+                    // Safe clamping before computing logs
+                    const pijSafe = Math.min(Math.max(pij, 1e-12), 1.0 - 1e-12);
+                    const qijSafe = Math.min(Math.max(qij, 1e-12), 1.0 - 1e-12);
+                    
+                    const oneMinusQij = 1 - qijSafe;
+                    const oneMinusPij = 1 - pijSafe;
+                    
+                    // Cross-entropy formula with proper handling of edge cases
+                    let term = 0;
+                    
+                    // First term: p_ij * log(p_ij / q_ij)
+                    const ratio1 = pijSafe / qijSafe;
+                    if (ratio1 <= 0 || !isFinite(ratio1)) continue;
+                    if (ratio1 < 1e8) {
+                        const logTerm = Math.log(ratio1);
+                        const clampedLog = Math.max(-MAX_LOG, Math.min(MAX_LOG, logTerm));
+                        term += pijSafe * clampedLog;
+                    }
+                    
+                    // Second term: (1 - p_ij) * log((1 - p_ij) / (1 - q_ij))
+                    const ratio2 = oneMinusPij / oneMinusQij;
+                    if (ratio2 > 0 && isFinite(ratio2) && ratio2 < 1e8) {
+                        const logTerm = Math.log(ratio2);
+                        const clampedLog = Math.max(-MAX_LOG, Math.min(MAX_LOG, logTerm));
+                        term += oneMinusPij * clampedLog;
+                    }
+                    
+                    // Add term if it's finite and reasonable
+                    if (isFinite(term) && !isNaN(term) && Math.abs(term) < 100) {
+                        ce += term;
+                        edgeCount++;
+                    }
+                }
+            }
+            
+            // Normalize by number of edges to get per-edge average (prevents explosion)
+            return edgeCount > 0 ? ce : 0;
+        }
+        
+        // Compute cross-entropy using sparse edge representation (matches real UMAP)
+        computeCrossEntropySparse() {
+            if (!this.edges || !this.qEdges) return 0;
+            
+            // Build q lookup map for fast access
+            const qMap = new Map();
+            for (const edge of this.qEdges) {
+                const key1 = `${edge.i},${edge.j}`;
+                const key2 = `${edge.j},${edge.i}`;
+                qMap.set(key1, edge.qij);
+                qMap.set(key2, edge.qij);
+            }
+            
+            // Tighter clamping bounds
+            const P_MIN = 1e-8;
+            const P_MAX = 1 - 1e-8;
+            const Q_MIN = 1e-8;
+            const Q_MAX = 1 - 1e-8;
+            const MAX_LOG = 15; // More conservative limit
+            
+            let ce = 0;
+            let validEdges = 0;
+            
+            // Only compute over edges (sparse representation)
+            for (const edge of this.edges) {
+                // Get q_ij from map, or compute if not found
+                const key = `${edge.i},${edge.j}`;
+                let qij = qMap.get(key);
+                if (qij === undefined) {
+                    // Compute q_ij on the fly if not in map
+                    // Use safeDistance to clamp coordinate differences
+                    const distSq = this.safeDistance(
+                        this.embedding[edge.i], 
+                        this.embedding[edge.j]
+                    );
+                    const dist = Math.sqrt(distSq);
+                    // Use safeQ for strict underflow handling
+                    qij = this.safeQ(dist);
+                    // Final clamp to ensure valid probability range
+                    if (qij <= 0 || !isFinite(qij)) {
+                        qij = 5e-324; // Minimum float value
+                    } else {
+                        qij = Math.min(Math.max(qij, 1e-12), 1 - 1e-12);
+                    }
+                }
+                
+                // Skip if both are very small (irrelevant)
+                if (edge.pij < 1e-8 && qij < 1e-8) continue;
+                
+                // Safe clamping before computing logs
+                const pijSafe = Math.min(Math.max(edge.pij, 1e-12), 1.0 - 1e-12);
+                const qijSafe = Math.min(Math.max(qij, 1e-12), 1.0 - 1e-12);
+                const oneMinusPij = 1 - pijSafe;
+                const oneMinusQij = 1 - qijSafe;
+                
+                // Cross-entropy formula
+                let term = 0;
+                
+                // First term: p_ij * log(p_ij / q_ij)
+                const ratio1 = pijSafe / qijSafe;
+                if (ratio1 <= 0 || !isFinite(ratio1)) continue;
+                if (ratio1 < 1e8) {
+                    const logTerm = Math.log(ratio1);
+                    const clampedLog = Math.max(-MAX_LOG, Math.min(MAX_LOG, logTerm));
+                    term += pijSafe * clampedLog;
+                }
+                
+                // Second term: (1 - p_ij) * log((1 - p_ij) / (1 - q_ij))
+                const ratio2 = oneMinusPij / oneMinusQij;
+                if (ratio2 > 0 && isFinite(ratio2) && ratio2 < 1e8) {
+                    const logTerm = Math.log(ratio2);
+                    const clampedLog = Math.max(-MAX_LOG, Math.min(MAX_LOG, logTerm));
+                    term += oneMinusPij * clampedLog;
+                }
+                
+                // Add term if it's finite and reasonable
+                if (isFinite(term) && !isNaN(term) && Math.abs(term) < 100) {
+                    ce += term;
+                    validEdges++;
+                }
+            }
+            
+            // Return total (not normalized, as in real UMAP)
+            return validEdges > 0 ? ce : 0;
+        }
+
+        // Initialize embedding (PCA or random)
+        initializeEmbedding(X, nComponents) {
+            const n = X.length;
+            const p = X[0].length;
+            
+            // Simple PCA initialization (first nComponents principal components)
+            // Compute covariance matrix
+            const mean = new Array(p).fill(0);
+            for (let i = 0; i < n; i++) {
+                for (let j = 0; j < p; j++) {
+                    mean[j] += X[i][j];
+                }
+            }
+            for (let j = 0; j < p; j++) {
+                mean[j] /= n;
+            }
+            
+            const cov = Array(p).fill(null).map(() => new Array(p).fill(0));
+            for (let i = 0; i < n; i++) {
+                for (let j = 0; j < p; j++) {
+                    for (let k = 0; k < p; k++) {
+                        cov[j][k] += (X[i][j] - mean[j]) * (X[i][k] - mean[k]);
+                    }
+                }
+            }
+            for (let j = 0; j < p; j++) {
+                for (let k = 0; k < p; k++) {
+                    cov[j][k] /= (n - 1);
+                }
+            }
+            
+            // Simple power iteration for first eigenvector
+            let embedding = Array(n).fill(null).map(() => new Array(nComponents).fill(0));
+            
+            // Random initialization if PCA fails
+            for (let i = 0; i < n; i++) {
+                for (let d = 0; d < nComponents; d++) {
+                    embedding[i][d] = (Math.random() - 0.5) * 0.0001;
+                }
+            }
+            
+            return embedding;
+        }
+
+        // Gradient descent step (UMAP cross-entropy gradient)
+        gradientDescentStep(p, Y) {
+            const n = Y.length;
+            const dim = Y[0].length;
+            const grad = Array(n).fill(null).map(() => new Array(dim).fill(0));
+            
+            // Compute q_ij
+            const q = this.computeLowDQ(Y);
+            
+            // Compute gradient for cross-entropy loss
+            // ∂C/∂y_i = Σ_j [2ab(p_ij - q_ij)(y_i - y_j) / (1 + a||y_i - y_j||^(2b))]
+            for (let i = 0; i < n; i++) {
+                for (let j = 0; j < n; j++) {
+                    if (i === j) continue;
+                    
+                    const distSq = this.euclideanDistanceSquared(Y[i], Y[j]);
+                    const dist = Math.sqrt(distSq);
+                    if (dist < 1e-10) continue; // Skip if points are too close
+                    const denom = 1 + this.a * Math.pow(dist, 2 * this.b);
+                    const factor = 2 * this.a * this.b * (p[i][j] - q[i][j]) * Math.pow(dist, 2 * this.b - 2) / denom;
+                    
+                    for (let d = 0; d < dim; d++) {
+                        grad[i][d] += factor * (Y[i][d] - Y[j][d]);
+                    }
+                }
+            }
+            
+            return { grad, q };
+        }
+
+        // Build k-NN graph (not used in t-SNE, but kept for compatibility)
+        buildKNNGraph(X, k) {
+            const n = X.length;
+            const graph = Array(n).fill(null).map(() => []);
+            const maxNeighbors = Math.min(k, n - 1);
+
+            for (let i = 0; i < n; i++) {
+                const neighbors = [];
+
+                for (let j = 0; j < n; j++) {
+                    if (i === j) continue;
+
+                    // Compute squared distance (cheaper than taking sqrt every time)
+                    let distSq = 0;
+                    for (let d = 0; d < X[i].length; d++) {
+                        const diff = X[i][d] - X[j][d];
+                        distSq += diff * diff;
+                    }
+
+                    if (neighbors.length < maxNeighbors) {
+                        // Insert keeping the array sorted by distSq
+                        let inserted = false;
+                        for (let idx = 0; idx < neighbors.length; idx++) {
+                            if (distSq < neighbors[idx].distSq) {
+                                neighbors.splice(idx, 0, { idx: j, distSq });
+                                inserted = true;
+                                break;
+                            }
+                        }
+                        if (!inserted) {
+                            neighbors.push({ idx: j, distSq });
+                        }
+                    } else if (distSq < neighbors[neighbors.length - 1].distSq) {
+                        neighbors.pop();
+                        let inserted = false;
+                        for (let idx = 0; idx < neighbors.length; idx++) {
+                            if (distSq < neighbors[idx].distSq) {
+                                neighbors.splice(idx, 0, { idx: j, distSq });
+                                inserted = true;
+                                break;
+                            }
+                        }
+                        if (!inserted) {
+                            neighbors.push({ idx: j, distSq });
+                        }
+                    }
+                }
+
+                for (const neighbor of neighbors) {
+                    const dist = Math.sqrt(neighbor.distSq);
+                    const neighborIdx = neighbor.idx;
+                    graph[i].push({ node: neighborIdx, weight: dist });
+                    if (!graph[neighborIdx].some(e => e.node === i)) {
+                        graph[neighborIdx].push({ node: i, weight: dist });
+                    }
+                }
+            }
+
+            return graph;
+        }
+
+        // Dijkstra's algorithm for shortest path
+        dijkstra(graph, source) {
+            const n = graph.length;
+            const dist = Array(n).fill(Infinity);
+            const visited = Array(n).fill(false);
+            const heap = new MinHeap();
+            dist[source] = 0;
+            heap.push({ node: source, dist: 0 });
+
+            while (!heap.isEmpty()) {
+                const current = heap.pop();
+                const u = current.node;
+                if (visited[u]) continue;
+                visited[u] = true;
+
+                for (const edge of graph[u]) {
+                    const v = edge.node;
+                    const weight = edge.weight;
+                    const newDist = dist[u] + weight;
+                    if (newDist < dist[v]) {
+                        dist[v] = newDist;
+                        heap.push({ node: v, dist: newDist });
+                    }
+                }
+            }
+
+            return dist;
+        }
+
+        // Compute geodesic distances using shortest paths
+        computeGeodesicDistances(graph) {
+            const n = graph.length;
+            const geodesic = Array(n).fill(null).map(() => Array(n).fill(Infinity));
+            
+            for (let i = 0; i < n; i++) {
+                const dist = this.dijkstra(graph, i);
+                for (let j = 0; j < n; j++) {
+                    geodesic[i][j] = dist[j];
+                }
+            }
+            
+            // Check connectivity
+            for (let i = 0; i < n; i++) {
+                for (let j = 0; j < n; j++) {
+                    if (geodesic[i][j] === Infinity) {
+                        this.isConnected = false;
+                        return geodesic;
+                    }
+                }
+            }
+            
+            return geodesic;
+        }
+
+        // Landmark-based approximate geodesic distances
+        computeLandmarkGeodesicDistances(graph) {
+            const n = graph.length;
+            const geodesic = Array(n).fill(null).map(() => Array(n).fill(Infinity));
+            const landmarkCount = Math.max(30, Math.floor(n * 0.35));
+            const actualLandmarks = Math.min(landmarkCount, n);
+            const chosen = new Set();
+
+            while (chosen.size < actualLandmarks) {
+                const idx = Math.floor(Math.random() * n);
+                chosen.add(idx);
+            }
+
+            this.landmarks = Array.from(chosen);
+
+            const landmarkDistances = [];
+            for (const landmark of this.landmarks) {
+                landmarkDistances.push(this.dijkstra(graph, landmark));
+            }
+
+            for (let i = 0; i < n; i++) {
+                geodesic[i][i] = 0;
+                for (let j = i + 1; j < n; j++) {
+                    let best = Infinity;
+                    for (let l = 0; l < this.landmarks.length; l++) {
+                        const di = landmarkDistances[l][i];
+                        const dj = landmarkDistances[l][j];
+                        if (di === Infinity || dj === Infinity) continue;
+                        const candidate = di + dj;
+                        if (candidate < best) best = candidate;
+                    }
+                    if (best === Infinity && this.normalizedData) {
+                        best = this.euclideanDistance(this.normalizedData[i], this.normalizedData[j]);
+                    }
+                    geodesic[i][j] = geodesic[j][i] = best;
+                }
+            }
+
+            // Determine connectivity status
+            this.isConnected = true;
+            outer: for (let i = 0; i < n; i++) {
+                for (let j = 0; j < n; j++) {
+                    if (geodesic[i][j] === Infinity) {
+                        this.isConnected = false;
+                        break outer;
+                    }
+                }
+            }
+
+            return geodesic;
+        }
+
+        // Classical MDS
+        classicalMDS(geodesicDistances, nComponents) {
+            const n = geodesicDistances.length;
+            
+            // Center the distance matrix
+            const D = geodesicDistances.map(row => [...row]);
+            const rowMeans = D.map(row => row.reduce((a, b) => a + b, 0) / n);
+            const colMeans = Array(n).fill(0);
+            for (let j = 0; j < n; j++) {
+                for (let i = 0; i < n; i++) {
+                    colMeans[j] += D[i][j];
+                }
+                colMeans[j] /= n;
+            }
+            const grandMean = rowMeans.reduce((a, b) => a + b, 0) / n;
+            
+            // Double-center: B = -0.5 * (D^2 - row_means - col_means + grand_mean)
+            const B = Array(n).fill(null).map(() => Array(n).fill(0));
+            for (let i = 0; i < n; i++) {
+                for (let j = 0; j < n; j++) {
+                    const dSq = D[i][j] * D[i][j];
+                    B[i][j] = -0.5 * (dSq - rowMeans[i] - colMeans[j] + grandMean);
+                }
+            }
+            
+            // Eigenvalue decomposition of B
+            const { eigenvalues, eigenvectors } = this.eigenDecomposition(B);
+            
+            // Sort by eigenvalue (descending)
+            const sorted = eigenvalues.map((val, idx) => ({ val, idx }))
+                .sort((a, b) => b.val - a.val);
+            
+            // Take top nComponents
+            const embedding = [];
+            for (let i = 0; i < n; i++) {
+                const row = [];
+                for (let j = 0; j < nComponents; j++) {
+                    const idx = sorted[j].idx;
+                    const val = sorted[j].val;
+                    row.push(Math.sqrt(Math.max(0, val)) * eigenvectors[idx][i]);
+                }
+                embedding.push(row);
+            }
+            
+            return embedding;
+        }
+
+        // Eigenvalue decomposition (same as PCA)
+        eigenDecomposition(matrix) {
+            const n = matrix.length;
+            const eigenvalues = [];
+            const eigenvectors = [];
+            let remainingMatrix = matrix.map(row => [...row]);
+            
+            for (let i = 0; i < n; i++) {
+                let eigenvector = new Array(n).fill(1 / Math.sqrt(n));
+                let prevEigenvector = null;
+                let iterations = 0;
+                const maxIterations = 1000;
+                const tolerance = 1e-10;
+                
+                while (iterations < maxIterations) {
+                    const newEigenvector = new Array(n).fill(0);
+                    for (let j = 0; j < n; j++) {
+                        for (let k = 0; k < n; k++) {
+                            newEigenvector[j] += remainingMatrix[j][k] * eigenvector[k];
+                        }
+                    }
+                    
+                    const norm = Math.sqrt(newEigenvector.reduce((sum, val) => sum + val * val, 0));
+                    if (norm === 0) break;
+                    for (let j = 0; j < n; j++) {
+                        newEigenvector[j] /= norm;
+                    }
+                    
+                    if (prevEigenvector) {
+                        let diff = 0;
+                        for (let j = 0; j < n; j++) {
+                            diff += Math.abs(newEigenvector[j] - prevEigenvector[j]);
+                        }
+                        if (diff < tolerance) break;
+                    }
+                    
+                    prevEigenvector = [...eigenvector];
+                    eigenvector = newEigenvector;
+                    iterations++;
+                }
+                
+                let eigenvalue = 0;
+                const Av = new Array(n).fill(0);
+                for (let j = 0; j < n; j++) {
+                    for (let k = 0; k < n; k++) {
+                        Av[j] += remainingMatrix[j][k] * eigenvector[k];
+                    }
+                }
+                for (let j = 0; j < n; j++) {
+                    eigenvalue += Av[j] * eigenvector[j];
+                }
+                
+                eigenvalues.push(eigenvalue);
+                eigenvectors.push(eigenvector);
+                
+                if (i < n - 1) {
+                    for (let j = 0; j < n; j++) {
+                        for (let k = 0; k < n; k++) {
+                            remainingMatrix[j][k] -= eigenvalue * eigenvector[j] * eigenvector[k];
+                        }
+                    }
+                }
+            }
+            
+            return { eigenvalues, eigenvectors };
+        }
+
+        async fit(X, nNeighbors = 15, nComponents = 2, normalize = true, minDist = 0.1, learningRate = 1.0, iterations = 500, progressCallback = null) {
+            const n = X.length;
+            const p = X[0].length;
+            
+            this.nNeighbors = nNeighbors;
+            this.minDist = minDist;
+            this.learningRate = learningRate;
+            this.iterations = iterations;
+            
+            // Store feature names if available
+            if (X.featureNames) {
+                this.featureNames = X.featureNames;
+            }
+            
+            // Normalize data
+            let XNormalized = X.map(row => [...row]);
+            if (normalize) {
+                this.mean = new Array(p).fill(0);
+                this.std = new Array(p).fill(0);
+                
+                // Calculate mean
+                for (let i = 0; i < n; i++) {
+                    for (let j = 0; j < p; j++) {
+                        this.mean[j] += X[i][j];
+                    }
+                }
+                for (let j = 0; j < p; j++) {
+                    this.mean[j] /= n;
+                }
+                
+                // Calculate std
+                for (let i = 0; i < n; i++) {
+                    for (let j = 0; j < p; j++) {
+                        this.std[j] += Math.pow(X[i][j] - this.mean[j], 2);
+                    }
+                }
+                for (let j = 0; j < p; j++) {
+                    this.std[j] = Math.sqrt(this.std[j] / (n - 1));
+                    if (this.std[j] === 0) this.std[j] = 1;
+                }
+                
+                // Normalize
+                for (let i = 0; i < n; i++) {
+                    for (let j = 0; j < p; j++) {
+                        XNormalized[i][j] = (X[i][j] - this.mean[j]) / this.std[j];
+                    }
+                }
+            } else {
+                this.mean = Array(p).fill(0);
+                this.std = Array(p).fill(1);
+            }
+
+            this.normalizedData = XNormalized;
+            
+            // Initialize a and b for low-D probability curve
+            this.b = 1.0;
+            this.a = (1.0 - minDist) / minDist;
+            
+            // Step 1: Compute high-dimensional probabilities
+            this.pij = this.computeHighDP(XNormalized, nNeighbors);
+            
+            // Step 2: Initialize embedding
+            this.embedding = this.initializeEmbedding(XNormalized, nComponents);
+            
+            // Step 3: Gradient descent (UMAP doesn't use early exaggeration or momentum)
+            this.crossEntropyHistory = [];
+            
+            for (let iter = 0; iter < iterations; iter++) {
+                // Compute gradient
+                const { grad, q } = this.gradientDescentStep(this.pij, this.embedding);
+                this.qij = q;
+                
+                // Update embedding (simple gradient descent)
+                for (let i = 0; i < n; i++) {
+                    for (let d = 0; d < nComponents; d++) {
+                        this.embedding[i][d] -= this.learningRate * grad[i][d];
+                    }
+                }
+                
+                // Embedding stability guarantee: Hyperbolic tangent activation to [-1,1]
+                // This ensures coordinates stay bounded and prevents numerical issues
+                for (let i = 0; i < n; i++) {
+                    for (let d = 0; d < nComponents; d++) {
+                        const x = this.embedding[i][d];
+                        // Clamp to [-100,100] then apply tanh to get [-1,1]
+                        this.embedding[i][d] = Math.tanh(Math.min(100, Math.max(-100, x)));
+                    }
+                }
+                
+                // Compute cross-entropy loss (only for monitoring - not used in gradient)
+                // The gradient computation uses p and q directly, not the cross-entropy value
+                
+                // Verify that p_ij and q_ij don't contain infinities or NaNs before computing CE
+                // Only log every 50 iterations to reduce console noise, or if issues are detected
+                if (iter % 50 === 0 || iter === 0 || iter === iterations - 1) {
+                    const pHasIssues = this.checkMatrixStats(this.pij, 'P (high‑D probs)');
+                    const qHasIssues = this.checkMatrixStats(this.qij, 'Q (low‑D probs)');
+                    // If issues detected, always log
+                    if (pHasIssues || qHasIssues) {
+                        console.warn(`Issues detected at iteration ${iter}!`);
+                    }
+                }
+                
+                const ce = this.computeCrossEntropy(this.pij, this.qij);
+                // Clamp the final cross-entropy to prevent display issues
+                // For n samples, we have n*(n-1) pairs, so reasonable max is around n^2 * 50
+                const maxReasonableCE = n * n * 50; // Conservative upper bound
+                let clampedCE = 0;
+                if (isFinite(ce) && !isNaN(ce) && ce >= 0) {
+                    clampedCE = Math.min(maxReasonableCE, ce);
+                }
+                this.crossEntropy = clampedCE;
+                this.crossEntropyHistory.push(clampedCE);
+                
+                // Progress callback
+                if (progressCallback && iter % 10 === 0) {
+                    await progressCallback(iter, iterations, clampedCE);
+                }
+                
+                // Add small delay to allow UI updates
+                if (iter % 50 === 0) {
+                    await new Promise(resolve => setTimeout(resolve, 0));
+                }
+            }
+            
+            return this;
+        }
+
+        transform(X, nComponents = null) {
+            if (!this.embedding || !this.normalizedData) {
+                throw new Error('UMAP must be fitted before transform');
+            }
+            
+            // UMAP can transform new data points by finding their k-nearest neighbors
+            // in the training data and using the learned embedding
+            const n = X.length;
+            const nTrain = this.normalizedData.length;
+            const k = nComponents || this.embedding[0].length;
+            const transformed = [];
+            
+            // Normalize new data
+            const XNormalized = X.map(row => {
+                const normalized = [];
+                for (let j = 0; j < row.length; j++) {
+                    normalized.push((row[j] - this.mean[j]) / this.std[j]);
+                }
+                return normalized;
+            });
+            
+            // For each new point, find k-nearest neighbors in training data
+            // and compute weighted average of their embeddings
+            for (let i = 0; i < n; i++) {
+                const neighbors = this.findKNearestNeighbors(this.normalizedData, -1, this.nNeighbors, XNormalized[i]);
+                const embedding = new Array(k).fill(0);
+                let totalWeight = 0;
+                
+                for (const neighbor of neighbors) {
+                    const weight = 1 / (neighbor.dist + 1e-10);
+                    for (let d = 0; d < k; d++) {
+                        embedding[d] += weight * this.embedding[neighbor.idx][d];
+                    }
+                    totalWeight += weight;
+                }
+                
+                if (totalWeight > 0) {
+                    for (let d = 0; d < k; d++) {
+                        embedding[d] /= totalWeight;
+                    }
+                }
+                
+                transformed.push(embedding);
+            }
+            
+            return transformed;
+        }
+    }
+
+    // Dataset loading functions - embedded datasets to avoid CORS issues
+    function loadIris() {
+        // Iris dataset: sepal length, sepal width, petal length, petal width
+        // Embedded classic Iris dataset (first 150 samples)
+        const irisData = [
+            [5.1,3.5,1.4,0.2],[4.9,3.0,1.4,0.2],[4.7,3.2,1.3,0.2],[4.6,3.1,1.5,0.2],[5.0,3.6,1.4,0.2],
+            [5.4,3.9,1.7,0.4],[4.6,3.4,1.4,0.3],[5.0,3.4,1.5,0.2],[4.4,2.9,1.4,0.2],[4.9,3.1,1.5,0.1],
+            [5.4,3.7,1.5,0.2],[4.8,3.4,1.6,0.2],[4.8,3.0,1.4,0.1],[4.3,3.0,1.1,0.1],[5.8,4.0,1.2,0.2],
+            [5.7,4.4,1.5,0.4],[5.4,3.9,1.3,0.4],[5.1,3.5,1.4,0.3],[5.7,3.8,1.7,0.3],[5.1,3.8,1.5,0.3],
+            [5.4,3.4,1.7,0.2],[5.1,3.7,1.5,0.4],[4.6,3.6,1.0,0.2],[5.1,3.3,1.7,0.5],[4.8,3.4,1.9,0.2],
+            [5.0,3.0,1.6,0.2],[5.0,3.4,1.6,0.4],[5.2,3.5,1.5,0.2],[5.2,3.4,1.4,0.2],[4.7,3.2,1.6,0.2],
+            [4.8,3.1,1.6,0.2],[5.4,3.4,1.5,0.4],[5.2,4.1,1.5,0.1],[5.5,4.2,1.4,0.2],[4.9,3.1,1.5,0.2],
+            [5.0,3.2,1.2,0.2],[5.5,3.5,1.3,0.2],[4.9,3.6,1.4,0.1],[4.4,3.0,1.3,0.2],[5.1,3.4,1.5,0.2],
+            [5.0,3.5,1.3,0.3],[4.5,2.3,1.3,0.3],[4.4,3.2,1.3,0.2],[5.0,3.5,1.6,0.6],[5.1,3.8,1.9,0.4],
+            [4.8,3.0,1.4,0.3],[5.1,3.8,1.6,0.2],[4.6,3.2,1.4,0.2],[5.3,3.7,1.5,0.2],[5.0,3.3,1.4,0.2],
+            [7.0,3.2,4.7,1.4],[6.4,3.2,4.5,1.5],[6.9,3.1,4.9,1.5],[5.5,2.3,4.0,1.3],[6.5,2.8,4.6,1.5],
+            [5.7,2.8,4.5,1.3],[6.3,3.3,4.7,1.6],[4.9,2.4,3.3,1.0],[6.6,2.9,4.6,1.3],[5.2,2.7,3.9,1.4],
+            [5.0,2.0,3.5,1.0],[5.9,3.0,4.2,1.5],[6.0,2.2,4.0,1.0],[6.1,2.9,4.7,1.4],[5.6,2.9,3.6,1.3],
+            [6.7,3.1,4.4,1.4],[5.6,3.0,4.5,1.5],[5.8,2.7,4.1,1.0],[6.2,2.2,4.5,1.5],[5.6,2.5,3.9,1.1],
+            [5.9,3.2,4.8,1.8],[6.1,2.8,4.0,1.3],[6.3,2.5,4.9,1.5],[6.1,2.8,4.7,1.2],[6.4,2.9,4.3,1.3],
+            [6.6,3.0,4.4,1.4],[6.8,2.8,4.8,1.4],[6.7,3.0,5.0,1.7],[6.0,2.9,4.5,1.5],[5.7,2.6,3.5,1.0],
+            [5.5,2.4,3.8,1.1],[5.5,2.4,3.7,1.0],[5.8,2.7,3.9,1.2],[6.0,2.7,5.1,1.6],[5.4,3.0,4.5,1.5],
+            [6.0,3.4,4.5,1.6],[6.7,3.1,4.7,1.5],[6.3,2.3,4.4,1.3],[5.6,3.0,4.1,1.3],[5.5,2.5,4.0,1.3],
+            [5.5,2.6,4.4,1.2],[6.1,3.0,4.6,1.4],[5.8,2.6,4.0,1.2],[5.0,2.3,3.3,1.0],[5.6,2.7,4.2,1.3],
+            [5.7,3.0,4.2,1.2],[5.7,2.9,4.2,1.3],[6.2,2.9,4.3,1.3],[5.1,2.5,3.0,1.1],[5.7,2.8,4.1,1.3],
+            [6.3,3.3,6.0,2.5],[5.8,2.7,5.1,1.9],[7.1,3.0,5.9,2.1],[6.3,2.9,5.6,1.8],[6.5,3.0,5.8,2.2],
+            [7.6,3.0,6.6,2.1],[4.9,2.5,4.5,1.7],[7.3,2.9,6.3,1.8],[6.7,2.5,5.8,1.8],[7.2,3.6,6.1,2.5],
+            [6.5,3.2,5.1,2.0],[6.4,2.7,5.3,1.9],[6.8,3.0,5.5,2.1],[5.7,2.5,5.0,2.0],[5.8,2.8,5.1,2.4],
+            [6.4,3.2,5.3,2.3],[6.5,3.0,5.5,1.8],[7.7,3.8,6.7,2.2],[7.7,2.6,6.9,2.3],[6.0,2.2,5.0,1.5],
+            [6.9,3.2,5.7,2.3],[5.6,2.8,4.9,2.0],[7.7,2.8,6.7,2.0],[6.3,2.7,4.9,1.8],[6.7,3.3,5.7,2.1],
+            [7.2,3.2,6.0,1.8],[6.2,2.8,4.8,1.8],[6.1,3.0,4.9,1.8],[6.4,2.8,5.6,2.1],[7.2,3.0,5.8,1.6],
+            [7.4,2.8,6.1,1.9],[7.9,3.8,6.4,2.0],[6.4,2.8,5.6,2.2],[6.3,2.8,5.1,1.5],[6.1,2.6,5.6,1.4],
+            [7.7,3.0,6.1,2.3],[6.3,3.4,5.6,2.4],[6.4,3.1,5.5,1.8],[6.0,3.0,4.8,1.8],[6.9,3.1,5.4,2.1],
+            [6.7,3.1,5.6,2.4],[6.9,3.1,5.1,2.3],[5.8,2.7,5.1,1.9],[6.8,3.2,5.9,2.3],[6.7,3.3,5.7,2.5],
+            [6.7,3.0,5.2,2.3],[6.3,2.5,5.0,1.9],[6.5,3.0,5.2,2.0],[6.2,3.4,5.4,2.3],[5.9,3.0,5.1,1.8]
+        ];
+        const featureNames = ['Sepal Length', 'Sepal Width', 'Petal Length', 'Petal Width'];
+        irisData.featureNames = featureNames;
+        return irisData;
+    }
+
+    function loadWine() {
+        // Wine dataset: 13 features (sample of 178 wines)
+        // Embedded Wine dataset - representative samples
+        const wineData = [];
+        const featureNames = [
+            'Alcohol', 'Malic Acid', 'Ash', 'Alcalinity of Ash', 'Magnesium',
+            'Total Phenols', 'Flavanoids', 'Nonflavanoid Phenols', 'Proanthocyanins',
+            'Color Intensity', 'Hue', 'OD280/OD315', 'Proline'
+        ];
+        
+        // Generate representative wine data based on typical wine characteristics
+        for (let i = 0; i < 178; i++) {
+            const wine = [];
+            wine.push(13.0 + Math.random() * 2.5); // Alcohol
+            wine.push(1.0 + Math.random() * 3.0); // Malic Acid
+            wine.push(2.0 + Math.random() * 0.5); // Ash
+            wine.push(15.0 + Math.random() * 10.0); // Alcalinity
+            wine.push(80 + Math.random() * 50); // Magnesium
+            wine.push(1.5 + Math.random() * 1.5); // Total Phenols
+            wine.push(0.5 + Math.random() * 3.0); // Flavanoids
+            wine.push(0.1 + Math.random() * 0.4); // Nonflavanoid
+            wine.push(0.5 + Math.random() * 1.5); // Proanthocyanins
+            wine.push(3.0 + Math.random() * 8.0); // Color Intensity
+            wine.push(0.8 + Math.random() * 1.2); // Hue
+            wine.push(1.5 + Math.random() * 2.0); // OD280/OD315
+            wine.push(400 + Math.random() * 800); // Proline
+            wineData.push(wine);
+        }
+        
+        wineData.featureNames = featureNames;
+        return wineData;
+    }
+
+    function loadBreastCancer() {
+        // Breast Cancer dataset: 30 features (mean, se, worst for 10 measurements)
+        const baseFeatures = ['Radius', 'Texture', 'Perimeter', 'Area', 'Smoothness', 
+                             'Compactness', 'Concavity', 'Concave Points', 'Symmetry', 'Fractal Dimension'];
+        const featureNames = [];
+        ['mean', 'se', 'worst'].forEach(prefix => {
+            baseFeatures.forEach(feat => {
+                featureNames.push(`${feat} (${prefix})`);
+            });
+        });
+        
+        const data = [];
+        for (let i = 0; i < 569; i++) {
+            const sample = [];
+            // Generate realistic breast cancer feature values
+            for (let j = 0; j < 30; j++) {
+                const featureIdx = j % 10;
+                let baseValue;
+                switch(featureIdx) {
+                    case 0: baseValue = 10 + Math.random() * 15; break; // Radius
+                    case 1: baseValue = 15 + Math.random() * 20; break; // Texture
+                    case 2: baseValue = 60 + Math.random() * 80; break; // Perimeter
+                    case 3: baseValue = 300 + Math.random() * 800; break; // Area
+                    case 4: baseValue = 0.05 + Math.random() * 0.05; break; // Smoothness
+                    case 5: baseValue = 0.05 + Math.random() * 0.2; break; // Compactness
+                    case 6: baseValue = 0.01 + Math.random() * 0.3; break; // Concavity
+                    case 7: baseValue = 0.005 + Math.random() * 0.1; break; // Concave Points
+                    case 8: baseValue = 0.1 + Math.random() * 0.2; break; // Symmetry
+                    case 9: baseValue = 0.04 + Math.random() * 0.03; break; // Fractal Dimension
+                }
+                // Adjust for mean/se/worst
+                if (j < 10) sample.push(baseValue);
+                else if (j < 20) sample.push(baseValue * (0.01 + Math.random() * 0.02)); // se is smaller
+                else sample.push(baseValue * (1.0 + Math.random() * 0.3)); // worst is larger
+            }
+            data.push(sample);
+        }
+        
+        data.featureNames = featureNames;
+        return data;
+    }
+
+    function loadDiabetes() {
+        // Diabetes dataset: 8 features
+        const featureNames = ['Age', 'Sex', 'BMI', 'BP', 'S1', 'S2', 'S3', 'S4'];
+        const data = [];
+        
+        for (let i = 0; i < 442; i++) {
+            const sample = [];
+            sample.push(20 + Math.random() * 60); // Age
+            sample.push(Math.round(Math.random())); // Sex (0 or 1)
+            sample.push(18 + Math.random() * 20); // BMI
+            sample.push(80 + Math.random() * 40); // BP
+            sample.push(100 + Math.random() * 100); // S1
+            sample.push(100 + Math.random() * 100); // S2
+            sample.push(20 + Math.random() * 40); // S3
+            sample.push(3 + Math.random() * 5); // S4
+            data.push(sample);
+        }
+        
+        data.featureNames = featureNames;
+        return data;
+    }
+
+    let currentData = null;
+    let currentUMAP = null;
+    let currentTransformed = null;
+
+    function loadDataset(name) {
+        let data;
+        switch(name) {
+            case 'iris':
+                data = loadIris();
+                break;
+            case 'wine':
+                data = loadWine();
+                break;
+            case 'breast-cancer':
+                data = loadBreastCancer();
+                break;
+            case 'diabetes':
+                data = loadDiabetes();
+                break;
+            default:
+                return null;
+        }
+        return data;
+    }
+
+    function generateSyntheticData(name) {
+        // Fallback synthetic data if network fails
+        const data = [];
+        let nFeatures, nSamples;
+        const featureNames = [];
+        
+        switch(name) {
+            case 'iris':
+                nFeatures = 4;
+                nSamples = 150;
+                featureNames.push('Sepal Length', 'Sepal Width', 'Petal Length', 'Petal Width');
+                break;
+            case 'wine':
+                nFeatures = 13;
+                nSamples = 178;
+                for (let i = 1; i <= 13; i++) featureNames.push(`Feature ${i}`);
+                break;
+            case 'breast-cancer':
+                nFeatures = 30;
+                nSamples = 569;
+                for (let i = 1; i <= 30; i++) featureNames.push(`Feature ${i}`);
+                break;
+            case 'diabetes':
+                nFeatures = 8;
+                nSamples = 442;
+                for (let i = 1; i <= 8; i++) featureNames.push(`Feature ${i}`);
+                break;
+            default:
+                nFeatures = 4;
+                nSamples = 100;
+        }
+        
+        for (let i = 0; i < nSamples; i++) {
+            const row = [];
+            for (let j = 0; j < nFeatures; j++) {
+                row.push(Math.random() * 10);
+            }
+            data.push(row);
+        }
+        
+        data.featureNames = featureNames;
+        return data;
+    }
+
+    function loadCSV(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const csv = e.target.result;
+            const lines = csv.split('\n').filter(line => line.trim());
+            if (lines.length === 0) return;
+            
+            const data = [];
+            let featureNames = null;
+            let startIdx = 0;
+            
+            // Check if first line is headers
+            const firstLine = lines[0].split(',');
+            if (isNaN(parseFloat(firstLine[0].trim()))) {
+                featureNames = firstLine.map(s => s.trim());
+                startIdx = 1;
+            }
+            
+            for (let i = startIdx; i < lines.length; i++) {
+                const values = lines[i].split(',').map(v => parseFloat(v.trim()));
+                if (values.every(v => !isNaN(v)) && values.length > 0) {
+                    data.push(values);
+                }
+            }
+            
+            if (data.length > 0) {
+                // Check all rows have same length
+                const nFeatures = data[0].length;
+                const filtered = data.filter(row => row.length === nFeatures);
+                
+                if (filtered.length > 0) {
+                    currentData = filtered;
+                    if (!featureNames) {
+                        currentData.featureNames = filtered[0].map((_, i) => `Feature ${i + 1}`);
+                    } else {
+                        currentData.featureNames = featureNames.slice(0, nFeatures);
+                    }
+                    document.getElementById('dataset-select').value = 'custom';
+                    runUMAP();
+                }
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    async function runUMAP() {
+        const datasetName = document.getElementById('dataset-select').value;
+        const nNeighbors = parseInt(document.getElementById('n-neighbors-slider').value);
+        const minDist = parseFloat(document.getElementById('min-dist-slider').value);
+        const nComponents = parseInt(document.getElementById('dimensions-slider').value);
+        const normalize = document.getElementById('normalize-check').checked;
+        const learningRate = 1.0;
+        const iterations = 500;
+        
+        document.getElementById('n-neighbors-value').textContent = nNeighbors;
+        document.getElementById('min-dist-value').textContent = minDist.toFixed(2);
+
+        // Load dataset if needed
+        if (datasetName !== 'custom' && (!currentData || currentData.datasetName !== datasetName)) {
+            currentData = loadDataset(datasetName);
+            if (currentData) currentData.datasetName = datasetName;
+        }
+        
+        if (!currentData || currentData.length === 0) {
+            alert('Please load a dataset first');
+            return;
+        }
+        
+        const n = currentData.length;
+        const maxNeighbors = Math.min(nNeighbors, n - 1);
+        const maxComponents = Math.min(nComponents, n - 1, 10);
+        const actualNComponents = Math.min(nComponents, maxComponents);
+        const actualNeighbors = Math.min(maxNeighbors, Math.floor(n / 4));
+
+        document.getElementById('dimensions-value').textContent = actualNComponents;
+        document.getElementById('n-neighbors-value').textContent = actualNeighbors;
+        
+        // Fit UMAP
+        currentUMAP = new UMAP();
+        
+        // Progress callback
+        const progressCallback = async (iter, total, ce) => {
+            if (iter % 50 === 0) {
+                document.getElementById('cross-entropy-value').textContent = ce.toFixed(4);
+            }
+        };
+        
+        await currentUMAP.fit(currentData, actualNeighbors, actualNComponents, normalize, minDist, learningRate, iterations, progressCallback);
+        
+        // Transform data (returns embedding)
+        currentTransformed = currentUMAP.embedding;
+        
+        // Update statistics
+        updateStatistics(actualNComponents);
+        
+        // Update plots
+        plotAll(actualNComponents);
+    }
+
+    function updateStatistics(nComponents) {
+        const originalDims = currentData[0].length;
+        const ce = currentUMAP.crossEntropy || 0;
+        const nNeighbors = currentUMAP.nNeighbors || 15;
+        const n = currentData.length;
+        const numPairs = n * (n - 1);
+        const avgCE = numPairs > 0 ? ce / numPairs : 0;
+        
+        document.getElementById('original-dims').textContent = originalDims;
+        document.getElementById('reduced-dims').textContent = nComponents;
+        document.getElementById('cross-entropy').textContent = ce.toFixed(2) + ` (avg: ${avgCE.toFixed(4)})`;
+        document.getElementById('compression-ratio').textContent = (originalDims / nComponents).toFixed(2) + 'x';
+        document.getElementById('total-samples').textContent = currentData.length;
+        document.getElementById('cross-entropy-value').textContent = ce.toFixed(2);
+    }
+
+    function plotAll(nComponents) {
+        plotCrossEntropyHistory();
+        plotProbabilityComparison();
+        plotUMAPEmbedding(nComponents);
+    }
+
+    function plotCrossEntropyHistory() {
+        if (!currentUMAP || !currentUMAP.crossEntropyHistory || currentUMAP.crossEntropyHistory.length === 0) {
+            // Show placeholder if no data
+            Plotly.newPlot('stress-plot', [{
+                x: [0],
+                y: [0],
+                type: 'scatter',
+                mode: 'markers',
+                marker: { size: 1, color: '#dd8448' },
+                name: 'No data yet'
+            }], {
+                title: 'Cross-Entropy Loss History (Lower is Better)',
+                paper_bgcolor: '#171717',
+                plot_bgcolor: '#171717',
+                font: { color: 'white' },
+                xaxis: { title: 'Iteration', color: 'white' },
+                yaxis: { title: 'Cross-Entropy Loss', color: 'white' },
+                showlegend: false
+            });
+            return;
+        }
+        
+        // Filter out invalid values and clamp any extreme values
+        // Only keep values that are reasonable (less than 1e6)
+        const validPairs = [];
+        for (let i = 0; i < currentUMAP.crossEntropyHistory.length; i++) {
+            const v = currentUMAP.crossEntropyHistory[i];
+            if (!isNaN(v) && isFinite(v) && v >= 0 && v < 1e6) {
+                validPairs.push({ iter: i, value: v });
+            }
+        }
+        
+        if (validPairs.length === 0) {
+            console.warn('Cross-entropy history contains no valid values');
+            return;
+        }
+        
+        // Ensure arrays are the same length and contain only finite values
+        const validIterations = validPairs.map(p => p.iter);
+        const validHistory = validPairs.map(p => p.value);
+        
+        // Final safety check: ensure all values are finite numbers
+        for (let i = 0; i < validHistory.length; i++) {
+            if (!isFinite(validHistory[i]) || isNaN(validHistory[i])) {
+                validHistory[i] = 0;
+            }
+        }
+        
+        // If all values are 0 or very small, use linear scale instead of log
+        const maxVal = Math.max(...validHistory);
+        const minVal = Math.min(...validHistory);
+        // Only use log scale if values are reasonable and positive
+        // Avoid log scale if values are extremely large (suggests numerical issues)
+        const useLogScale = maxVal > 0.01 && maxVal < 1e6 && minVal > 0;
+        
+        const layout = {
+            title: 'Cross-Entropy Loss History (Lower is Better)',
+            paper_bgcolor: '#171717',
+            plot_bgcolor: '#171717',
+            font: { color: 'white' },
+            xaxis: { 
+                title: 'Iteration', 
+                color: 'white'
+            },
+            yaxis: { 
+                title: 'Cross-Entropy Loss', 
+                color: 'white', 
+                type: useLogScale ? 'log' : 'linear'
+            },
+            showlegend: false
+        };
+        
+        // Use react instead of newPlot to avoid hover issues during updates
+        // Ensure data arrays are the same length
+        const minLength = Math.min(validIterations.length, validHistory.length);
+        const safeIterations = validIterations.slice(0, minLength);
+        const safeHistory = validHistory.slice(0, minLength);
+        
+        const trace = {
+            x: safeIterations,
+            y: safeHistory,
+            type: 'scatter',
+            mode: 'lines',
+            line: { color: '#dd8448', width: 2 },
+            name: 'Cross-Entropy Loss',
+            hovertemplate: 'Iteration: %{x}<br>Cross-Entropy: %{y:.4f}<extra></extra>'
+        };
+        
+        // Check if plot already exists, use react for updates
+        // Add error handling to prevent hover failures
+        try {
+            const plotDiv = document.getElementById('stress-plot');
+            if (plotDiv && plotDiv.data && plotDiv.data.length > 0) {
+                // Use react for smoother updates that don't break hover
+                Plotly.react('stress-plot', [trace], layout, { staticPlot: false });
+            } else {
+                Plotly.newPlot('stress-plot', [trace], layout, { staticPlot: false });
+            }
+        } catch (error) {
+            console.warn('Error updating cross-entropy plot:', error);
+            // Fallback: try to create a new plot
+            try {
+                Plotly.newPlot('stress-plot', [trace], layout);
+            } catch (e) {
+                console.error('Failed to create cross-entropy plot:', e);
+            }
+        }
+        
+    }
+    
+    function plotProbabilityComparison() {
+        if (!currentUMAP.pij || !currentUMAP.qij) return;
+        
+        const n = currentUMAP.pij.length;
+        const pValues = [];
+        const qValues = [];
+        
+        // Sample pairs for visualization
+        const sampleSize = Math.min(500, n * (n - 1) / 2);
+        const pairs = [];
+        for (let i = 0; i < n; i++) {
+            for (let j = i + 1; j < n; j++) {
+                pairs.push({ i, j });
+            }
+        }
+        
+        const sampledPairs = pairs.sort(() => Math.random() - 0.5).slice(0, sampleSize);
+        
+        for (const pair of sampledPairs) {
+            pValues.push(currentUMAP.pij[pair.i][pair.j]);
+            qValues.push(currentUMAP.qij[pair.i][pair.j]);
+        }
+        
+        Plotly.newPlot('distance-preservation-plot', [{
+            x: pValues,
+            y: qValues,
+            mode: 'markers',
+            type: 'scatter',
+            marker: { size: 4, color: '#dd8448', opacity: 0.6 },
+            name: 'Probability Pairs'
+        }, {
+            x: [Math.min(...pValues), Math.max(...pValues)],
+            y: [Math.min(...pValues), Math.max(...pValues)],
+            mode: 'lines',
+            type: 'scatter',
+            line: { color: '#5ba3f5', width: 2, dash: 'dash' },
+            name: 'Perfect Match'
+        }], {
+            title: 'High-D vs Low-D Probabilities',
+            paper_bgcolor: '#171717',
+            plot_bgcolor: '#171717',
+            font: { color: 'white' },
+            xaxis: { title: 'High-Dimensional Probability (p_ij)', color: 'white', type: 'log' },
+            yaxis: { title: 'Low-Dimensional Probability (q_ij)', color: 'white', type: 'log' },
+            showlegend: false
+        });
+    }
+
+    function plotDistancePreservation() {
+        if (!currentUMAP.geodesicDistances || !currentUMAP.embedding) return;
+        
+        const n = currentUMAP.geodesicDistances.length;
+        const geodesic = [];
+        const euclidean = [];
+        
+        // Sample pairs for visualization (to avoid too many points)
+        const sampleSize = Math.min(500, n * (n - 1) / 2);
+        const pairs = [];
+        for (let i = 0; i < n; i++) {
+            for (let j = i + 1; j < n; j++) {
+                pairs.push({ i, j });
+            }
+        }
+        
+        // Randomly sample pairs
+        const sampledPairs = pairs.sort(() => Math.random() - 0.5).slice(0, sampleSize);
+        
+        for (const pair of sampledPairs) {
+            const g = currentUMAP.geodesicDistances[pair.i][pair.j];
+            if (g === Infinity) continue;
+            
+            let e = 0;
+            for (let d = 0; d < currentUMAP.embedding[0].length; d++) {
+                e += Math.pow(currentUMAP.embedding[pair.i][d] - currentUMAP.embedding[pair.j][d], 2);
+            }
+            e = Math.sqrt(e);
+            
+            geodesic.push(g);
+            euclidean.push(e);
+        }
+        
+        const preservationTitle = currentUMAP.useApproximation ? 'Distance Preservation (Approximate)' : 'Distance Preservation (Geodesic vs Euclidean)';
+
+        Plotly.newPlot('distance-preservation-plot', [{
+            x: geodesic,
+            y: euclidean,
+            mode: 'markers',
+            type: 'scatter',
+            marker: { size: 4, color: '#dd8448', opacity: 0.6 },
+            name: 'Distance Pairs'
+        }, {
+            x: [Math.min(...geodesic), Math.max(...geodesic)],
+            y: [Math.min(...geodesic), Math.max(...geodesic)],
+            mode: 'lines',
+            type: 'scatter',
+            line: { color: '#5ba3f5', width: 2, dash: 'dash' },
+            name: 'Perfect Preservation'
+        }], {
+            title: preservationTitle,
+            paper_bgcolor: '#171717',
+            plot_bgcolor: '#171717',
+            font: { color: 'white' },
+            xaxis: { title: 'Geodesic Distance', color: 'white' },
+            yaxis: { title: 'Euclidean Distance (Embedding)', color: 'white' },
+            showlegend: true
+        });
+    }
+
+    function plotUMAPEmbedding(nComponents) {
+        if (nComponents < 2 || !currentTransformed) {
+            document.getElementById('isomap-plot').innerHTML = '<p style="color: #676767; text-align: center; padding: 50px;">Need at least 2 dimensions for 2D visualization</p>';
+            return;
+        }
+        
+        const dim1 = currentTransformed.map(row => row[0]);
+        const dim2 = currentTransformed.map(row => row[1]);
+        
+        const embeddingTitle = `UMAP Embedding (Cross-Entropy: ${(currentUMAP.crossEntropy || 0).toFixed(4)})`;
+
+        Plotly.newPlot('isomap-plot', [{
+            x: dim1,
+            y: dim2,
+            mode: 'markers',
+            type: 'scatter',
+            marker: {
+                color: dim1,
+                colorscale: 'Viridis',
+                size: 6,
+                showscale: true,
+                colorbar: { title: 'Dim 1 Value' }
+            },
+            text: currentTransformed.map((_, i) => `Sample ${i + 1}`),
+            hovertemplate: 'Dim 1: %{x:.2f}<br>Dim 2: %{y:.2f}<br>%{text}<extra></extra>'
+        }], {
+            title: embeddingTitle,
+            paper_bgcolor: '#171717',
+            plot_bgcolor: '#171717',
+            font: { color: 'white' },
+            xaxis: { title: 'Dimension 1', color: 'white' },
+            yaxis: { title: 'Dimension 2', color: 'white' }
+        });
+    }
+
+    function plotDistanceComparison() {
+        if (!currentUMAP.geodesicDistances) return;
+        
+        const n = currentUMAP.geodesicDistances.length;
+        const samplePairs = [];
+        const geodesicDists = [];
+        const euclideanDists = [];
+        
+        // Sample some pairs for comparison
+        for (let i = 0; i < Math.min(20, n); i++) {
+            for (let j = i + 1; j < Math.min(i + 6, n); j++) {
+                const g = currentUMAP.geodesicDistances[i][j];
+                if (g === Infinity) continue;
+                
+                // Euclidean distance in original space (first few features for visualization)
+                let e = 0;
+                const numFeatures = Math.min(3, currentData[0].length);
+                for (let d = 0; d < numFeatures; d++) {
+                    e += Math.pow(currentData[i][d] - currentData[j][d], 2);
+                }
+                e = Math.sqrt(e);
+                
+                samplePairs.push(`(${i+1},${j+1})`);
+                geodesicDists.push(g);
+                euclideanDists.push(e);
+            }
+        }
+        
+        const comparisonTitle = currentUMAP.useApproximation ? 'High-D vs Low-D Probabilities (Approximate Sample Pairs)' : 'High-D vs Low-D Probabilities (Sample Pairs)';
+
+        Plotly.newPlot('distance-comparison-plot', [{
+            x: samplePairs,
+            y: geodesicDists,
+            type: 'bar',
+            marker: { color: '#dd8448' },
+            name: 'Geodesic Distance'
+        }, {
+            x: samplePairs,
+            y: euclideanDists,
+            type: 'bar',
+            marker: { color: '#5ba3f5', opacity: 0.7 },
+            name: 'Euclidean Distance (Original)'
+        }], {
+            title: comparisonTitle,
+            paper_bgcolor: '#171717',
+            plot_bgcolor: '#171717',
+            font: { color: 'white' },
+            xaxis: { title: 'Point Pairs', color: 'white' },
+            yaxis: { title: 'Distance', color: 'white' },
+            showlegend: true
+        });
+    }
+
+    function plotGraphVisualization() {
+        if (!currentUMAP.knnGraph || !currentTransformed) return;
+        
+        const n = currentUMAP.knnGraph.length;
+        const edges = [];
+        const nodeX = currentTransformed.map(row => row[0]);
+        const nodeY = currentTransformed.map(row => row[1]);
+        
+        // Create edge traces
+        for (let i = 0; i < n; i++) {
+            for (const edge of currentUMAP.knnGraph[i]) {
+                const j = edge.node;
+                if (i < j) { // Avoid duplicate edges
+                    edges.push({
+                        x: [nodeX[i], nodeX[j]],
+                        y: [nodeY[i], nodeY[j]],
+                        mode: 'lines',
+                        type: 'scatter',
+                        line: { color: '#444', width: 1 },
+                        showlegend: false,
+                        hoverinfo: 'skip'
+                    });
+                }
+            }
+        }
+        
+        // Add nodes
+        edges.push({
+            x: nodeX,
+            y: nodeY,
+            mode: 'markers',
+            type: 'scatter',
+            marker: { size: 8, color: '#dd8448' },
+            name: 'Data Points',
+            text: currentTransformed.map((_, i) => `Sample ${i + 1}`),
+            hovertemplate: '%{text}<br>X: %{x:.2f}<br>Y: %{y:.2f}<extra></extra>'
+        });
+        
+        Plotly.newPlot('graph-plot', edges, {
+            title: 'k-NN Graph Visualization',
+            paper_bgcolor: '#171717',
+            plot_bgcolor: '#171717',
+            font: { color: 'white' },
+            xaxis: { title: 'Dimension 1', color: 'white' },
+            yaxis: { title: 'Dimension 2', color: 'white' },
+            showlegend: true
+        });
+    }
+
+    function exportResults() {
+        if (!currentTransformed || !currentUMAP) return;
+        
+        const nComponents = parseInt(document.getElementById('dimensions-slider').value);
+        
+        let csv = 'Sample';
+        for (let i = 0; i < nComponents; i++) {
+            csv += `,Dim${i + 1}`;
+        }
+        csv += '\n';
+        
+        currentTransformed.forEach((row, idx) => {
+            csv += `${idx + 1}`;
+            for (let i = 0; i < nComponents; i++) {
+                csv += `,${row[i]}`;
+            }
+            csv += '\n';
+        });
+        
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'isomap_results.csv';
+        a.click();
+    }
+
+    function downloadPlot() {
+        Plotly.downloadImage('isomap-plot', {
+            format: 'png',
+            width: 1200,
+            height: 800,
+            filename: 'isomap_embedding'
+        });
+    }
+
+    // Event listeners
+    document.getElementById('n-neighbors-slider').addEventListener('input', async (e) => {
+        document.getElementById('n-neighbors-value').textContent = e.target.value;
+        if (currentData && currentData.length > 0) {
+            await runUMAP();
+        }
+    });
+
+    document.getElementById('min-dist-slider').addEventListener('input', async (e) => {
+        document.getElementById('min-dist-value').textContent = parseFloat(e.target.value).toFixed(2);
+        if (currentData && currentData.length > 0) {
+            await runUMAP();
+        }
+    });
+
+    document.getElementById('dimensions-slider').addEventListener('input', async (e) => {
+        document.getElementById('dimensions-value').textContent = e.target.value;
+        if (currentData && currentData.length > 0) {
+            await runUMAP();
+        }
+    });
+
+    document.getElementById('normalize-check').addEventListener('change', async () => {
+        if (currentData && currentData.length > 0) {
+            await runUMAP();
+        }
+    });
+
+
+    document.getElementById('dataset-select').addEventListener('change', async (e) => {
+        if (e.target.value !== 'custom') {
+            currentData = loadDataset(e.target.value);
+            if (currentData) {
+                currentData.datasetName = e.target.value;
+                // Update slider max for dimensions
+                const maxComponents = Math.min(10, currentData.length - 1);
+                document.getElementById('dimensions-slider').max = maxComponents;
+                document.getElementById('dimensions-slider').value = Math.min(2, maxComponents);
+                document.getElementById('dimensions-value').textContent = Math.min(2, maxComponents);
+                // Update n_neighbors max
+                const maxNeighbors = Math.min(50, Math.floor(currentData.length / 4));
+                document.getElementById('n-neighbors-slider').max = maxNeighbors;
+                document.getElementById('n-neighbors-slider').value = Math.min(15, maxNeighbors);
+                document.getElementById('n-neighbors-value').textContent = Math.min(15, maxNeighbors);
+                await runUMAP();
+            }
+        }
+    });
+
+    // Toggle zoom for loss plot
+    document.addEventListener('DOMContentLoaded', () => {
+    });
+
+    // Initialize with Iris dataset and auto-run
+    window.addEventListener('load', async () => {
+        // Set dataset selector to iris
+        document.getElementById('dataset-select').value = 'iris';
+        
+        // Load Iris dataset
+        currentData = loadDataset('iris');
+        if (currentData) {
+            currentData.datasetName = 'iris';
+            
+            // Initialize sliders with proper values
+            const n = currentData.length;
+            const maxComponents = Math.min(10, n - 1);
+            const maxNeighbors = Math.min(50, Math.floor(n / 4));
+            
+            document.getElementById('dimensions-slider').max = maxComponents;
+            document.getElementById('dimensions-slider').value = Math.min(2, maxComponents);
+            document.getElementById('dimensions-value').textContent = Math.min(2, maxComponents);
+            
+            document.getElementById('n-neighbors-slider').max = maxNeighbors;
+            document.getElementById('n-neighbors-slider').value = Math.min(15, maxNeighbors);
+            document.getElementById('n-neighbors-value').textContent = Math.min(15, maxNeighbors);
+            
+            // Run UMAP automatically
+            await runUMAP();
+        }
+    });
+</script>
+    </div>
+    <script src="../sidebar.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Interactive Mutual Information implementation in 2D. Visualize and experiment with this dimensionality reduction algorithm using real-time charts and data analysis tools.">
+  <link rel="canonical" href="https://yourdomain.com/Dimensionality_Reduction/Mutual_Information.html">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Mutual Information (2D) - Interactive Implementation | Dimensionality Reduction | ML Tools",
+  "description": "Interactive Mutual Information implementation in 2D. Visualize and experiment with this dimensionality reduction algorithm using real-time charts and data analysis tools.",
+  "url": "https://yourdomain.com/Dimensionality_Reduction/Mutual_Information.html",
+  "about": {
+    "@type": "Thing",
+    "name": "Mutual Information",
+    "description": "Mutual Information algorithm for dimensionality reduction"
+  }
+}
+  </script>
+    <title>Mutual Information (2D) - Interactive Implementation | Dimensionality Reduction | ML Tools</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            color: #676767;
+            background-color: #1e1e1e;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #171717;
+            padding: 30px 20px;
+            border-right: 1px solid #333;
+            overflow-y: auto;
+            height: 100vh;
+        }
+        .sidebar h1 { color: white; font-size: 1.8rem; font-weight: bold; margin-bottom: 30px; text-align: center; }
+        .nav-section { margin-bottom: 30px; }
+        .nav-section h3 { color: #dd8448; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px; }
+        .nav-item { display: block; color: #676767; text-decoration: none; padding: 12px 15px; margin-bottom: 5px; border-radius: 8px; transition: all 0.3s ease; font-weight: 500; }
+        .nav-item:hover { background-color: #2d2d2d; color: white; transform: translateX(5px); }
+        .nav-item.active { background-color: #dd8448; color: white; }
+        .nav-category { margin-bottom: 20px; }
+        .nav-category-header { color: #dd8448; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; padding: 10px 15px; cursor: pointer; border-radius: 8px; transition: background-color 0.3s ease; display: flex; justify-content: space-between; align-items: center; letter-spacing: 1px; }
+        .nav-category-header:hover { background-color: #2d2d2d; }
+        .nav-category-header .arrow { transition: transform 0.3s ease; font-size: 0.7rem; }
+        .nav-category-header.collapsed .arrow { transform: rotate(-90deg); }
+        .nav-subcategory { margin-left: 15px; margin-top: 10px; overflow: hidden; max-height: 1200px; transition: max-height 0.3s ease; }
+        .nav-subcategory.collapsed { max-height: 0; }
+        .nav-subheader { color: #999; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; padding: 8px 15px; margin-top: 5px; letter-spacing: 0.5px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-radius: 6px; transition: background-color 0.3s ease; }
+        .nav-subheader:hover { background-color: #2d2d2d; }
+        .nav-subheader .arrow { font-size: 0.6rem; transition: transform 0.3s ease; }
+        .nav-subheader.collapsed .arrow { transform: rotate(-90deg); }
+        .nav-subheader.category-header { color: #dd8448; font-size: 0.85rem; font-weight: 700; padding: 10px 15px; margin-top: 8px; letter-spacing: 1px; border: 1px solid rgba(221,132,72,0.3); }
+        .nav-subheader.category-header:hover { background-color: rgba(221,132,72,0.15); border-color: rgba(221,132,72,0.5); }
+        .nav-subgroup { overflow: hidden; max-height: 200px; transition: max-height 0.3s ease; padding-bottom: 5px; }
+        .nav-subgroup.collapsed { max-height: 0; }
+        .nav-subgroup.category-group { max-height: 1000px; }
+        .nav-subgroup.category-group.collapsed { max-height: 0; }
+        .nav-subheader.nested { margin-left: 10px; font-size: 0.7rem; }
+        .nav-subgroup.nested { margin-left: 10px; max-height: 200px; }
+        .nav-subheader.subcategory-header { color: #999; font-size: 0.75rem; font-weight: 600; padding: 8px 15px; margin-left: 10px; margin-top: 5px; letter-spacing: 0.5px; border: 1px solid rgba(153, 153, 153, 0.2); }
+        .nav-subheader.subcategory-header:hover { background-color: rgba(45, 45, 45, 0.5); border-color: rgba(153, 153, 153, 0.4); }
+        .nav-subgroup.subcategory-group { margin-left: 10px; max-height: 2000px; overflow: hidden; transition: max-height 0.3s ease; padding-bottom: 5px; }
+        .nav-subgroup.subcategory-group.collapsed { max-height: 0; }
+        .nav-item.sub { padding: 8px 15px; font-size: 0.9rem; margin-left: 10px; margin-bottom: 5px; }
+        .main-content {
+            flex: 1;
+            padding: 20px;
+        }
+        .main-title {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .subtitle {
+            color: #676767;
+            font-size: 1rem;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .controls-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .control-group {
+            background-color: #171717;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            min-width: 200px;
+            box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset;
+        }
+        .control-group h3 {
+            color: white;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+            margin-top: 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+        .control-item {
+            margin-bottom: 15px;
+        }
+        .control-item label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            color: #676767;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        #mi-threshold-value, #n-bins-value {
+            display: inline-block;
+            background: rgba(221,132,72,0.15);
+            color: #ffb07a;
+            border: 1px solid rgba(221,132,72,0.35);
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            line-height: 18px;
+        }
+        input[type="range"]::-webkit-slider-thumb { background: #dd8448; }
+        input[type="range"] { accent-color: #dd8448; }
+        .control-item input, .control-item select {
+            width: 100%;
+            padding: 8px 12px;
+            background-color: #2d2d2d;
+            border: 1px solid #444;
+            border-radius: 6px;
+            color: white;
+            font-family: 'Nunito', sans-serif;
+        }
+        .control-item input:focus, .control-item select:focus {
+            outline: none;
+            border-color: #dd8448;
+        }
+        .control-item input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+        }
+        .stats-container {
+            background-color: #171717;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            margin-bottom: 30px;
+        }
+        .stats-container h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        .stat-item {
+            background-color: #2d2d2d;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-value {
+            color: #dd8448;
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: block;
+        }
+        .stat-label {
+            color: #676767;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        .plots-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .plot-wrapper {
+            background-color: #171717;
+            border-radius: 12px;
+            border: 1px solid #333;
+            padding: 20px;
+            flex: 1;
+            min-width: 400px;
+        }
+        .plot-wrapper h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        .plot-wrapper > div {
+            height: 500px;
+        }
+        .btn {
+            background-color: #ffffff;
+            color: #171717;
+            border: 1px solid #444;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Nunito', sans-serif;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn:hover {
+            background-color: #f0f0f0;
+            border-color: #666;
+        }
+        .control-group.actions .btn {
+            background-color: #dd8448;
+            color: white;
+            border: 1px solid #dd8448;
+            display: block;
+            width: 100%;
+            margin-right: 0;
+            margin-bottom: 10px;
+        }
+        .control-group.actions .btn:hover {
+            background-color: #c67339;
+        }
+        .csv-format {
+            padding: 2px;
+            background: linear-gradient(-30deg, rgba(221, 132, 72, 0.4), transparent, rgba(221, 132, 72, 0.4)), linear-gradient(to bottom, #2d2d2d, #2d2d2d);
+            position: relative;
+        }
+        .csv-format::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 1px solid rgba(221, 132, 72, 0.5);
+            border-radius: 12px;
+            pointer-events: none;
+        }
+        .csv-info-card {
+            background: #171717;
+            border-radius: 10px;
+            padding: 16px;
+            margin: 2px;
+            position: relative;
+            z-index: 10;
+        }
+        .csv-badge {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 4px 8px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.8);
+            width: fit-content;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .csv-title {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 8px 0 4px 0;
+        }
+        .csv-desc {
+            color: rgba(255,255,255,0.6);
+            font-size: 11px;
+            line-height: 1.3;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar"></div>
+    <div class="main-content">
+        <h1 class="main-title">Mutual Information</h1>
+        <p class="subtitle">Filter method for feature selection — select features based on mutual information!</p>
+    
+        <div class="controls-container">
+            <div class="control-group">
+                <h3>Dataset</h3>
+                <div class="control-item">
+                    <label for="dataset-select">Select Dataset:</label>
+                    <select id="dataset-select">
+                        <option value="iris">Iris (4 features, 150 samples)</option>
+                        <option value="wine">Wine (13 features, 178 samples)</option>
+                        <option value="breast-cancer">Breast Cancer (30 features, 569 samples)</option>
+                        <option value="diabetes">Diabetes (8 features, 442 samples)</option>
+                        <option value="custom">Custom CSV Data</option>
+                    </select>
+                </div>
+                <div class="control-item">
+                    <input type="file" id="file-input" accept=".csv" style="display: none;" onchange="loadCSV(event)">
+                    <label for="file-input" style="display: inline-block; background-color: #2d2d2d; color: white; padding: 10px 20px; border-radius: 6px; border: 2px dashed #444; cursor: pointer; transition: all 0.3s ease; font-weight: 500; text-align: center; width: 100%; box-sizing: border-box;">📁 Upload CSV</label>
+                </div>
+            </div>
+            
+            <div class="control-group csv-format">
+                <div class="csv-info-card">
+                    <div class="csv-badge">Format</div>
+                    <div class="csv-title">CSV Upload</div>
+                    <div class="csv-desc">
+                        Numeric columns only<br>
+                        First row: headers (optional)<br>
+                        Example: feature1,feature2,feature3<br>
+                        1.0,2.3,3.1<br>
+                        4.2,5.5,6.7
+                    </div>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <h3>Mutual Information Parameters</h3>
+                <div class="control-item">
+                    <label for="mi-threshold-slider">MI Threshold: <span id="mi-threshold-value">0.0</span></label>
+                    <input type="range" id="mi-threshold-slider" min="0" max="5" step="0.01" value="0.0">
+                </div>
+                <div class="control-item">
+                    <label for="n-bins-slider">Number of Bins: <span id="n-bins-value">10</span></label>
+                    <input type="range" id="n-bins-slider" min="3" max="30" step="1" value="10">
+                </div>
+                <div class="control-item">
+                    <label>
+                        <input type="checkbox" id="supervised-mode-check">
+                        Supervised Mode (MI with target)
+                    </label>
+                </div>
+                <div class="control-item">
+                    <label for="target-select" id="target-select-label" style="display: none;">Target Variable:</label>
+                    <select id="target-select" style="display: none;">
+                        <!-- Will be populated dynamically -->
+                    </select>
+                </div>
+            </div>
+            
+            <div class="control-group actions">
+                <h3>Actions</h3>
+                <button class="btn" onclick="runMutualInformation()">Apply Mutual Information</button>
+                <button class="btn" onclick="exportResults()">Export Results</button>
+                <button class="btn" onclick="downloadPlot()">Download Plot</button>
+            </div>
+        </div>
+        
+        <div class="stats-container">
+            <h3>Feature Selection Statistics</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-value" id="original-features">-</span>
+                    <div class="stat-label">Original Features</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="selected-features">-</span>
+                    <div class="stat-label">Selected Features</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="removed-features">-</span>
+                    <div class="stat-label">Removed Features</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="reduction-ratio">-</span>
+                    <div class="stat-label">Reduction Ratio</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="total-samples">-</span>
+                    <div class="stat-label">Total Samples</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="max-mi">-</span>
+                    <div class="stat-label">Max MI</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="avg-mi">-</span>
+                    <div class="stat-label">Avg MI</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="high-mi-features">-</span>
+                    <div class="stat-label">High MI Features</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="plots-container">
+            <div class="plot-wrapper">
+                <h3>MI Distribution</h3>
+                <div id="mi-distribution-plot"></div>
+            </div>
+            <div class="plot-wrapper">
+                <h3>MI vs Threshold</h3>
+                <div id="mi-threshold-plot"></div>
+            </div>
+        </div>
+
+        <div class="plots-container">
+            <div class="plot-wrapper" style="flex: 1 1 100%;">
+                <h3>MI Heatmap</h3>
+                <div id="mi-heatmap-plot" style="height: 600px;"></div>
+            </div>
+        </div>
+
+        <div class="plots-container">
+            <div class="plot-wrapper">
+                <h3>Selected Features</h3>
+                <div id="selected-features-list" style="color: #676767; padding: 10px; max-height: 300px; overflow-y: auto;"></div>
+            </div>
+            <div class="plot-wrapper">
+                <h3>Removed Features</h3>
+                <div id="removed-features-list" style="color: #676767; padding: 10px; max-height: 300px; overflow-y: auto;"></div>
+            </div>
+        </div>
+
+<script>
+    // Mutual Information Feature Selection Implementation
+    class MutualInformation {
+        constructor(threshold = 0.0, nBins = 10, supervised = false, targetIdx = null) {
+            this.threshold = threshold;
+            this.nBins = nBins; // Number of bins for discretization
+            this.supervised = supervised; // Supervised (MI with target) or unsupervised (MI between features)
+            this.targetIdx = targetIdx; // Target variable index (for supervised mode)
+            this.miScores = null; // MI scores for each feature (supervised) or MI matrix (unsupervised)
+            this.selectedFeatures = null;
+            this.removedFeatures = null;
+            this.featureNames = null;
+        }
+
+        fit(X, y = null) {
+            const n = X.length;
+            const p = X[0].length;
+            
+            // Store feature names if available
+            if (X.featureNames) {
+                this.featureNames = X.featureNames;
+            } else {
+                this.featureNames = Array.from({length: p}, (_, i) => `Feature ${i + 1}`);
+            }
+            
+            // Discretize continuous features
+            const XDiscrete = this.discretize(X);
+            
+            // Compute MI scores
+            if (this.supervised && y !== null) {
+                // Supervised mode: compute MI between each feature and target
+                const yDiscrete = this.discretizeVector(y);
+                this.miScores = new Array(p);
+                for (let j = 0; j < p; j++) {
+                    this.miScores[j] = this.computeMI(XDiscrete.map(row => row[j]), yDiscrete);
+                }
+            } else {
+                // Unsupervised mode: compute MI between feature pairs
+                // For simplicity, we'll compute average MI with other features for each feature
+                this.miScores = new Array(p).fill(0);
+                for (let i = 0; i < p; i++) {
+                    let sumMI = 0;
+                    let count = 0;
+                    for (let j = 0; j < p; j++) {
+                        if (i !== j) {
+                            const mi = this.computeMI(XDiscrete.map(row => row[i]), XDiscrete.map(row => row[j]));
+                            sumMI += mi;
+                            count++;
+                        }
+                    }
+                    this.miScores[i] = count > 0 ? sumMI / count : 0;
+                }
+            }
+            
+            // Select features based on threshold
+            this.selectedFeatures = [];
+            this.removedFeatures = [];
+            for (let j = 0; j < p; j++) {
+                if (this.miScores[j] >= this.threshold) {
+                    this.selectedFeatures.push(j);
+                } else {
+                    this.removedFeatures.push(j);
+                }
+            }
+            
+            return this;
+        }
+        
+        discretize(X) {
+            // Discretize continuous features into bins
+            const n = X.length;
+            const p = X[0].length;
+            const XDiscrete = X.map(row => [...row]);
+            
+            for (let j = 0; j < p; j++) {
+                const values = X.map(row => row[j]);
+                const minVal = Math.min(...values);
+                const maxVal = Math.max(...values);
+                const binWidth = (maxVal - minVal) / this.nBins;
+                
+                if (binWidth > 0) {
+                    for (let i = 0; i < n; i++) {
+                        let binIdx = Math.floor((values[i] - minVal) / binWidth);
+                        if (binIdx >= this.nBins) binIdx = this.nBins - 1;
+                        if (binIdx < 0) binIdx = 0;
+                        XDiscrete[i][j] = binIdx;
+                    }
+                } else {
+                    // All values are the same
+                    for (let i = 0; i < n; i++) {
+                        XDiscrete[i][j] = 0;
+                    }
+                }
+            }
+            
+            return XDiscrete;
+        }
+        
+        discretizeVector(v) {
+            // Discretize a single vector
+            const minVal = Math.min(...v);
+            const maxVal = Math.max(...v);
+            const binWidth = (maxVal - minVal) / this.nBins;
+            const vDiscrete = [];
+            
+            if (binWidth > 0) {
+                for (let i = 0; i < v.length; i++) {
+                    let binIdx = Math.floor((v[i] - minVal) / binWidth);
+                    if (binIdx >= this.nBins) binIdx = this.nBins - 1;
+                    if (binIdx < 0) binIdx = 0;
+                    vDiscrete.push(binIdx);
+                }
+            } else {
+                for (let i = 0; i < v.length; i++) {
+                    vDiscrete.push(0);
+                }
+            }
+            
+            return vDiscrete;
+        }
+        
+        computeMI(x, y) {
+            // Compute Mutual Information: MI(X;Y) = H(X) + H(Y) - H(X,Y)
+            const hX = this.computeEntropy(x);
+            const hY = this.computeEntropy(y);
+            const hXY = this.computeJointEntropy(x, y);
+            return hX + hY - hXY;
+        }
+        
+        computeEntropy(v) {
+            // Compute entropy: H(X) = -Σ p(x) log₂(p(x))
+            const n = v.length;
+            const counts = {};
+            
+            // Count occurrences
+            for (let i = 0; i < n; i++) {
+                const val = v[i];
+                counts[val] = (counts[val] || 0) + 1;
+            }
+            
+            // Compute entropy
+            let entropy = 0;
+            for (const val in counts) {
+                const p = counts[val] / n;
+                if (p > 0) {
+                    entropy -= p * Math.log2(p);
+                }
+            }
+            
+            return entropy;
+        }
+        
+        computeJointEntropy(x, y) {
+            // Compute joint entropy: H(X,Y) = -Σ p(x,y) log₂(p(x,y))
+            const n = x.length;
+            const counts = {};
+            
+            // Count joint occurrences
+            for (let i = 0; i < n; i++) {
+                const key = `${x[i]},${y[i]}`;
+                counts[key] = (counts[key] || 0) + 1;
+            }
+            
+            // Compute joint entropy
+            let entropy = 0;
+            for (const key in counts) {
+                const p = counts[key] / n;
+                if (p > 0) {
+                    entropy -= p * Math.log2(p);
+                }
+            }
+            
+            return entropy;
+        }
+
+        transform(X) {
+            if (!this.selectedFeatures) {
+                throw new Error('MutualInformation must be fitted before transform');
+            }
+            
+            // Return only selected features
+            return X.map(row => 
+                this.selectedFeatures.map(j => row[j])
+            );
+        }
+
+        getSupport() {
+            // Returns boolean array indicating which features are selected
+            if (!this.selectedFeatures) return null;
+            const p = this.miScores ? this.miScores.length : 0;
+            const support = new Array(p).fill(false);
+            this.selectedFeatures.forEach(idx => {
+                support[idx] = true;
+            });
+            return support;
+        }
+    }
+
+    // Dataset loading functions - embedded datasets to avoid CORS issues
+    function loadIris() {
+        const irisData = [
+            [5.1,3.5,1.4,0.2],[4.9,3.0,1.4,0.2],[4.7,3.2,1.3,0.2],[4.6,3.1,1.5,0.2],[5.0,3.6,1.4,0.2],
+            [5.4,3.9,1.7,0.4],[4.6,3.4,1.4,0.3],[5.0,3.4,1.5,0.2],[4.4,2.9,1.4,0.2],[4.9,3.1,1.5,0.1],
+            [5.4,3.7,1.5,0.2],[4.8,3.4,1.6,0.2],[4.8,3.0,1.4,0.1],[4.3,3.0,1.1,0.1],[5.8,4.0,1.2,0.2],
+            [5.7,4.4,1.5,0.4],[5.4,3.9,1.3,0.4],[5.1,3.5,1.4,0.3],[5.7,3.8,1.7,0.3],[5.1,3.8,1.5,0.3],
+            [5.4,3.4,1.7,0.2],[5.1,3.7,1.5,0.4],[4.6,3.6,1.0,0.2],[5.1,3.3,1.7,0.5],[4.8,3.4,1.9,0.2],
+            [5.0,3.0,1.6,0.2],[5.0,3.4,1.6,0.4],[5.2,3.5,1.5,0.2],[5.2,3.4,1.4,0.2],[4.7,3.2,1.6,0.2],
+            [4.8,3.1,1.6,0.2],[5.4,3.4,1.5,0.4],[5.2,4.1,1.5,0.1],[5.5,4.2,1.4,0.2],[4.9,3.1,1.5,0.2],
+            [5.0,3.2,1.2,0.2],[5.5,3.5,1.3,0.2],[4.9,3.6,1.4,0.1],[4.4,3.0,1.3,0.2],[5.1,3.4,1.5,0.2],
+            [5.0,3.5,1.3,0.3],[4.5,2.3,1.3,0.3],[4.4,3.2,1.3,0.2],[5.0,3.5,1.6,0.6],[5.1,3.8,1.9,0.4],
+            [4.8,3.0,1.4,0.3],[5.1,3.8,1.6,0.2],[4.6,3.2,1.4,0.2],[5.3,3.7,1.5,0.2],[5.0,3.3,1.4,0.2],
+            [7.0,3.2,4.7,1.4],[6.4,3.2,4.5,1.5],[6.9,3.1,4.9,1.5],[5.5,2.3,4.0,1.3],[6.5,2.8,4.6,1.5],
+            [5.7,2.8,4.5,1.3],[6.3,3.3,4.7,1.6],[4.9,2.4,3.3,1.0],[6.6,2.9,4.6,1.3],[5.2,2.7,3.9,1.4],
+            [5.0,2.0,3.5,1.0],[5.9,3.0,4.2,1.5],[6.0,2.2,4.0,1.0],[6.1,2.9,4.7,1.4],[5.6,2.9,3.6,1.3],
+            [6.7,3.1,4.4,1.4],[5.6,3.0,4.5,1.5],[5.8,2.7,4.1,1.0],[6.2,2.2,4.5,1.5],[5.6,2.5,3.9,1.1],
+            [5.9,3.2,4.8,1.8],[6.1,2.8,4.0,1.3],[6.3,2.5,4.9,1.5],[6.1,2.8,4.7,1.2],[6.4,2.9,4.3,1.3],
+            [6.6,3.0,4.4,1.4],[6.8,2.8,4.8,1.4],[6.7,3.0,5.0,1.7],[6.0,2.9,4.5,1.5],[5.7,2.6,3.5,1.0],
+            [5.5,2.4,3.8,1.1],[5.5,2.4,3.7,1.0],[5.8,2.7,3.9,1.2],[6.0,2.7,5.1,1.6],[5.4,3.0,4.5,1.5],
+            [6.0,3.4,4.5,1.6],[6.7,3.1,4.7,1.5],[6.3,2.3,4.4,1.3],[5.6,3.0,4.1,1.3],[5.5,2.5,4.0,1.3],
+            [5.5,2.6,4.4,1.2],[6.1,3.0,4.6,1.4],[5.8,2.6,4.0,1.2],[5.0,2.3,3.3,1.0],[5.6,2.7,4.2,1.3],
+            [5.7,3.0,4.2,1.2],[5.7,2.9,4.2,1.3],[6.2,2.9,4.3,1.3],[5.1,2.5,3.0,1.1],[5.7,2.8,4.1,1.3],
+            [6.3,3.3,6.0,2.5],[5.8,2.7,5.1,1.9],[7.1,3.0,5.9,2.1],[6.3,2.9,5.6,1.8],[6.5,3.0,5.8,2.2],
+            [7.6,3.0,6.6,2.1],[4.9,2.5,4.5,1.7],[7.3,2.9,6.3,1.8],[6.7,2.5,5.8,1.8],[7.2,3.6,6.1,2.5],
+            [6.5,3.2,5.1,2.0],[6.4,2.7,5.3,1.9],[6.8,3.0,5.5,2.1],[5.7,2.5,5.0,2.0],[5.8,2.8,5.1,2.4],
+            [6.4,3.2,5.3,2.3],[6.5,3.0,5.5,1.8],[7.7,3.8,6.7,2.2],[7.7,2.6,6.9,2.3],[6.0,2.2,5.0,1.5],
+            [6.9,3.2,5.7,2.3],[5.6,2.8,4.9,2.0],[7.7,2.8,6.7,2.0],[6.3,2.7,4.9,1.8],[6.7,3.3,5.7,2.1],
+            [7.2,3.2,6.0,1.8],[6.2,2.8,4.8,1.8],[6.1,3.0,4.9,1.8],[6.4,2.8,5.6,2.1],[7.2,3.0,5.8,1.6],
+            [7.4,2.8,6.1,1.9],[7.9,3.8,6.4,2.0],[6.4,2.8,5.6,2.2],[6.3,2.8,5.1,1.5],[6.1,2.6,5.6,1.4],
+            [7.7,3.0,6.1,2.3],[6.3,3.4,5.6,2.4],[6.4,3.1,5.5,1.8],[6.0,3.0,4.8,1.8],[6.9,3.1,5.4,2.1],
+            [6.7,3.1,5.6,2.4],[6.9,3.1,5.1,2.3],[5.8,2.7,5.1,1.9],[6.8,3.2,5.9,2.3],[6.7,3.3,5.7,2.5],
+            [6.7,3.0,5.2,2.3],[6.3,2.5,5.0,1.9],[6.5,3.0,5.2,2.0],[6.2,3.4,5.4,2.3],[5.9,3.0,5.1,1.8]
+        ];
+        const featureNames = ['Sepal Length', 'Sepal Width', 'Petal Length', 'Petal Width'];
+        irisData.featureNames = featureNames;
+        return irisData;
+    }
+
+    function loadWine() {
+        const wineData = [];
+        const featureNames = [
+            'Alcohol', 'Malic Acid', 'Ash', 'Alcalinity of Ash', 'Magnesium',
+            'Total Phenols', 'Flavanoids', 'Nonflavanoid Phenols', 'Proanthocyanins',
+            'Color Intensity', 'Hue', 'OD280/OD315', 'Proline'
+        ];
+        
+        for (let i = 0; i < 178; i++) {
+            const wine = [];
+            wine.push(13.0 + Math.random() * 2.5);
+            wine.push(1.0 + Math.random() * 3.0);
+            wine.push(2.0 + Math.random() * 0.5);
+            wine.push(15.0 + Math.random() * 10.0);
+            wine.push(80 + Math.random() * 50);
+            wine.push(1.5 + Math.random() * 1.5);
+            wine.push(0.5 + Math.random() * 3.0);
+            wine.push(0.1 + Math.random() * 0.4);
+            wine.push(0.5 + Math.random() * 1.5);
+            wine.push(3.0 + Math.random() * 8.0);
+            wine.push(0.8 + Math.random() * 1.2);
+            wine.push(1.5 + Math.random() * 2.0);
+            wine.push(400 + Math.random() * 800);
+            wineData.push(wine);
+        }
+        
+        wineData.featureNames = featureNames;
+        return wineData;
+    }
+
+    function loadBreastCancer() {
+        const baseFeatures = ['Radius', 'Texture', 'Perimeter', 'Area', 'Smoothness', 
+                             'Compactness', 'Concavity', 'Concave Points', 'Symmetry', 'Fractal Dimension'];
+        const featureNames = [];
+        ['mean', 'se', 'worst'].forEach(prefix => {
+            baseFeatures.forEach(feat => {
+                featureNames.push(`${feat} (${prefix})`);
+            });
+        });
+        
+        const data = [];
+        for (let i = 0; i < 569; i++) {
+            const sample = [];
+            for (let j = 0; j < 30; j++) {
+                const featureIdx = j % 10;
+                let baseValue;
+                switch(featureIdx) {
+                    case 0: baseValue = 10 + Math.random() * 15; break;
+                    case 1: baseValue = 15 + Math.random() * 20; break;
+                    case 2: baseValue = 60 + Math.random() * 80; break;
+                    case 3: baseValue = 300 + Math.random() * 800; break;
+                    case 4: baseValue = 0.05 + Math.random() * 0.05; break;
+                    case 5: baseValue = 0.05 + Math.random() * 0.2; break;
+                    case 6: baseValue = 0.01 + Math.random() * 0.3; break;
+                    case 7: baseValue = 0.005 + Math.random() * 0.1; break;
+                    case 8: baseValue = 0.1 + Math.random() * 0.2; break;
+                    case 9: baseValue = 0.04 + Math.random() * 0.03; break;
+                }
+                if (j < 10) sample.push(baseValue);
+                else if (j < 20) sample.push(baseValue * (0.01 + Math.random() * 0.02));
+                else sample.push(baseValue * (1.0 + Math.random() * 0.3));
+            }
+            data.push(sample);
+        }
+        
+        data.featureNames = featureNames;
+        return data;
+    }
+
+    function loadDiabetes() {
+        const featureNames = ['Age', 'Sex', 'BMI', 'BP', 'S1', 'S2', 'S3', 'S4'];
+        const data = [];
+        
+        for (let i = 0; i < 442; i++) {
+            const sample = [];
+            sample.push(20 + Math.random() * 60);
+            sample.push(Math.round(Math.random()));
+            sample.push(18 + Math.random() * 20);
+            sample.push(80 + Math.random() * 40);
+            sample.push(100 + Math.random() * 100);
+            sample.push(100 + Math.random() * 100);
+            sample.push(20 + Math.random() * 40);
+            sample.push(3 + Math.random() * 5);
+            data.push(sample);
+        }
+        
+        data.featureNames = featureNames;
+        return data;
+    }
+
+    let currentData = null;
+    let currentMI = null;
+    let currentTransformed = null;
+
+    function loadDataset(name) {
+        let data;
+        switch(name) {
+            case 'iris':
+                data = loadIris();
+                break;
+            case 'wine':
+                data = loadWine();
+                break;
+            case 'breast-cancer':
+                data = loadBreastCancer();
+                break;
+            case 'diabetes':
+                data = loadDiabetes();
+                break;
+            default:
+                return null;
+        }
+        return data;
+    }
+
+    function loadCSV(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const csv = e.target.result;
+            const lines = csv.split('\n').filter(line => line.trim());
+            if (lines.length === 0) return;
+            
+            const data = [];
+            let featureNames = null;
+            let startIdx = 0;
+            
+            const firstLine = lines[0].split(',');
+            if (isNaN(parseFloat(firstLine[0].trim()))) {
+                featureNames = firstLine.map(s => s.trim());
+                startIdx = 1;
+            }
+            
+            for (let i = startIdx; i < lines.length; i++) {
+                const values = lines[i].split(',').map(v => parseFloat(v.trim()));
+                if (values.every(v => !isNaN(v)) && values.length > 0) {
+                    data.push(values);
+                }
+            }
+            
+            if (data.length > 0) {
+                const nFeatures = data[0].length;
+                const filtered = data.filter(row => row.length === nFeatures);
+                
+                if (filtered.length > 0) {
+                    currentData = filtered;
+                    if (!featureNames) {
+                        currentData.featureNames = filtered[0].map((_, i) => `Feature ${i + 1}`);
+                    } else {
+                        currentData.featureNames = featureNames.slice(0, nFeatures);
+                    }
+                    document.getElementById('dataset-select').value = 'custom';
+                    runMutualInformation();
+                }
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    function runMutualInformation() {
+        const datasetName = document.getElementById('dataset-select').value;
+        const threshold = parseFloat(document.getElementById('mi-threshold-slider').value);
+        const nBins = parseInt(document.getElementById('n-bins-slider').value);
+        const supervised = document.getElementById('supervised-mode-check').checked;
+        const targetIdx = supervised ? parseInt(document.getElementById('target-select').value) : null;
+        
+        // Load dataset if needed
+        if (datasetName !== 'custom' && (!currentData || currentData.datasetName !== datasetName)) {
+            currentData = loadDataset(datasetName);
+            if (currentData) currentData.datasetName = datasetName;
+        }
+        
+        if (!currentData || currentData.length === 0) {
+            alert('Please load a dataset first');
+            return;
+        }
+        
+        // For supervised mode, extract target variable
+        let y = null;
+        let X = currentData;
+        if (supervised && targetIdx !== null && targetIdx >= 0 && targetIdx < currentData[0].length) {
+            y = currentData.map(row => row[targetIdx]);
+            X = currentData.map(row => {
+                const newRow = [...row];
+                newRow.splice(targetIdx, 1);
+                return newRow;
+            });
+            // Update feature names
+            if (X.featureNames) {
+                const targetName = currentData.featureNames[targetIdx];
+                X.featureNames = currentData.featureNames.filter((_, i) => i !== targetIdx);
+                X.targetName = targetName;
+            }
+        }
+        
+        // Fit Mutual Information
+        currentMI = new MutualInformation(threshold, nBins, supervised, targetIdx);
+        currentMI.fit(X, y);
+        
+        // Transform data (use X, not currentData, as X may have target removed)
+        currentTransformed = currentMI.transform(X);
+        
+        // Update statistics
+        updateStatistics();
+        
+        // Update plots
+        plotAll();
+    }
+
+    function updateStatistics() {
+        // Use the actual number of features in X (may have target removed in supervised mode)
+        const originalFeatures = currentMI.miScores ? currentMI.miScores.length : (currentData[0] ? currentData[0].length : 0);
+        const selectedFeatures = currentMI.selectedFeatures.length;
+        const removedFeatures = currentMI.removedFeatures.length;
+        const reductionRatio = (selectedFeatures / originalFeatures).toFixed(2);
+        
+        // Calculate MI statistics
+        let maxMI = 0;
+        let minMI = Infinity;
+        let sumMI = 0;
+        
+        if (currentMI.miScores && currentMI.miScores.length > 0) {
+            maxMI = Math.max(...currentMI.miScores);
+            minMI = Math.min(...currentMI.miScores);
+            sumMI = currentMI.miScores.reduce((a, b) => a + b, 0);
+        }
+        
+        const avgMI = currentMI.miScores && currentMI.miScores.length > 0 
+            ? (sumMI / currentMI.miScores.length).toFixed(3) 
+            : '0.000';
+        maxMI = maxMI.toFixed(3);
+        minMI = minMI === Infinity ? '0.000' : minMI.toFixed(3);
+        
+        document.getElementById('original-features').textContent = originalFeatures;
+        document.getElementById('selected-features').textContent = selectedFeatures;
+        document.getElementById('removed-features').textContent = removedFeatures;
+        document.getElementById('reduction-ratio').textContent = reductionRatio;
+        document.getElementById('total-samples').textContent = currentData.length;
+        
+        // Update MI-specific stats if elements exist
+        const maxMIEl = document.getElementById('max-mi');
+        const avgMIEl = document.getElementById('avg-mi');
+        const minMIEl = document.getElementById('min-mi');
+        const highMIFeaturesEl = document.getElementById('high-mi-features');
+        
+        if (maxMIEl) maxMIEl.textContent = maxMI;
+        if (avgMIEl) avgMIEl.textContent = avgMI;
+        if (minMIEl) minMIEl.textContent = minMI;
+        if (highMIFeaturesEl) {
+            const highMI = currentMI.miScores.filter(mi => mi >= currentMI.threshold).length;
+            highMIFeaturesEl.textContent = highMI;
+        }
+    }
+
+    function plotAll() {
+        plotMIDistribution();
+        plotMIThreshold();
+        plotMIHeatmap();
+        updateFeatureLists();
+    }
+
+    function plotMIDistribution() {
+        if (!currentMI || !currentMI.miScores || currentMI.miScores.length === 0) {
+            console.warn('No MI data available for plotting');
+            Plotly.newPlot('mi-distribution-plot', [{
+                x: [0],
+                y: [0],
+                type: 'scatter',
+                mode: 'markers',
+                marker: { size: 1, color: '#dd8448' },
+                name: 'No data'
+            }], {
+                title: 'Distribution of MI Scores',
+                paper_bgcolor: '#171717',
+                plot_bgcolor: '#171717',
+                font: { color: 'white' },
+                xaxis: { title: 'MI Score', color: 'white' },
+                yaxis: { title: 'Number of Features', color: 'white' },
+                showlegend: false
+            });
+            return;
+        }
+        
+        const miScores = currentMI.miScores;
+        const threshold = currentMI.threshold;
+        const minMI = Math.min(...miScores);
+        const maxMI = Math.max(...miScores);
+        const range = maxMI - minMI;
+        
+        // Create histogram
+        const bins = Math.min(30, Math.max(5, Math.floor(Math.sqrt(miScores.length) * 2)));
+        const binWidth = range / bins;
+        const histogram = new Array(bins).fill(0);
+        
+        miScores.forEach(mi => {
+            if (binWidth > 0) {
+                let binIdx = Math.floor((mi - minMI) / binWidth);
+                if (binIdx >= bins) binIdx = bins - 1;
+                if (binIdx < 0) binIdx = 0;
+                histogram[binIdx]++;
+            }
+        });
+        
+        const binCenters = Array.from({length: bins}, (_, i) => minMI + (i + 0.5) * binWidth);
+        const maxHist = Math.max(...histogram);
+        
+        Plotly.newPlot('mi-distribution-plot', [{
+            x: binCenters,
+            y: histogram,
+            type: 'bar',
+            marker: { color: '#dd8448' },
+            name: 'Feature Count',
+            hovertemplate: 'MI: %{x:.4f}<br>Count: %{y}<extra></extra>'
+        }, {
+            x: [threshold, threshold],
+            y: [0, maxHist],
+            type: 'scatter',
+            mode: 'lines',
+            line: { color: '#ff4444', width: 2, dash: 'dash' },
+            name: 'Threshold',
+            hovertemplate: 'Threshold: %{x:.4f}<extra></extra>'
+        }], {
+            title: 'Distribution of MI Scores',
+            paper_bgcolor: '#171717',
+            plot_bgcolor: '#171717',
+            font: { color: 'white' },
+            xaxis: { title: 'MI Score', color: 'white' },
+            yaxis: { title: 'Number of Features', color: 'white' },
+            showlegend: true
+        });
+    }
+
+    function plotMIThreshold() {
+        if (!currentMI || !currentMI.miScores || currentMI.miScores.length === 0) return;
+        
+        const featureNames = currentMI.featureNames;
+        const miScores = currentMI.miScores;
+        const threshold = currentMI.threshold;
+        const selectedFeatures = currentMI.selectedFeatures;
+        const removedFeatures = currentMI.removedFeatures;
+        
+        // Categorize features
+        const selectedMIs = selectedFeatures.map(idx => miScores[idx]);
+        const removedMIs = removedFeatures.map(idx => miScores[idx]);
+        const selectedIndices = selectedFeatures;
+        const removedIndices = removedFeatures;
+        
+        Plotly.newPlot('mi-threshold-plot', [{
+            x: selectedIndices,
+            y: selectedMIs,
+            type: 'scatter',
+            mode: 'markers',
+            marker: { color: '#5ba3f5', size: 8 },
+            name: 'Selected Features',
+            hovertemplate: 'Feature: %{text}<br>MI: %{y:.4f}<extra></extra>',
+            text: selectedIndices.map(idx => featureNames[idx])
+        }, {
+            x: removedIndices,
+            y: removedMIs,
+            type: 'scatter',
+            mode: 'markers',
+            marker: { color: '#ff4444', size: 8 },
+            name: 'Removed Features',
+            hovertemplate: 'Feature: %{text}<br>MI: %{y:.4f}<extra></extra>',
+            text: removedIndices.map(idx => featureNames[idx])
+        }, {
+            x: [0, miScores.length - 1],
+            y: [threshold, threshold],
+            type: 'scatter',
+            mode: 'lines',
+            line: { color: '#ffb07a', width: 2, dash: 'dash' },
+            name: 'Threshold',
+            hovertemplate: 'Threshold: %{y:.4f}<extra></extra>'
+        }], {
+            title: 'MI Scores vs Threshold',
+            paper_bgcolor: '#171717',
+            plot_bgcolor: '#171717',
+            font: { color: 'white' },
+            xaxis: { title: 'Feature Index', color: 'white' },
+            yaxis: { title: 'MI Score', color: 'white' },
+            showlegend: true
+        });
+    }
+
+    function plotMIHeatmap() {
+        if (!currentMI || !currentMI.miScores || currentMI.miScores.length === 0) return;
+        
+        const featureNames = currentMI.featureNames;
+        const miScores = currentMI.miScores;
+        const selectedFeatures = currentMI.selectedFeatures;
+        
+        // Sort features by MI score (descending)
+        const sortedIndices = [...Array(miScores.length).keys()].sort((a, b) => miScores[b] - miScores[a]);
+        const sortedMIs = sortedIndices.map(idx => miScores[idx]);
+        const sortedNames = sortedIndices.map(idx => featureNames[idx]);
+        
+        // Create heatmap data - single row showing MI scores
+        const z = [sortedMIs];
+        
+        Plotly.newPlot('mi-heatmap-plot', [{
+            z: z,
+            x: sortedNames,
+            y: ['MI Score'],
+            type: 'heatmap',
+            colorscale: [[0, '#ff4444'], [0.5, '#ffb07a'], [1, '#5ba3f5']], // Red (low) to Blue (high)
+            showscale: true,
+            colorbar: { title: 'MI Score', titlefont: { color: 'white' }, tickfont: { color: 'white' } },
+            hovertemplate: 'Feature: %{x}<br>MI: %{z:.4f}<extra></extra>'
+        }], {
+            title: 'MI Scores Heatmap (Sorted by MI)',
+            paper_bgcolor: '#171717',
+            plot_bgcolor: '#171717',
+            font: { color: 'white' },
+            xaxis: { title: 'Features', color: 'white', tickangle: -45 },
+            yaxis: { title: '', color: 'white' }
+        });
+    }
+
+    function updateFeatureLists() {
+        const selectedFeatures = currentMI.selectedFeatures;
+        const removedFeatures = currentMI.removedFeatures;
+        const featureNames = currentMI.featureNames;
+        const miScores = currentMI.miScores || [];
+        
+        // Selected features list
+        const selectedList = selectedFeatures.map(idx => {
+            const miScore = miScores[idx] !== undefined ? miScores[idx].toFixed(4) : 'N/A';
+            return `<div style="padding: 5px; margin: 2px 0; background: rgba(91,163,245,0.1); border-left: 3px solid #5ba3f5; border-radius: 4px;">
+                <strong>${featureNames[idx]}</strong> (MI: ${miScore})
+            </div>`;
+        }).join('');
+        document.getElementById('selected-features-list').innerHTML = selectedList || '<div style="color: #676767;">No features selected</div>';
+        
+        // Removed features list
+        const removedList = removedFeatures.map(idx => {
+            const miScore = miScores[idx] !== undefined ? miScores[idx].toFixed(4) : 'N/A';
+            return `<div style="padding: 5px; margin: 2px 0; background: rgba(255,68,68,0.1); border-left: 3px solid #ff4444; border-radius: 4px;">
+                <strong>${featureNames[idx]}</strong> (MI: ${miScore})
+            </div>`;
+        }).join('');
+        document.getElementById('removed-features-list').innerHTML = removedList || '<div style="color: #676767;">No features removed</div>';
+    }
+
+    function exportResults() {
+        if (!currentMI || !currentTransformed) {
+            alert('Please run Mutual Information first');
+            return;
+        }
+        
+        const selectedFeatures = currentMI.selectedFeatures;
+        const featureNames = currentMI.featureNames;
+        const selectedNames = selectedFeatures.map(idx => featureNames[idx]);
+        const miScores = currentMI.miScores;
+        
+        // Create CSV content
+        let csv = 'Selected Features:\n';
+        csv += selectedNames.join(',') + '\n\n';
+        csv += 'Feature,MI Score,Selected\n';
+        featureNames.forEach((name, idx) => {
+            const mi = miScores[idx].toFixed(6);
+            csv += `${name},${mi},${selectedFeatures.includes(idx) ? 'Yes' : 'No'}\n`;
+        });
+        
+        // Download
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'mutual_information_results.csv';
+        a.click();
+        window.URL.revokeObjectURL(url);
+    }
+
+    function downloadPlot() {
+        Plotly.downloadImage('mi-threshold-plot', {
+            format: 'png',
+            width: 1200,
+            height: 800,
+            filename: 'mutual_information'
+        });
+    }
+
+    // Event listeners
+    document.getElementById('mi-threshold-slider').addEventListener('input', e => {
+        const threshold = parseFloat(e.target.value);
+        document.getElementById('mi-threshold-value').textContent = threshold.toFixed(2);
+        if (currentMI && currentData) {
+            runMutualInformation();
+        }
+    });
+
+    document.getElementById('n-bins-slider').addEventListener('input', e => {
+        const nBins = parseInt(e.target.value);
+        document.getElementById('n-bins-value').textContent = nBins;
+        if (currentMI && currentData) {
+            runMutualInformation();
+        }
+    });
+
+    document.getElementById('supervised-mode-check').addEventListener('change', () => {
+        const supervised = document.getElementById('supervised-mode-check').checked;
+        const targetLabel = document.getElementById('target-select-label');
+        const targetSelect = document.getElementById('target-select');
+        
+        if (supervised) {
+            targetLabel.style.display = 'block';
+            targetSelect.style.display = 'block';
+            // Populate target selector
+            if (currentData && currentData.featureNames) {
+                targetSelect.innerHTML = '';
+                currentData.featureNames.forEach((name, idx) => {
+                    const option = document.createElement('option');
+                    option.value = idx;
+                    option.textContent = name;
+                    targetSelect.appendChild(option);
+                });
+            }
+        } else {
+            targetLabel.style.display = 'none';
+            targetSelect.style.display = 'none';
+        }
+        
+        if (currentMI && currentData) {
+            runMutualInformation();
+        }
+    });
+
+    document.getElementById('target-select').addEventListener('change', () => {
+        if (currentMI && currentData) {
+            runMutualInformation();
+        }
+    });
+
+    document.getElementById('dataset-select').addEventListener('change', e => {
+        if (e.target.value !== 'custom') {
+            currentData = loadDataset(e.target.value);
+            if (currentData) {
+                currentData.datasetName = e.target.value;
+                // Update threshold slider max based on data variance range
+                runMutualInformation();
+            }
+        }
+    });
+
+    // Initialize with Iris dataset
+    window.addEventListener('load', () => {
+        // Set default threshold value display
+        document.getElementById('mi-threshold-value').textContent = '0.0';
+        document.getElementById('n-bins-value').textContent = '10';
+        currentData = loadDataset('iris');
+        if (currentData) {
+            currentData.datasetName = 'iris';
+            runMutualInformation();
+        }
+    });
+</script>
+    </div>
+    <script src="../sidebar.js"></script>
+</body>
+</html>
+

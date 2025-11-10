@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Learn about Gplvm, a dimensionality reduction method. Comprehensive overview with theory, applications, and use cases for machine learning and data science.">
+  <link rel="canonical" href="https://yourdomain.com/Dimensionality_Reduction/GPLVM_Overview.html">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "name": "Gplvm - Overview & Theory | Dimensionality Reduction | ML Tools",
+  "description": "Learn about Gplvm, a dimensionality reduction method. Comprehensive overview with theory, applications, and use cases for machine learning and data science.",
+  "url": "https://yourdomain.com/Dimensionality_Reduction/GPLVM_Overview.html",
+  "about": {
+    "@type": "Thing",
+    "name": "Gplvm",
+    "description": "Gplvm algorithm for dimensionality reduction"
+  },
+  "headline": "Gplvm",
+  "articleSection": "Dimensionality Reduction"
+}
+  </script>
+    <title>Gplvm - Overview & Theory | Dimensionality Reduction | ML Tools</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            color: #cfcfcf;
+            background-color: #1e1e1e;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #171717;
+            padding: 30px 20px;
+            border-right: 1px solid #333;
+            overflow-y: auto;
+            height: 100vh;
+        }
+        .sidebar h1 { color: white; font-size: 1.8rem; font-weight: bold; margin-bottom: 30px; text-align: center; }
+        .nav-section { margin-bottom: 30px; }
+        .nav-section h3 { color: #dd8448; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px; }
+        .nav-item { display: block; color: #676767; text-decoration: none; padding: 12px 15px; margin-bottom: 5px; border-radius: 8px; transition: all 0.3s ease; font-weight: 500; }
+        .nav-item:hover { background-color: #2d2d2d; color: white; transform: translateX(5px); }
+        .nav-item.active { background-color: #dd8448; color: white; }
+        .nav-category { margin-bottom: 20px; }
+        .nav-category-header { color: #dd8448; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; padding: 10px 15px; cursor: pointer; border-radius: 8px; transition: background-color 0.3s ease; display: flex; justify-content: space-between; align-items: center; letter-spacing: 1px; }
+        .nav-category-header:hover { background-color: #2d2d2d; }
+        .nav-category-header .arrow { transition: transform 0.3s ease; font-size: 0.7rem; }
+        .nav-category-header.collapsed .arrow { transform: rotate(-90deg); }
+        .nav-subcategory { margin-left: 15px; margin-top: 10px; overflow: hidden; max-height: 1200px; transition: max-height 0.3s ease; }
+        .nav-subcategory.collapsed { max-height: 0; }
+        .nav-subheader { color: #999; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; padding: 8px 15px; margin-top: 5px; letter-spacing: 0.5px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-radius: 6px; transition: background-color 0.3s ease; }
+        .nav-subheader:hover { background-color: #2d2d2d; }
+        .nav-subheader .arrow { font-size: 0.6rem; transition: transform 0.3s ease; }
+        .nav-subheader.collapsed .arrow { transform: rotate(-90deg); }
+        .nav-subheader.category-header { color: #dd8448; font-size: 0.85rem; font-weight: 700; padding: 10px 15px; margin-top: 8px; letter-spacing: 1px; border: 1px solid rgba(221,132,72,0.3); }
+        .nav-subheader.category-header:hover { background-color: rgba(221,132,72,0.15); border-color: rgba(221,132,72,0.5); }
+        .nav-subgroup { overflow: hidden; max-height: 200px; transition: max-height 0.3s ease; padding-bottom: 5px; }
+        .nav-subgroup.collapsed { max-height: 0; }
+        .nav-subgroup.category-group { max-height: 1000px; }
+        .nav-subgroup.category-group.collapsed { max-height: 0; }
+        .nav-subheader.nested { margin-left: 10px; font-size: 0.7rem; }
+        .nav-subgroup.nested { margin-left: 10px; max-height: 200px; }
+        .nav-subheader.subcategory-header { color: #999; font-size: 0.75rem; font-weight: 600; padding: 8px 15px; margin-left: 10px; margin-top: 5px; letter-spacing: 0.5px; border: 1px solid rgba(153, 153, 153, 0.2); }
+        .nav-subheader.subcategory-header:hover { background-color: rgba(45, 45, 45, 0.5); border-color: rgba(153, 153, 153, 0.4); }
+        .nav-subgroup.subcategory-group { margin-left: 10px; max-height: 2000px; overflow: hidden; transition: max-height 0.3s ease; padding-bottom: 5px; }
+        .nav-subgroup.subcategory-group.collapsed { max-height: 0; }
+        .nav-item.sub { padding: 8px 15px; font-size: 0.9rem; margin-left: 10px; margin-bottom: 5px; }
+        .main-content {
+            flex: 1;
+            padding: 40px;
+        }
+        .title {
+            color: #ffffff;
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin: 0 0 8px 0;
+        }
+        .subtitle {
+            color: #8a8a8a;
+            font-size: 1rem;
+            margin-bottom: 28px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+        .card {
+            background-color: #171717;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 22px;
+            transition: border-color 0.3s ease, transform 0.3s ease;
+        }
+        .card:hover { border-color: #dd8448; transform: translateY(-3px); }
+        .card h3 { color: #ffffff; margin: 0 0 8px 0; font-size: 1.15rem; }
+        .card p { color: #9a9a9a; margin: 0; line-height: 1.6; }
+        .section {
+            background-color: #171717;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .section h2 {
+            color: #ffffff;
+            font-size: 1.5rem;
+            margin: 0 0 12px 0;
+        }
+        .badge {
+            display: inline-block;
+            background: rgba(221,132,72,0.15);
+            color: #ffb07a;
+            border: 1px solid rgba(221,132,72,0.35);
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        .list { margin: 0; padding-left: 18px; color: #b0b0b0; }
+        .list li { margin-bottom: 6px; }
+        .split {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .callout {
+            background: #202020;
+            border: 1px dashed #3a3a3a;
+            border-radius: 10px;
+            padding: 14px;
+            color: #a9a9a9;
+        }
+        .kpi {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 10px;
+        }
+        .kpi .item {
+            background: #1c1c1c;
+            border: 1px solid #2a2a2a;
+            border-radius: 10px;
+            padding: 10px 12px;
+        }
+        .kpi .label { color: #8e8e8e; font-size: 12px; }
+        .kpi .value { color: #ffffff; font-weight: 700; font-size: 18px; }
+        .muted { color: #9a9a9a; }
+        .accent { color: #dd8448; }
+    </style>
+</head>
+<body>
+    <div class="sidebar"></div>
+    <div class="main-content">
+        <h1 class="title">Gaussian Process Latent Variable Models (GPLVM) Overview <span class="badge">Guide</span></h1>
+        <div class="subtitle">A probabilistic non-linear dimensionality reduction method that uses Gaussian Processes to model the mapping from latent space to data space — captures complex non-linear relationships with uncertainty quantification.</div>
+
+        <div class="grid">
+            <div class="card">
+                <h3>Primary Uses</h3>
+                <p>Non-linear probabilistic dimensionality reduction, uncertainty quantification in latent space, handling complex non-linear manifolds, generative modeling with non-linear mappings, data visualization with confidence intervals, modeling smooth continuous latent spaces.</p>
+            </div>
+            <div class="card">
+                <h3>Strengths</h3>
+                <p>Captures non-linear relationships, provides uncertainty estimates, generative model (can sample new data), principled probabilistic framework, smooth continuous latent space, can handle missing data, flexible kernel functions for different data types.</p>
+            </div>
+            <div class="card">
+                <h3>Watch-outs</h3>
+                <p>Computationally expensive (O(n³) for n samples), requires optimization of latent variables (gradient descent), sensitive to kernel hyperparameters, may get stuck in local optima, slower than linear methods like PCA, requires careful initialization.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>How It Works <span class="badge">Mathematical Foundation</span></h2>
+            <div class="split">
+                <div>
+                    <p class="muted">Gaussian Process Latent Variable Models (GPLVM) model data as <span class="accent">x = f(z) + ε</span>, where z is a latent variable, f is a non-linear function modeled by a Gaussian Process (GP), and ε ~ N(0,σ²I) is Gaussian noise. Unlike linear methods, GPLVM uses GPs to learn smooth non-linear mappings from latent space to data space, enabling discovery of complex manifolds.</p>
+                    <ul class="list">
+                        <li><strong>Gaussian Process Model</strong>: f ~ GP(0, k(z,z')), where k is a kernel function (e.g., RBF). Each dimension of data is modeled by an independent GP.</li>
+                        <li><strong>Likelihood</strong>: p(X|Z,θ) = Πᵢ p(xᵢ|Z,θ) where each p(xᵢ|Z,θ) is Gaussian with mean 0 and covariance K + σ²I, where K is the kernel matrix.</li>
+                        <li><strong>Optimization</strong>: Optimize latent variables Z and hyperparameters θ by maximizing log-likelihood using gradient descent. No closed-form solution.</li>
+                        <li><strong>Kernel Function</strong>: Typically RBF kernel k(z,z') = σ²_f exp(-0.5 * ||z-z'||² / l²), where σ²_f is signal variance and l is length scale.</li>
+                        <li><strong>Posterior Distribution</strong>: p(z*|X,Z) = N(μ*, Σ*) provides uncertainty estimates for new latent points, enabling principled uncertainty quantification.</li>
+                        <li><strong>Non-Linear Mapping</strong>: The GP learns a smooth, continuous non-linear function from latent space to data space, capturing complex manifolds.</li>
+                    </ul>
+                </div>
+                <div class="callout">Tip: GPLVM is computationally expensive (O(n³) for n samples) but provides powerful non-linear dimensionality reduction with uncertainty estimates. Use GPLVM when you need to capture non-linear relationships that linear methods like PCA cannot handle. Initialize latent variables with PCA for faster convergence.</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Dimensionality Reduction Statistics <span class="badge">Interpretation</span></h2>
+            <div class="kpi">
+                <div class="item"><div class="label">Original Dimensions</div><div class="value">Number of input features</div></div>
+                <div class="item"><div class="label">Reduced Dimensions</div><div class="value">Number of latent dimensions</div></div>
+                <div class="item"><div class="label">Kernel Length Scale</div><div class="value">RBF kernel length scale parameter</div></div>
+                <div class="item"><div class="label">Signal Variance</div><div class="value">RBF kernel signal variance parameter</div></div>
+                <div class="item"><div class="label">Noise Variance (σ²)</div><div class="value">Estimated noise variance parameter</div></div>
+                <div class="item"><div class="label">Log Likelihood</div><div class="value">Model fit quality (higher = better)</div></div>
+                <div class="item"><div class="label">Optimization Iterations</div><div class="value">Number of gradient descent iterations</div></div>
+                <div class="item"><div class="label">Compression Ratio</div><div class="value">Original / Reduced dimensions</div></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Reading the Visualizations <span class="badge">Analysis</span></h2>
+            <ul class="list">
+                <li><strong>Scree Plot</strong>: Shows eigenvalues (variance) per component. Look for "elbow" to determine optimal number of components. Components after elbow add little information.</li>
+                <li><strong>Cumulative Variance Explained</strong>: Shows how much variance is retained with k components. Typically aim for 80-95% variance explained.</li>
+                <li><strong>Biplot</strong>: Shows both data points (projected) and original feature vectors (loadings). Feature vectors point in direction of maximum variance for that feature.</li>
+                <li><strong>Component Loadings</strong>: Shows how much each original feature contributes to each PC. High absolute values indicate strong contribution.</li>
+                <li><strong>Original vs Reduced</strong>: Compare data before and after PCA. Reduced data should preserve main patterns while removing noise.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Parameter Guidance <span class="badge">Best Practice</span></h2>
+            <ul class="list">
+                <li><strong>Number of Latent Dimensions</strong>: Typically 2-3 for visualization, or use cross-validation. More dimensions = more flexibility but slower optimization.</li>
+                <li><strong>Kernel Length Scale</strong>: Controls smoothness of the mapping. Smaller values = more wiggly, larger values = smoother. Start with data scale.</li>
+                <li><strong>Signal Variance</strong>: Controls magnitude of the GP function. Typically set to data variance or optimized jointly with other hyperparameters.</li>
+                <li><strong>Noise Variance (σ²)</strong>: Estimated during optimization. Lower σ² = less noise, higher σ² = more uncertainty.</li>
+                <li><strong>Initialization</strong>: Initialize latent variables with PCA for faster convergence. Random initialization may lead to poor local optima.</li>
+                <li><strong>Learning Rate</strong>: Use adaptive learning rate or small fixed rate (0.01-0.1) for gradient descent optimization.</li>
+                <li><strong>Standardization</strong>: Always standardize (mean=0, std=1) for stable optimization and meaningful kernel parameters.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Data Preparation <span class="badge">Best Practice</span></h2>
+            <ul class="list">
+                <li><strong>Standardize Features</strong>: Critical! Features must be on same scale (mean=0, std=1) or PCA will be dominated by features with larger variance.</li>
+                <li><strong>Handle Missing Values</strong>: PPCA can handle missing values through EM algorithm, but for best results, impute or remove missing values if possible.</li>
+                <li><strong>Remove Outliers</strong>: Extreme outliers can distort principal components. Consider robust PCA or outlier removal.</li>
+                <li><strong>Feature Selection</strong>: Remove constant or near-constant features (zero variance) as they contribute nothing to PCA.</li>
+                <li><strong>Sample Size</strong>: Need n > p (more samples than features) for stable covariance matrix estimation. For p > n, consider regularization.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Common Pitfalls <span class="badge">Avoid</span></h2>
+            <ul class="list">
+                <li><strong>Not Standardizing</strong>: Features with larger scales dominate PCA, leading to misleading results. Always standardize!</li>
+                <li><strong>Too Many Components</strong>: Including all components defeats the purpose. Use variance explained to select meaningful subset.</li>
+                <li><strong>Too Few Components</strong>: Losing too much variance (e.g., <70%) may discard important information. Check cumulative variance.</li>
+                <li><strong>Interpreting PCs as Original Features</strong>: PCs are linear combinations of original features, not the features themselves. Use loadings to understand what each PC represents.</li>
+                <li><strong>Assuming Linearity</strong>: PCA only captures linear relationships. Non-linear patterns require non-linear methods (e.g., t-SNE, UMAP).</li>
+                <li><strong>Using PCA on Categorical Data</strong>: PCA requires numeric data. Encode categorical variables appropriately first.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>When to Use <span class="badge">Application</span></h2>
+            <ul class="list">
+                <li><strong>High-Dimensional Data</strong>: When you have many features (p > 50) and want to reduce dimensionality for visualization or downstream analysis.</li>
+                <li><strong>Multicollinearity</strong>: When features are highly correlated, PCA creates orthogonal components that remove redundancy.</li>
+                <li><strong>Noise Reduction</strong>: When you want to remove noise by keeping only high-variance components (assuming signal has higher variance than noise).</li>
+                <li><strong>Visualization</strong>: When you want to visualize high-dimensional data in 2D or 3D while preserving maximum variance.</li>
+                <li><strong>Feature Extraction</strong>: When you want to create new features (components) that are linear combinations of original features for machine learning.</li>
+                <li><strong>Data Compression</strong>: When you want to compress data for storage or transmission while retaining most information.</li>
+                <li><strong>Exploratory Analysis</strong>: When you want to understand the main sources of variation in your data.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Alternatives to Consider <span class="badge">Comparison</span></h2>
+            <ul class="list">
+                <li><strong>vs Probabilistic PCA</strong>: GPLVM is non-linear (uses GP), PPCA is linear. Use PPCA for linear data, GPLVM for non-linear manifolds with uncertainty needs.</li>
+                <li><strong>vs Standard PCA</strong>: GPLVM captures non-linear relationships, PCA is linear. Use PCA for speed and linear data, GPLVM for non-linear patterns.</li>
+                <li><strong>vs t-SNE/UMAP</strong>: GPLVM provides uncertainty estimates and generative model, t-SNE/UMAP focus on visualization. Use GPLVM when you need probabilistic framework, t-SNE/UMAP for visualization.</li>
+                <li><strong>vs Variational Autoencoders (VAE)</strong>: GPLVM uses GP (kernel-based), VAE uses neural networks. GPLVM is more interpretable but slower, VAE scales better to large datasets.</li>
+                <li><strong>vs Kernel PCA</strong>: GPLVM optimizes latent variables, Kernel PCA uses fixed kernel. GPLVM provides uncertainty and generative model, Kernel PCA is faster.</li>
+                <li><strong>vs Gaussian Process Regression</strong>: GPLVM learns latent space, GP Regression uses fixed inputs. Use GPLVM for dimensionality reduction, GP Regression for supervised learning.</li>
+            </ul>
+        </div>
+    </div>
+    <script src="../sidebar.js"></script>
+</body>
+</html>
+

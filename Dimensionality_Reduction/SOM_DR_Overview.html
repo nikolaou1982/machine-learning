@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Learn about SOM, a dimensionality reduction method. Comprehensive overview with theory, applications, and use cases for machine learning and data science.">
+  <link rel="canonical" href="https://yourdomain.com/Dimensionality_Reduction/SOM_DR_Overview.html">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "name": "SOM - Overview & Theory | Dimensionality Reduction | ML Tools",
+  "description": "Learn about SOM, a dimensionality reduction method. Comprehensive overview with theory, applications, and use cases for machine learning and data science.",
+  "url": "https://yourdomain.com/Dimensionality_Reduction/SOM_DR_Overview.html",
+  "about": {
+    "@type": "Thing",
+    "name": "SOM",
+    "description": "SOM algorithm for dimensionality reduction"
+  },
+  "headline": "SOM",
+  "articleSection": "Dimensionality Reduction"
+}
+  </script>
+    <title>SOM - Overview & Theory | Dimensionality Reduction | ML Tools</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            color: #cfcfcf;
+            background-color: #1e1e1e;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #171717;
+            padding: 30px 20px;
+            border-right: 1px solid #333;
+            overflow-y: auto;
+            height: 100vh;
+        }
+        .sidebar h1 { color: white; font-size: 1.8rem; font-weight: bold; margin-bottom: 30px; text-align: center; }
+        .nav-section { margin-bottom: 30px; }
+        .nav-section h3 { color: #dd8448; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px; }
+        .nav-item { display: block; color: #676767; text-decoration: none; padding: 12px 15px; margin-bottom: 5px; border-radius: 8px; transition: all 0.3s ease; font-weight: 500; }
+        .nav-item:hover { background-color: #2d2d2d; color: white; transform: translateX(5px); }
+        .nav-item.active { background-color: #dd8448; color: white; }
+        .nav-category { margin-bottom: 20px; }
+        .nav-category-header { color: #dd8448; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; padding: 10px 15px; cursor: pointer; border-radius: 8px; transition: background-color 0.3s ease; display: flex; justify-content: space-between; align-items: center; letter-spacing: 1px; }
+        .nav-category-header:hover { background-color: #2d2d2d; }
+        .nav-category-header .arrow { transition: transform 0.3s ease; font-size: 0.7rem; }
+        .nav-category-header.collapsed .arrow { transform: rotate(-90deg); }
+        .nav-subcategory { margin-left: 15px; margin-top: 10px; overflow: hidden; max-height: 1200px; transition: max-height 0.3s ease; }
+        .nav-subcategory.collapsed { max-height: 0; }
+        .nav-subheader { color: #999; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; padding: 8px 15px; margin-top: 5px; letter-spacing: 0.5px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-radius: 6px; transition: background-color 0.3s ease; }
+        .nav-subheader:hover { background-color: #2d2d2d; }
+        .nav-subheader .arrow { font-size: 0.6rem; transition: transform 0.3s ease; }
+        .nav-subheader.collapsed .arrow { transform: rotate(-90deg); }
+        .nav-subheader.category-header { color: #dd8448; font-size: 0.85rem; font-weight: 700; padding: 10px 15px; margin-top: 8px; letter-spacing: 1px; border: 1px solid rgba(221,132,72,0.3); }
+        .nav-subheader.category-header:hover { background-color: rgba(221,132,72,0.15); border-color: rgba(221,132,72,0.5); }
+        .nav-subgroup { overflow: hidden; max-height: 200px; transition: max-height 0.3s ease; padding-bottom: 5px; }
+        .nav-subgroup.collapsed { max-height: 0; }
+        .nav-subgroup.category-group { max-height: 1000px; }
+        .nav-subgroup.category-group.collapsed { max-height: 0; }
+        .nav-subheader.nested { margin-left: 10px; font-size: 0.7rem; }
+        .nav-subgroup.nested { margin-left: 10px; max-height: 200px; }
+        .nav-subheader.subcategory-header { color: #999; font-size: 0.75rem; font-weight: 600; padding: 8px 15px; margin-left: 10px; margin-top: 5px; letter-spacing: 0.5px; border: 1px solid rgba(153, 153, 153, 0.2); }
+        .nav-subheader.subcategory-header:hover { background-color: rgba(45, 45, 45, 0.5); border-color: rgba(153, 153, 153, 0.4); }
+        .nav-subgroup.subcategory-group { margin-left: 10px; max-height: 2000px; overflow: hidden; transition: max-height 0.3s ease; padding-bottom: 5px; }
+        .nav-subgroup.subcategory-group.collapsed { max-height: 0; }
+        .nav-item.sub { padding: 8px 15px; font-size: 0.9rem; margin-left: 10px; margin-bottom: 5px; }
+        .main-content {
+            flex: 1;
+            padding: 40px;
+        }
+        .title {
+            color: #ffffff;
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin: 0 0 8px 0;
+        }
+        .subtitle {
+            color: #8a8a8a;
+            font-size: 1rem;
+            margin-bottom: 28px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+        .card {
+            background-color: #171717;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 22px;
+            transition: border-color 0.3s ease, transform 0.3s ease;
+        }
+        .card:hover { border-color: #dd8448; transform: translateY(-3px); }
+        .card h3 { color: #ffffff; margin: 0 0 8px 0; font-size: 1.15rem; }
+        .card p { color: #9a9a9a; margin: 0; line-height: 1.6; }
+        .section {
+            background-color: #171717;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .section h2 {
+            color: #ffffff;
+            font-size: 1.5rem;
+            margin: 0 0 12px 0;
+        }
+        .badge {
+            display: inline-block;
+            background: rgba(221,132,72,0.15);
+            color: #ffb07a;
+            border: 1px solid rgba(221,132,72,0.35);
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        .list { margin: 0; padding-left: 18px; color: #b0b0b0; }
+        .list li { margin-bottom: 6px; }
+        .split {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .callout {
+            background: #202020;
+            border: 1px dashed #3a3a3a;
+            border-radius: 10px;
+            padding: 14px;
+            color: #a9a9a9;
+        }
+        .kpi {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 10px;
+        }
+        .kpi .item {
+            background: #1c1c1c;
+            border: 1px solid #2a2a2a;
+            border-radius: 10px;
+            padding: 10px 12px;
+        }
+        .kpi .label { color: #8e8e8e; font-size: 12px; }
+        .kpi .value { color: #ffffff; font-weight: 700; font-size: 18px; }
+        .muted { color: #9a9a9a; }
+        .accent { color: #dd8448; }
+    </style>
+</head>
+<body>
+    <div class="sidebar"></div>
+    <div class="main-content">
+        <h1 class="title">Self-Organizing Maps (SOM) Overview <span class="badge">Guide</span></h1>
+        <div class="subtitle">Neural network-based dimensionality reduction that creates a low-dimensional grid representation of high-dimensional data through competitive learning and neighborhood preservation.</div>
+
+        <div class="grid">
+            <div class="card">
+                <h3>Primary Uses</h3>
+                <p>Dimensionality reduction, data visualization, clustering, feature extraction, topology preservation, exploratory data analysis, data compression, pattern recognition.</p>
+            </div>
+            <div class="card">
+                <h3>Strengths</h3>
+                <p>Preserves topological structure, intuitive 2D/3D visualization, handles non-linear relationships, unsupervised learning, interpretable grid representation, can handle large datasets efficiently.</p>
+            </div>
+            <div class="card">
+                <h3>Watch-outs</h3>
+                <p>Grid size selection is critical, sensitive to initialization, learning rate and neighborhood decay require tuning, may not preserve all distances accurately, computational cost increases with grid size, convergence can be slow.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>How It Works <span class="badge">Mathematical Foundation</span></h2>
+            <div class="split">
+                <div>
+                    <p class="muted">A <span class="accent">Self-Organizing Map (SOM)</span> is an unsupervised neural network that maps high-dimensional data onto a lower-dimensional (typically 2D) grid of neurons. Each neuron has a weight vector in the original feature space. Through competitive learning, the SOM learns to represent the data distribution while preserving topological relationships.</p>
+                    <ul class="list">
+                        <li><strong>Grid Structure</strong>: 2D grid of neurons (e.g., 10×10, 20×20), each with a weight vector w_i ∈ ℝ^d</li>
+                        <li><strong>Competitive Learning</strong>: For each input x, find Best Matching Unit (BMU): i* = argmin_i ||x - w_i||</li>
+                        <li><strong>Neighborhood Function</strong>: Update BMU and nearby neurons: h(i, i*, t) = exp(-d²(i, i*) / (2σ²(t)))</li>
+                        <li><strong>Weight Update</strong>: w_i(t+1) = w_i(t) + α(t) × h(i, i*, t) × (x - w_i(t))</li>
+                        <li><strong>Learning Rate Decay</strong>: α(t) = α₀ × exp(-t/τ_α) decreases over time</li>
+                        <li><strong>Neighborhood Decay</strong>: σ(t) = σ₀ × exp(-t/τ_σ) shrinks neighborhood radius</li>
+                        <li><strong>Topology Preservation</strong>: Nearby neurons in the grid represent similar data points</li>
+                    </ul>
+                </div>
+                <div class="callout">Tip: The SOM creates a "map" where similar data points are placed close together on the grid. This makes it excellent for visualization and exploratory analysis. The grid size should be chosen based on data complexity - too small = poor representation, too large = overfitting.</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Dimensionality Reduction Statistics <span class="badge">Interpretation</span></h2>
+            <div class="kpi">
+                <div class="item"><div class="label">Original Dimensions</div><div class="value">Number of input features</div></div>
+                <div class="item"><div class="label">Grid Dimensions</div><div class="value">Size of SOM grid (e.g., 10×10 = 100 neurons)</div></div>
+                <div class="item"><div class="label">Quantization Error</div><div class="value">Average distance from data to BMU (lower = better)</div></div>
+                <div class="item"><div class="label">Topographic Error</div><div class="value">Proportion of data with non-adjacent BMUs (lower = better)</div></div>
+                <div class="item"><div class="label">Compression Ratio</div><div class="value">Original dimensions / Grid dimensions</div></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Reading the Visualizations <span class="badge">Analysis</span></h2>
+            <ul class="list">
+                <li><strong>SOM Grid Visualization</strong>: 2D grid showing the learned weight vectors. Each cell represents a neuron. Color/intensity can represent distance, density, or feature values.</li>
+                <li><strong>U-Matrix (Unified Distance Matrix)</strong>: Shows distances between adjacent neurons. Dark regions = large distances (cluster boundaries), light regions = small distances (clusters).</li>
+                <li><strong>Component Planes</strong>: Separate visualization for each feature dimension. Shows how each feature varies across the map.</li>
+                <li><strong>Data Projection</strong>: Original data points projected onto the 2D grid. Shows how data is distributed across the map.</li>
+                <li><strong>Quantization Error</strong>: Should decrease during training. High error = grid too small or insufficient training.</li>
+                <li><strong>Topographic Error</strong>: Measures topology preservation. Low error = good preservation of neighborhood relationships.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Parameter Guidance <span class="badge">Best Practice</span></h2>
+            <ul class="list">
+                <li><strong>Grid Size</strong>: Start with √(5×n) neurons (n = number of samples). For visualization, 10×10 to 20×20 is common. Larger grids = more detail but slower training.</li>
+                <li><strong>Initial Learning Rate (α₀)</strong>: Start with 0.1-0.5. Higher = faster learning but less stable. Decreases over time.</li>
+                <li><strong>Initial Neighborhood Radius (σ₀)</strong>: Start with half the grid size (e.g., 5 for 10×10 grid). Controls how many neurons update per iteration.</li>
+                <li><strong>Training Iterations</strong>: Typically 100-1000 iterations per sample. More iterations = better convergence but slower.</li>
+                <li><strong>Decay Rates (τ_α, τ_σ)</strong>: Control how quickly learning rate and neighborhood shrink. τ = total_iterations / 3 is a good starting point.</li>
+                <li><strong>Initialization</strong>: Random initialization or PCA-based initialization. PCA initialization often converges faster.</li>
+                <li><strong>Grid Shape</strong>: Square grids are most common. Hexagonal grids can provide better topology preservation.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Data Preparation <span class="badge">Best Practice</span></h2>
+            <ul class="list">
+                <li><strong>Normalization</strong>: Normalize features to [0,1] or standardize to mean=0, std=1. Critical for distance calculations. Use MinMaxScaler or StandardScaler.</li>
+                <li><strong>Handle Missing Values</strong>: Remove or impute missing values before training. SOM cannot handle NaN directly.</li>
+                <li><strong>Feature Scaling</strong>: Ensure all features are on similar scales. Features with larger ranges will dominate distance calculations.</li>
+                <li><strong>Feature Selection</strong>: Remove irrelevant or redundant features to improve map quality and reduce computational cost.</li>
+                <li><strong>Sample Size</strong>: Works well with moderate to large datasets (n > 100). Very small datasets may not train effectively.</li>
+                <li><strong>Data Quality</strong>: Remove outliers that might distort the map. SOM is sensitive to outliers in distance calculations.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Common Pitfalls <span class="badge">Avoid</span></h2>
+            <ul class="list">
+                <li><strong>Grid Too Small</strong>: Results in poor representation and high quantization error. Increase grid size or reduce data complexity.</li>
+                <li><strong>Grid Too Large</strong>: May overfit to training data and lose generalization. Also increases computational cost.</li>
+                <li><strong>Learning Rate Too High</strong>: Causes unstable training and poor convergence. Decrease initial learning rate.</li>
+                <li><strong>Neighborhood Too Large</strong>: All neurons update similarly, losing local structure. Decrease initial neighborhood radius.</li>
+                <li><strong>Insufficient Training</strong>: Map hasn't converged, leading to poor representation. Increase iterations or adjust decay rates.</li>
+                <li><strong>Not Normalizing Data</strong>: Features on different scales cause distance calculations to be dominated by large-scale features. Always normalize!</li>
+                <li><strong>Ignoring Topographic Error</strong>: High topographic error means topology is not preserved. May need larger grid or more training.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>When to Use <span class="badge">Application</span></h2>
+            <ul class="list">
+                <li><strong>Data Visualization</strong>: When you want to visualize high-dimensional data in 2D while preserving structure.</li>
+                <li><strong>Exploratory Data Analysis</strong>: When you want to discover clusters, patterns, and relationships in data.</li>
+                <li><strong>Topology Preservation</strong>: When preserving neighborhood relationships is important.</li>
+                <li><strong>Feature Extraction</strong>: When you want to extract lower-dimensional representations for downstream tasks.</li>
+                <li><strong>Clustering</strong>: When you want to identify clusters in data (can be combined with clustering algorithms).</li>
+                <li><strong>Data Compression</strong>: When you want to compress data to a grid representation.</li>
+                <li><strong>Non-Linear Dimensionality Reduction</strong>: When data has non-linear relationships that linear methods cannot capture.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Alternatives to Consider <span class="badge">Comparison</span></h2>
+            <ul class="list">
+                <li><strong>vs PCA</strong>: SOM preserves topology and handles non-linear relationships; PCA is linear and doesn't preserve topology. Use SOM for non-linear data with topology preservation needs.</li>
+                <li><strong>vs t-SNE/UMAP</strong>: SOM creates a grid structure (can transform new data); t-SNE/UMAP create scatter plots (only embed training data). Use SOM when you need a grid structure or to transform new samples.</li>
+                <li><strong>vs K-Means</strong>: SOM preserves topology and creates continuous map; K-Means creates discrete clusters. Use SOM when topology preservation is important.</li>
+                <li><strong>vs Autoencoders</strong>: SOM creates interpretable grid; autoencoders create continuous latent space. Use SOM for visualization and interpretability, autoencoders for feature learning.</li>
+            </ul>
+        </div>
+    </div>
+    <script src="../sidebar.js"></script>
+</body>
+</html>
+

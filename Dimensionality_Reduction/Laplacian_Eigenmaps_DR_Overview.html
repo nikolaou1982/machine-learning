@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Learn about Laplacian Eigenmaps, a dimensionality reduction method. Comprehensive overview with theory, applications, and use cases for machine learning and data science.">
+  <link rel="canonical" href="https://yourdomain.com/Dimensionality_Reduction/Laplacian_Eigenmaps_DR_Overview.html">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "name": "Laplacian Eigenmaps - Overview & Theory | Dimensionality Reduction | ML Tools",
+  "description": "Learn about Laplacian Eigenmaps, a dimensionality reduction method. Comprehensive overview with theory, applications, and use cases for machine learning and data science.",
+  "url": "https://yourdomain.com/Dimensionality_Reduction/Laplacian_Eigenmaps_DR_Overview.html",
+  "about": {
+    "@type": "Thing",
+    "name": "Laplacian Eigenmaps",
+    "description": "Laplacian Eigenmaps algorithm for dimensionality reduction"
+  },
+  "headline": "Laplacian Eigenmaps",
+  "articleSection": "Dimensionality Reduction"
+}
+  </script>
+    <title>Laplacian Eigenmaps - Overview & Theory | Dimensionality Reduction | ML Tools</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            color: #cfcfcf;
+            background-color: #1e1e1e;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #171717;
+            padding: 30px 20px;
+            border-right: 1px solid #333;
+            overflow-y: auto;
+            height: 100vh;
+        }
+        .sidebar h1 { color: white; font-size: 1.8rem; font-weight: bold; margin-bottom: 30px; text-align: center; }
+        .nav-section { margin-bottom: 30px; }
+        .nav-section h3 { color: #dd8448; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px; }
+        .nav-item { display: block; color: #676767; text-decoration: none; padding: 12px 15px; margin-bottom: 5px; border-radius: 8px; transition: all 0.3s ease; font-weight: 500; }
+        .nav-item:hover { background-color: #2d2d2d; color: white; transform: translateX(5px); }
+        .nav-item.active { background-color: #dd8448; color: white; }
+        .nav-category { margin-bottom: 20px; }
+        .nav-category-header { color: #dd8448; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; padding: 10px 15px; cursor: pointer; border-radius: 8px; transition: background-color 0.3s ease; display: flex; justify-content: space-between; align-items: center; letter-spacing: 1px; }
+        .nav-category-header:hover { background-color: #2d2d2d; }
+        .nav-category-header .arrow { transition: transform 0.3s ease; font-size: 0.7rem; }
+        .nav-category-header.collapsed .arrow { transform: rotate(-90deg); }
+        .nav-subcategory { margin-left: 15px; margin-top: 10px; overflow: hidden; max-height: 1200px; transition: max-height 0.3s ease; }
+        .nav-subcategory.collapsed { max-height: 0; }
+        .nav-subheader { color: #999; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; padding: 8px 15px; margin-top: 5px; letter-spacing: 0.5px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-radius: 6px; transition: background-color 0.3s ease; }
+        .nav-subheader:hover { background-color: #2d2d2d; }
+        .nav-subheader .arrow { font-size: 0.6rem; transition: transform 0.3s ease; }
+        .nav-subheader.collapsed .arrow { transform: rotate(-90deg); }
+        .nav-subheader.category-header { color: #dd8448; font-size: 0.85rem; font-weight: 700; padding: 10px 15px; margin-top: 8px; letter-spacing: 1px; border: 1px solid rgba(221,132,72,0.3); }
+        .nav-subheader.category-header:hover { background-color: rgba(221,132,72,0.15); border-color: rgba(221,132,72,0.5); }
+        .nav-subgroup { overflow: hidden; max-height: 200px; transition: max-height 0.3s ease; padding-bottom: 5px; }
+        .nav-subgroup.collapsed { max-height: 0; }
+        .nav-subgroup.category-group { max-height: 1000px; }
+        .nav-subgroup.category-group.collapsed { max-height: 0; }
+        .nav-subheader.nested { margin-left: 10px; font-size: 0.7rem; }
+        .nav-subgroup.nested { margin-left: 10px; max-height: 200px; }
+        .nav-subheader.subcategory-header { color: #999; font-size: 0.75rem; font-weight: 600; padding: 8px 15px; margin-left: 10px; margin-top: 5px; letter-spacing: 0.5px; border: 1px solid rgba(153, 153, 153, 0.2); }
+        .nav-subheader.subcategory-header:hover { background-color: rgba(45, 45, 45, 0.5); border-color: rgba(153, 153, 153, 0.4); }
+        .nav-subgroup.subcategory-group { margin-left: 10px; max-height: 2000px; overflow: hidden; transition: max-height 0.3s ease; padding-bottom: 5px; }
+        .nav-subgroup.subcategory-group.collapsed { max-height: 0; }
+        .nav-item.sub { padding: 8px 15px; font-size: 0.9rem; margin-left: 10px; margin-bottom: 5px; }
+        .main-content {
+            flex: 1;
+            padding: 40px;
+        }
+        .title {
+            color: #ffffff;
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin: 0 0 8px 0;
+        }
+        .subtitle {
+            color: #8a8a8a;
+            font-size: 1rem;
+            margin-bottom: 28px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+        .card {
+            background-color: #171717;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 22px;
+            transition: border-color 0.3s ease, transform 0.3s ease;
+        }
+        .card:hover { border-color: #dd8448; transform: translateY(-3px); }
+        .card h3 { color: #ffffff; margin: 0 0 8px 0; font-size: 1.15rem; }
+        .card p { color: #9a9a9a; margin: 0; line-height: 1.6; }
+        .section {
+            background-color: #171717;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .section h2 {
+            color: #ffffff;
+            font-size: 1.5rem;
+            margin: 0 0 12px 0;
+        }
+        .badge {
+            display: inline-block;
+            background: rgba(221,132,72,0.15);
+            color: #ffb07a;
+            border: 1px solid rgba(221,132,72,0.35);
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        .list { margin: 0; padding-left: 18px; color: #b0b0b0; }
+        .list li { margin-bottom: 6px; }
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .callout {
+            background: #202020;
+            border: 1px dashed #3a3a3a;
+            border-radius: 10px;
+            padding: 14px;
+            color: #a9a9a9;
+        }
+        .kpi {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 10px;
+        }
+        .kpi .item {
+            background: #1c1c1c;
+            border: 1px solid #2a2a2a;
+            border-radius: 10px;
+            padding: 10px 12px;
+        }
+        .kpi .label { color: #8e8e8e; font-size: 12px; }
+        .kpi .value { color: #ffffff; font-weight: 700; font-size: 18px; }
+        .muted { color: #9a9a9a; }
+        .accent { color: #dd8448; }
+    </style>
+</head>
+<body>
+    <div class="sidebar"></div>
+    <div class="main-content">
+        <h1 class="title">Laplacian Eigenmaps Overview <span class="badge">Guide</span></h1>
+        <div class="subtitle">Spectral manifold learning technique that uses the graph Laplacian to find a low-dimensional embedding that preserves local neighborhood relationships and smoothness.</div>
+
+        <div class="grid">
+            <div class="card">
+                <h3>Primary Uses</h3>
+                <p>Non-linear dimensionality reduction, spectral clustering, data visualization, preserving local structure, graph-based learning, semi-supervised learning.</p>
+            </div>
+            <div class="card">
+                <h3>Strengths</h3>
+                <p>Preserves local neighborhood structure, smooth embedding (minimizes variation), spectral method (well-understood theory), works well with graph-based data, handles disconnected components.</p>
+            </div>
+            <div class="card">
+                <h3>Watch-outs</h3>
+                <p>Sensitive to neighborhood size and heat kernel parameter, computationally expensive for large graphs, requires connected graph (or handle components separately), can be sensitive to outliers.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>How It Works <span class="badge">Mathematical Foundation</span></h2>
+            <div class="summary">
+                <div>
+                    <p class="muted"><span class="accent">Laplacian Eigenmaps</span> constructs a weighted graph from the data where edges connect nearby points, then finds a low-dimensional embedding by solving a generalized eigenvalue problem involving the graph Laplacian. The embedding minimizes the weighted sum of squared distances between neighboring points.</p>
+                    <ul class="list">
+                        <li><strong>Graph Construction:</strong> Build a k-NN or ε-neighborhood graph where edges connect nearby points based on Euclidean distance.</li>
+                        <li><strong>Weight Matrix:</strong> Assign weights to edges using a heat kernel <em>W<sub>ij</sub> = exp(-‖x<sub>i</sub> − x<sub>j</sub>‖² / t)</em> or binary weights (1 if connected, 0 otherwise).</li>
+                        <li><strong>Graph Laplacian:</strong> Compute <em>L = D − W</em> where <em>D</em> is the degree matrix (diagonal with row sums of <em>W</em>).</li>
+                        <li><strong>Generalized Eigenvalue Problem:</strong> Solve <em>Lf = λDf</em> for the smallest non-zero eigenvalues and corresponding eigenvectors.</li>
+                        <li><strong>Embedding:</strong> Use eigenvectors 2 … d+1 as coordinates (first eigenvector is constant, discarded).</li>
+                        <li><strong>Smoothness:</strong> The embedding minimizes <em>Σ<sub>ij</sub> W<sub>ij</sub>‖y<sub>i</sub> − y<sub>j</sub>‖²</em>, encouraging nearby points to have similar coordinates.</li>
+                    </ul>
+                </div>
+                <div class="callout">Tip: The heat kernel parameter <em>t</em> controls the scale of locality. Small <em>t</em> emphasizes very local structure; large <em>t</em> makes the graph more connected. Start with <em>t</em> around the median squared distance to nearest neighbors.</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Dimensionality Reduction Statistics <span class="badge">Interpretation</span></h2>
+            <div class="kpi">
+                <div class="item"><div class="label">Original Dimensions</div><div class="value">Input feature count</div></div>
+                <div class="item"><div class="label">Reduced Dimensions</div><div class="value">User-selected embedding size</div></div>
+                <div class="item"><div class="label">Graph Connectivity</div><div class="value">Number of connected components</div></div>
+                <div class="item"><div class="label">Eigenvalue Gap</div><div class="value">Spectral gap between embedding eigenvalues</div></div>
+                <div class="item"><div class="label">Compression Ratio</div><div class="value">Original dims / reduced dims</div></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Reading the Visualizations <span class="badge">Analysis</span></h2>
+            <ul class="list">
+                <li><strong>2D Embedding Plot:</strong> Visualize the spectral embedding; points that were neighbors in the original space should remain close.</li>
+                <li><strong>Eigenvalue Spectrum:</strong> Inspect the eigenvalue distribution; a clear gap suggests a good embedding dimension.</li>
+                <li><strong>Graph Visualization:</strong> View the constructed graph to understand local connectivity.</li>
+                <li><strong>Heat Kernel Effect:</strong> Compare embeddings with different <em>t</em> values to see how locality scale affects results.</li>
+                <li><strong>Component Analysis:</strong> Identify disconnected components that may need separate treatment.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Parameter Guidance <span class="badge">Best Practice</span></h2>
+            <ul class="list">
+                <li><strong>k (Neighbors):</strong> Typically 5–20. Controls graph connectivity; too small fragments the graph, too large loses local structure.</li>
+                <li><strong>Heat Kernel Parameter (t):</strong> Start with median squared distance to k-th neighbor; adjust to control locality scale.</li>
+                <li><strong>Embedding Dimension:</strong> Use eigenvalue gap or domain knowledge; 2–3 for visualization, higher for downstream tasks.</li>
+                <li><strong>Graph Type:</strong> k-NN graph is common; ε-neighborhood can be more robust but requires tuning ε.</li>
+                <li><strong>Normalization:</strong> Standardize features before computing distances to treat all dimensions uniformly.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Data Preparation <span class="badge">Checklist</span></h2>
+            <ul class="list">
+                <li>Normalize or standardize features (critical for distance-based graph construction).</li>
+                <li>Ensure sufficient sampling density to maintain graph connectivity.</li>
+                <li>Impute or remove missing values—graph construction requires complete data.</li>
+                <li>Check for disconnected components; may need to process separately or adjust k/t.</li>
+                <li>Consider removing outliers that create spurious graph connections.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Common Pitfalls <span class="badge">Avoid</span></h2>
+            <ul class="list">
+                <li><strong>k too small:</strong> Graph becomes disconnected; embedding fragments into separate components.</li>
+                <li><strong>k too large:</strong> Graph becomes too dense; loses local structure, embedding becomes less meaningful.</li>
+                <li><strong>t too small:</strong> Heat kernel decays too fast; graph becomes sparse, embedding unstable.</li>
+                <li><strong>t too large:</strong> Heat kernel becomes nearly uniform; embedding approaches PCA-like behavior.</li>
+                <li><strong>Disconnected graph:</strong> Multiple zero eigenvalues; need to handle components separately or increase k.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>When to Use <span class="badge">Application</span></h2>
+            <ul class="list">
+                <li>Visualizing data with clear local structure or manifold geometry.</li>
+                <li>Pre-processing for spectral clustering or graph-based methods.</li>
+                <li>Semi-supervised learning where local smoothness is important.</li>
+                <li>Data with graph-like structure (e.g., social networks, molecular data).</li>
+                <li>When you need a smooth embedding that preserves local neighborhoods.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Alternatives to Consider <span class="badge">Comparison</span></h2>
+            <ul class="list">
+                <li><strong>LLE:</strong> Similar local preservation but uses reconstruction weights instead of graph Laplacian.</li>
+                <li><strong>Isomap:</strong> Preserves global geodesic distances; better for large-scale manifold unfolding.</li>
+                <li><strong>Diffusion Maps:</strong> Uses diffusion operator instead of Laplacian; captures multi-scale structure.</li>
+                <li><strong>t-SNE / UMAP:</strong> Probabilistic methods; better for visualization and clustering but less theoretically grounded.</li>
+                <li><strong>Graph Convolutional Networks:</strong> Learn embeddings via neural networks; more flexible but require training.</li>
+            </ul>
+        </div>
+    </div>
+    <script src="../sidebar.js"></script>
+</body>
+</html>
+

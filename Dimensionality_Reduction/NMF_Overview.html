@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Learn about NMF, a dimensionality reduction method. Comprehensive overview with theory, applications, and use cases for machine learning and data science.">
+  <link rel="canonical" href="https://yourdomain.com/Dimensionality_Reduction/NMF_Overview.html">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "name": "NMF - Overview & Theory | Dimensionality Reduction | ML Tools",
+  "description": "Learn about NMF, a dimensionality reduction method. Comprehensive overview with theory, applications, and use cases for machine learning and data science.",
+  "url": "https://yourdomain.com/Dimensionality_Reduction/NMF_Overview.html",
+  "about": {
+    "@type": "Thing",
+    "name": "NMF",
+    "description": "NMF algorithm for dimensionality reduction"
+  },
+  "headline": "NMF",
+  "articleSection": "Dimensionality Reduction"
+}
+  </script>
+    <title>NMF - Overview & Theory | Dimensionality Reduction | ML Tools</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            color: #cfcfcf;
+            background-color: #1e1e1e;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #171717;
+            padding: 30px 20px;
+            border-right: 1px solid #333;
+            overflow-y: auto;
+            height: 100vh;
+        }
+        .sidebar h1 { color: white; font-size: 1.8rem; font-weight: bold; margin-bottom: 30px; text-align: center; }
+        .nav-section { margin-bottom: 30px; }
+        .nav-section h3 { color: #dd8448; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px; }
+        .nav-item { display: block; color: #676767; text-decoration: none; padding: 12px 15px; margin-bottom: 5px; border-radius: 8px; transition: all 0.3s ease; font-weight: 500; }
+        .nav-item:hover { background-color: #2d2d2d; color: white; transform: translateX(5px); }
+        .nav-item.active { background-color: #dd8448; color: white; }
+        .nav-category { margin-bottom: 20px; }
+        .nav-category-header { color: #dd8448; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; padding: 10px 15px; cursor: pointer; border-radius: 8px; transition: background-color 0.3s ease; display: flex; justify-content: space-between; align-items: center; letter-spacing: 1px; }
+        .nav-category-header:hover { background-color: #2d2d2d; }
+        .nav-category-header .arrow { transition: transform 0.3s ease; font-size: 0.7rem; }
+        .nav-category-header.collapsed .arrow { transform: rotate(-90deg); }
+        .nav-subcategory { margin-left: 15px; margin-top: 10px; overflow: hidden; max-height: 1200px; transition: max-height 0.3s ease; }
+        .nav-subcategory.collapsed { max-height: 0; }
+        .nav-subheader { color: #999; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; padding: 8px 15px; margin-top: 5px; letter-spacing: 0.5px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-radius: 6px; transition: background-color 0.3s ease; }
+        .nav-subheader:hover { background-color: #2d2d2d; }
+        .nav-subheader .arrow { font-size: 0.6rem; transition: transform 0.3s ease; }
+        .nav-subheader.collapsed .arrow { transform: rotate(-90deg); }
+        .nav-subheader.category-header { color: #dd8448; font-size: 0.85rem; font-weight: 700; padding: 10px 15px; margin-top: 8px; letter-spacing: 1px; border: 1px solid rgba(221,132,72,0.3); }
+        .nav-subheader.category-header:hover { background-color: rgba(221,132,72,0.15); border-color: rgba(221,132,72,0.5); }
+        .nav-subgroup { overflow: hidden; max-height: 200px; transition: max-height 0.3s ease, padding-bottom 0.3s ease; padding-bottom: 5px; }
+        .nav-subgroup.collapsed { max-height: 0; padding-bottom: 0; }
+        .nav-subgroup.category-group { max-height: 1000px; }
+        .nav-subgroup.category-group.collapsed { max-height: 0; }
+        .nav-subheader.nested { margin-left: 10px; font-size: 0.7rem; }
+        .nav-subgroup.nested { margin-left: 10px; max-height: 200px; }
+        .nav-subheader.subcategory-header { color: #999; font-size: 0.75rem; font-weight: 600; padding: 8px 15px; margin-left: 10px; margin-top: 5px; letter-spacing: 0.5px; border: 1px solid rgba(153, 153, 153, 0.2); }
+        .nav-subheader.subcategory-header:hover { background-color: rgba(45, 45, 45, 0.5); border-color: rgba(153, 153, 153, 0.4); }
+        .nav-subgroup.subcategory-group { margin-left: 10px; max-height: 2000px; overflow: hidden; transition: max-height 0.3s ease, padding-bottom 0.3s ease; padding-bottom: 5px; }
+        .nav-subgroup.subcategory-group.collapsed { max-height: 0; padding-bottom: 0; }
+        .nav-item.sub { padding: 8px 15px; font-size: 0.9rem; margin-left: 10px; margin-bottom: 5px; }
+        .main-content {
+            flex: 1;
+            padding: 40px;
+        }
+        .title {
+            color: #ffffff;
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin: 0 0 8px 0;
+        }
+        .subtitle {
+            color: #8a8a8a;
+            font-size: 1rem;
+            margin-bottom: 28px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+        .card {
+            background-color: #171717;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 22px;
+            transition: border-color 0.3s ease, transform 0.3s ease;
+        }
+        .card:hover { border-color: #dd8448; transform: translateY(-3px); }
+        .card h3 { color: #ffffff; margin: 0 0 8px 0; font-size: 1.15rem; }
+        .card p { color: #9a9a9a; margin: 0; line-height: 1.6; }
+        .section {
+            background-color: #171717;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .section h2 {
+            color: #ffffff;
+            font-size: 1.5rem;
+            margin: 0 0 12px 0;
+        }
+        .badge {
+            display: inline-block;
+            background: rgba(221,132,72,0.15);
+            color: #ffb07a;
+            border: 1px solid rgba(221,132,72,0.35);
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        .list { margin: 0; padding-left: 18px; color: #b0b0b0; }
+        .list li { margin-bottom: 6px; }
+        .split {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .callout {
+            background: #202020;
+            border: 1px dashed #3a3a3a;
+            border-radius: 10px;
+            padding: 14px;
+            color: #a9a9a9;
+        }
+        .kpi {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 10px;
+        }
+        .kpi .item {
+            background: #1c1c1c;
+            border: 1px solid #2a2a2a;
+            border-radius: 10px;
+            padding: 10px 12px;
+        }
+        .kpi .label { color: #8e8e8e; font-size: 12px; }
+        .kpi .value { color: #ffffff; font-weight: 700; font-size: 18px; }
+        .muted { color: #9a9a9a; }
+        .accent { color: #dd8448; }
+    </style>
+</head>
+<body>
+    <div class="sidebar"></div>
+    <div class="main-content">
+        <h1 class="title">NMF Overview <span class="badge">Guide</span></h1>
+        <div class="subtitle">Non-negative Matrix Factorization: decomposes a non-negative matrix into two non-negative factor matrices for parts-based representation and dimensionality reduction.</div>
+
+        <div class="grid">
+            <div class="card">
+                <h3>Primary Uses</h3>
+                <p>Topic modeling, image processing, feature extraction, dimensionality reduction, collaborative filtering, parts-based learning, document clustering, audio source separation, gene expression analysis.</p>
+            </div>
+            <div class="card">
+                <h3>Strengths</h3>
+                <p>Produces interpretable parts-based representations, enforces non-negativity constraint (natural for many data types), handles sparse matrices well, good for additive models, useful for topic discovery in text.</p>
+            </div>
+            <div class="card">
+                <h3>Watch-outs</h3>
+                <p>Requires non-negative input data, solution may not be unique (multiple local minima), computationally intensive iterative optimization, sensitive to initialization, may converge slowly.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>How It Works <span class="badge">Mathematical Foundation</span></h2>
+            <div class="split">
+                <div>
+                    <p class="muted">NMF factors a non-negative matrix <span class="accent">A</span> (m × n) into two non-negative matrices: <span class="accent">A ≈ W × H</span>, where W (m × k) is the basis matrix and H (k × n) is the coefficient matrix. The goal is to minimize the reconstruction error while maintaining non-negativity.</p>
+                    <ul class="list">
+                        <li><strong>Factorization</strong>: A ≈ W × H where A (m × n), W (m × k), H (k × n), all non-negative</li>
+                        <li><strong>Basis Matrix (W)</strong>: Contains k basis vectors (components) that represent parts or patterns in the data</li>
+                        <li><strong>Coefficient Matrix (H)</strong>: Contains coefficients (weights) indicating how much each basis contributes to each sample</li>
+                        <li><strong>Objective Function</strong>: Minimize ||A - WH||² (Frobenius norm) or KL divergence D(A || WH)</li>
+                        <li><strong>Multiplicative Updates</strong>: Iterative algorithm that updates W and H using multiplicative rules that preserve non-negativity</li>
+                        <li><strong>Dimensionality Reduction</strong>: k < min(m, n) reduces dimensions from n to k, with W providing interpretable basis</li>
+                        <li><strong>Parts-Based Representation</strong>: Unlike PCA/SVD which finds global patterns, NMF finds additive parts that combine to form data</li>
+                    </ul>
+                </div>
+                <div class="callout">Tip: NMF is particularly useful when data is naturally non-negative (e.g., pixel intensities, word counts, gene expression levels). The non-negativity constraint leads to parts-based, interpretable representations where components represent meaningful parts or topics.</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Dimensionality Reduction Statistics <span class="badge">Interpretation</span></h2>
+            <div class="kpi">
+                <div class="item"><div class="label">Original Dimensions</div><div class="value">Number of input features</div></div>
+                <div class="item"><div class="label">Number of Components</div><div class="value">Number of basis vectors (k)</div></div>
+                <div class="item"><div class="label">Reconstruction Error</div><div class="value">Frobenius norm ||A - WH||² (lower = better)</div></div>
+                <div class="item"><div class="label">Compression Ratio</div><div class="value">Original / Components dimensions</div></div>
+                <div class="item"><div class="label">Sparsity</div><div class="value">Proportion of zero/near-zero values in W and H</div></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Reading the Visualizations <span class="badge">Analysis</span></h2>
+            <ul class="list">
+                <li><strong>Basis Vectors (W)</strong>: Show the learned components/patterns. Each basis vector represents a "part" or "topic" that can be combined to reconstruct data.</li>
+                <li><strong>Coefficient Matrix (H)</strong>: Shows how much each basis contributes to each sample. Higher values indicate stronger presence of that component.</li>
+                <li><strong>Reconstruction Error</strong>: Shows how well W × H approximates original data. Lower error = better approximation. Monitor convergence during optimization.</li>
+                <li><strong>Component Contributions</strong>: Visualize which features contribute most to each component. Useful for interpreting what each component represents.</li>
+                <li><strong>2D Projection</strong>: Project data onto first two components for visualization. Shows how samples relate to the learned basis vectors.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Parameter Guidance <span class="badge">Best Practice</span></h2>
+            <ul class="list">
+                <li><strong>Number of Components (k)</strong>: Choose based on domain knowledge (e.g., number of topics), use reconstruction error vs k plot to find elbow, or cross-validation. Typically 2-50 for most applications.</li>
+                <li><strong>Initialization</strong>: Random initialization is common, but better initialization (e.g., SVD-based) can improve convergence. Try multiple random seeds.</li>
+                <li><strong>Max Iterations</strong>: Set high enough for convergence (typically 200-1000). Monitor reconstruction error to check convergence.</li>
+                <li><strong>Tolerance</strong>: Stop when change in reconstruction error is below threshold (e.g., 1e-6). Prevents unnecessary iterations.</li>
+                <li><strong>Regularization</strong>: Optional L1/L2 regularization can promote sparsity or smoothness. Useful for interpretability or preventing overfitting.</li>
+                <li><strong>Update Rules</strong>: Multiplicative updates (Lee & Seung) are standard. Alternating least squares (ALS) can be faster but may violate non-negativity.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Data Preparation <span class="badge">Best Practice</span></h2>
+            <ul class="list">
+                <li><strong>Non-Negative Data</strong>: NMF requires all values ≥ 0. If data has negatives, shift by adding constant to make minimum = 0, or use absolute values (loses sign information).</li>
+                <li><strong>Normalization</strong>: Optional but can help. Normalize rows (samples) or columns (features) to unit norm if scales vary widely.</li>
+                <li><strong>Handle Missing Values</strong>: Remove or impute missing values before NMF (cannot handle NaN).</li>
+                <li><strong>Remove Outliers</strong>: Extreme outliers can distort basis vectors. Consider clipping or robust preprocessing.</li>
+                <li><strong>Sparse Matrices</strong>: NMF works well with sparse data (e.g., document-term matrices). Sparse representation can speed up computation.</li>
+                <li><strong>Feature Scaling</strong>: If features have very different scales, consider normalization. However, NMF is less sensitive to scale than PCA.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Common Pitfalls <span class="badge">Avoid</span></h2>
+            <ul class="list">
+                <li><strong>Negative Input Data</strong>: NMF requires non-negative input. Applying NMF to data with negatives will fail or produce meaningless results.</li>
+                <li><strong>Too Many Components</strong>: Using k close to min(m, n) defeats the purpose. Use reconstruction error vs k to find optimal number.</li>
+                <li><strong>Too Few Components</strong>: Using very few components (e.g., k=1) may lose important structure. Start with domain-informed k and adjust.</li>
+                <li><strong>Poor Initialization</strong>: Random initialization can lead to poor local minima. Try multiple initializations or use SVD-based initialization.</li>
+                <li><strong>Insufficient Iterations</strong>: NMF may need many iterations to converge. Check reconstruction error to ensure convergence.</li>
+                <li><strong>Ignoring Convergence</strong>: Monitor reconstruction error. If it's not decreasing, algorithm may be stuck or converged.</li>
+                <li><strong>Interpreting Components</strong>: Components are not necessarily orthogonal or ordered by importance. Interpret based on actual values, not ordering.</li>
+                <li><strong>Using NMF on Centered Data</strong>: Centering (subtracting mean) can make data negative. For NMF, use original non-negative data or shift to non-negative.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>When to Use <span class="badge">Application</span></h2>
+            <ul class="list">
+                <li><strong>Topic Modeling</strong>: When analyzing text documents to discover latent topics. Each component represents a topic, coefficients indicate topic proportions.</li>
+                <li><strong>Image Processing</strong>: When decomposing images into parts (e.g., facial features, object parts). NMF finds additive parts-based representations.</li>
+                <li><strong>Feature Extraction</strong>: When you want interpretable features that represent parts or patterns in data (e.g., gene expression patterns).</li>
+                <li><strong>Collaborative Filtering</strong>: When building recommendation systems using matrix factorization with non-negative constraints (e.g., user-item ratings).</li>
+                <li><strong>Dimensionality Reduction</strong>: When you need dimensionality reduction with interpretable, parts-based components (unlike PCA which finds global patterns).</li>
+                <li><strong>Sparse Data</strong>: When working with sparse non-negative matrices (e.g., document-term, user-item matrices). NMF handles sparsity naturally.</li>
+                <li><strong>Additive Models</strong>: When data can be modeled as sum of parts (e.g., audio source separation, spectral unmixing).</li>
+                <li><strong>Interpretability Required</strong>: When you need components that are interpretable and represent meaningful parts or topics (e.g., medical imaging, text analysis).</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Alternatives to Consider <span class="badge">Comparison</span></h2>
+            <ul class="list">
+                <li><strong>vs SVD/PCA</strong>: NMF enforces non-negativity and finds parts-based representations; SVD/PCA allow negatives and find global patterns. Use NMF when interpretability and non-negativity matter (e.g., topic modeling).</li>
+                <li><strong>vs Latent Dirichlet Allocation (LDA)</strong>: Both used for topic modeling. NMF is simpler and deterministic; LDA is probabilistic and provides topic distributions. Use LDA for probabilistic topic modeling.</li>
+                <li><strong>vs Independent Component Analysis (ICA)</strong>: Both find additive components. ICA finds statistically independent components; NMF finds non-negative parts. Use ICA when independence is important.</li>
+                <li><strong>vs K-means</strong>: Both can cluster data. NMF provides soft assignments and parts-based representation; K-means provides hard assignments. Use NMF when you want parts-based interpretation.</li>
+                <li><strong>vs Autoencoders</strong>: Both can learn representations. Autoencoders are non-linear and flexible; NMF is linear and interpretable. Use autoencoders for complex non-linear patterns.</li>
+            </ul>
+        </div>
+    </div>
+    <script src="../sidebar.js"></script>
+</body>
+</html>
+

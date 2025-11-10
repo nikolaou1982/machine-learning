@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Interactive Denclue implementation in 2D. Visualize and experiment with this clustering algorithm using real-time charts and data analysis tools.">
+  <link rel="canonical" href="https://yourdomain.com/Clustering/DENCLUE.html">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Denclue (2D) - Interactive Implementation | Clustering | ML Tools",
+  "description": "Interactive Denclue implementation in 2D. Visualize and experiment with this clustering algorithm using real-time charts and data analysis tools.",
+  "url": "https://yourdomain.com/Clustering/DENCLUE.html",
+  "about": {
+    "@type": "Thing",
+    "name": "Denclue",
+    "description": "Denclue algorithm for clustering"
+  }
+}
+  </script>
+    <title>Denclue (2D) - Interactive Implementation | Clustering | ML Tools</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body{font-family:'Nunito',sans-serif;color:#676767;background-color:#1e1e1e;margin:0;padding:0;display:flex;min-height:100vh}.sidebar{width:250px;background-color:#171717;padding:30px 20px;border-right:1px solid #333}.sidebar h1{color:white;font-size:1.8rem;font-weight:bold;margin-bottom:30px;text-align:center}.nav-section{margin-bottom:30px}.nav-section h3{color:#dd8448;font-size:0.9rem;font-weight:600;text-transform:uppercase;margin-bottom:15px;letter-spacing:1px}.nav-item{display:block;color:#676767;text-decoration:none;padding:12px 15px;margin-bottom:5px;border-radius:8px;transition:all 0.3s ease;font-weight:500}.nav-item:hover{background-color:#2d2d2d;color:white;transform:translateX(5px)}.nav-item.active{background-color:#dd8448;color:white}.nav-category{margin-bottom:20px}.nav-category-header{color:#dd8448;font-size:0.85rem;font-weight:600;text-transform:uppercase;padding:10px 15px;cursor:pointer;border-radius:8px;transition:background-color 0.3s ease;display:flex;justify-content:space-between;align-items:center;letter-spacing:1px}.nav-category-header:hover{background-color:#2d2d2d}.nav-category-header .arrow{transition:transform 0.3s ease;font-size:0.7rem}.nav-category-header.collapsed .arrow{transform:rotate(-90deg)}.nav-subcategory{margin-left:15px;margin-top:10px;overflow:hidden;max-height:800px;transition:max-height 0.3s ease}.nav-subcategory.collapsed{max-height:0}.nav-subheader{color:#999;font-size:0.75rem;font-weight:600;text-transform:uppercase;padding:8px 15px;margin-top:5px;letter-spacing:0.5px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border-radius:6px;transition:background-color 0.3s ease}.nav-subheader:hover{background-color:#2d2d2d}.nav-subheader .arrow{font-size:0.6rem;transition:transform 0.3s ease}.nav-subheader.collapsed .arrow{transform:rotate(-90deg)}.nav-subheader.category-header{color:#dd8448;font-size:0.85rem;font-weight:700;padding:10px 15px;margin-top:8px;letter-spacing:1px;border:1px solid rgba(221,132,72,0.3)}.nav-subheader.category-header:hover{background-color:rgba(221,132,72,0.15);border-color:rgba(221,132,72,0.5)}.nav-subgroup{overflow:hidden;max-height:200px;transition:max-height 0.3s ease;padding-bottom:5px}.nav-subgroup.collapsed{max-height:0}.nav-subgroup.category-group{max-height:1000px}.nav-subgroup.category-group.collapsed{max-height:0}.nav-subheader.nested{margin-left:10px;font-size:0.7rem}.nav-subgroup.nested{margin-left:10px;max-height:200px;overflow:hidden;transition:max-height 0.3s ease;padding-bottom:5px}.nav-subgroup.nested.collapsed{max-height:0}.nav-subheader.subcategory-header{color:#999;font-size:0.75rem;font-weight:600;padding:8px 15px;margin-left:10px;margin-top:5px;letter-spacing:0.5px;border:1px solid rgba(153,153,153,0.2)}.nav-subheader.subcategory-header:hover{background-color:rgba(45,45,45,0.5);border-color:rgba(153,153,153,0.4)}.nav-subgroup.subcategory-group{margin-left:10px;max-height:800px;overflow:hidden;transition:max-height 0.3s ease;padding-bottom:5px}.nav-subgroup.subcategory-group.collapsed{max-height:0}.nav-item.sub{padding:8px 15px;font-size:0.9rem;margin-left:10px;margin-bottom:5px}.main-content{flex:1;padding:20px}.main-title{color:white;font-size:2.5rem;font-weight:bold;margin-bottom:10px;text-align:center}.subtitle{color:#676767;font-size:1rem;margin-bottom:30px;text-align:center}.controls-container{display:flex;gap:20px;margin-bottom:30px;flex-wrap:wrap}.control-group{background-color:#171717;padding:20px;border-radius:12px;border:1px solid #333;min-width:200px}.control-group h3{color:white;font-size:1.1rem;margin-bottom:15px;font-weight:600}.control-item{margin-bottom:15px}.control-item label{display:block;color:#676767;margin-bottom:5px;font-weight:500}.control-item input,.control-item select{width:100%;padding:8px 12px;background-color:#2d2d2d;border:1px solid #444;border-radius:6px;color:white;font-family:'Nunito',sans-serif}.control-item input:focus,.control-item select:focus{outline:none;border-color:#dd8448}.btn{background-color:#dd8448;color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:600;font-family:'Nunito',sans-serif;transition:background-color 0.3s ease}.btn:hover{background-color:#c67339}.csv-upload{position:relative;display:inline-block}.csv-upload input[type="file"]{position:absolute;opacity:0;width:100%;height:100%;cursor:pointer}.csv-upload-label{display:inline-block;background-color:#2d2d2d;color:white;padding:10px 20px;border-radius:6px;border:2px dashed #444;cursor:pointer;transition:all 0.3s ease;font-weight:500}.csv-upload-label:hover{border-color:#dd8448;background-color:#3d3d3d}:root{--electric-border-color:#dd8448;--electric-light-color:#ff9f5a;--gradient-color:rgba(221,132,72,0.4);--color-neutral-900:#2d2d2d}.control-group.csv-format{padding:2px;background:linear-gradient(-30deg,var(--gradient-color),transparent,var(--gradient-color)),linear-gradient(to bottom,var(--color-neutral-900),var(--color-neutral-900));position:relative}.control-group.csv-format::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;border:1px solid rgba(221,132,72,0.5);border-radius:12px;pointer-events:none}.control-group.csv-format::after{content:'';position:absolute;top:-2px;left:-2px;right:-2px;bottom:-2px;border:1px solid var(--electric-border-color);border-radius:12px;pointer-events:none}.csv-glow-1,.csv-glow-2{position:absolute;top:0;left:0;right:0;bottom:0;border-radius:12px;pointer-events:none}.csv-glow-1{border:1px solid rgba(221,132,72,0.6);filter:blur(1px)}.csv-glow-2{border:1px solid var(--electric-light-color);filter:blur(3px)}.csv-info-card{background:#171717;border-radius:10px;padding:16px;margin:2px;position:relative;z-index:10}.csv-badge{background:rgba(255,255,255,0.1);border-radius:8px;padding:4px 8px;font-size:10px;font-weight:bold;text-transform:uppercase;color:rgba(255,255,255,0.8);width:fit-content;border:1px solid rgba(255,255,255,0.2)}.csv-title{color:white;font-size:16px;font-weight:600;margin:8px 0 4px 0}.csv-desc{color:rgba(255,255,255,0.6);font-size:11px;line-height:1.3}.stats-container{background-color:#171717;padding:20px;border-radius:12px;border:1px solid #333;margin-bottom:30px}.stats-container h3{color:white;margin-bottom:15px;font-weight:600}.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:15px}.stat-item{background-color:#2d2d2d;padding:15px;border-radius:8px;text-align:center}.stat-value{color:#dd8448;font-size:1.5rem;font-weight:bold;display:block}.stat-label{color:#676767;font-size:0.9rem;margin-top:5px}.plots-container{display:flex;gap:20px;margin-bottom:30px;flex-wrap:wrap}.plot-wrapper{background-color:#171717;border-radius:12px;border:1px solid #333;padding:20px;flex:1;min-width:400px}.plot-wrapper h3{color:white;margin-bottom:15px;font-weight:600}
+    </style>
+</head>
+<body>
+    <div class="sidebar"><h1>ML Tools</h1><div class="nav-section"><h3>Dashboard</h3><a href="main.html" class="nav-item">Overview</a></div><div class="nav-section"><h3>Clustering Methods</h3><div class="nav-category"><div class="nav-category-header collapsed" onclick="toggleCategory(this)"><span>Density-Based</span><span class="arrow">▼</span></div><div class="nav-subcategory collapsed"><div class="nav-subheader collapsed" onclick="toggleSubgroup(this)"><span>DBSCAN</span><span class="arrow">▼</span></div><div class="nav-subgroup collapsed"><a href="DBSCAN.html" class="nav-item sub">2D</a><a href="DBSCAN3D.html" class="nav-item sub">3D</a></div><div class="nav-subheader collapsed" onclick="toggleSubgroup(this)"><span>HDBSCAN</span><span class="arrow">▼</span></div><div class="nav-subgroup collapsed"><a href="HierarchicalDBSCAN.html" class="nav-item sub">2D</a><a href="HierarchicalDBSCAN3D.html" class="nav-item sub">3D</a></div><div class="nav-subheader collapsed" onclick="toggleSubgroup(this)"><span>OPTICS</span><span class="arrow">▼</span></div><div class="nav-subgroup collapsed"><a href="OPTICS.html" class="nav-item sub">2D</a><a href="OPTICS3D.html" class="nav-item sub">3D</a></div><div class="nav-subheader collapsed" onclick="toggleSubgroup(this)"><span>DENCLUE</span><span class="arrow">▼</span></div><div class="nav-subgroup collapsed"><a href="DENCLUE.html" class="nav-item sub active">2D</a><a href="DENCLUE3D.html" class="nav-item sub">3D</a></div></div></div></div></div><script>{const saved=localStorage.getItem('sidebarState');if(saved){const s=JSON.parse(saved);const ch=document.querySelector('.nav-category-header');const sc=ch.nextElementSibling;const sh=document.querySelectorAll('.nav-subheader');if(s.category){ch.classList.remove('collapsed');sc.classList.remove('collapsed')}if(s.dbscan){sh[0].classList.remove('collapsed');sh[0].nextElementSibling.classList.remove('collapsed')}if(s.hdbscan){sh[1].classList.remove('collapsed');sh[1].nextElementSibling.classList.remove('collapsed')}if(s.optics){sh[2].classList.remove('collapsed');sh[2].nextElementSibling.classList.remove('collapsed')}if(s.denclue){sh[3].classList.remove('collapsed');sh[3].nextElementSibling.classList.remove('collapsed')}}}restoreSidebarState()</script><div class="main-content"><h1 class="main-title">DENCLUE Clustering</h1><p class="subtitle">DENsity-based CLUstEring using kernel density estimation and hill-climbing</p><div class="controls-container"><div class="control-group"><h3>Dataset</h3><div class="control-item"><label for="dataset-select">Select Dataset:</label><select id="dataset-select"><option value="0">Two Moons</option><option value="1">Blobs with Noise</option><option value="2">Uneven Density</option><option value="custom">Custom CSV Data</option></select></div><div class="control-item"><div class="csv-upload"><input type="file" id="file-input" accept=".csv" onchange="loadCSV(event)"><label for="file-input" class="csv-upload-label">📁 Upload CSV</label></div></div></div><div class="control-group csv-format"><div class="csv-glow-1"></div><div class="csv-glow-2"></div><div class="csv-info-card"><div class="csv-badge">Format</div><div class="csv-title">CSV Upload</div><div class="csv-desc">Two numeric columns required<br>Example: x,y<br>1.0,2.3<br>3.1,4.2</div></div></div><div class="control-group"><h3>DENCLUE Parameters</h3><div class="control-item"><label for="sigma">Sigma (Bandwidth):</label><input type="number" id="sigma" value="0.5" min="0.1" max="2" step="0.1" onchange="runDENCLUE()"></div><div class="control-item"><label for="xi">Xi (Density Threshold):</label><input type="number" id="xi" value="0.01" min="0.001" max="0.1" step="0.001" onchange="runDENCLUE()"></div></div><div class="control-group"><h3>Actions</h3><button class="btn" style="width:100%;display:block;margin-bottom:10px" onclick="generateNewData()">Generate New Data</button><button class="btn" style="width:100%;display:block;margin-bottom:10px" onclick="exportResults()">Export Results</button><button class="btn" style="width:100%;display:block" onclick="downloadPlot()">Download Plot</button></div></div><div class="stats-container"><h3>DENCLUE Statistics</h3><div class="stats-grid"><div class="stat-item"><span class="stat-value" id="total-points-metric">-</span><div class="stat-label">Total Points</div></div><div class="stat-item"><span class="stat-value" id="clusters-metric">-</span><div class="stat-label">Clusters</div></div><div class="stat-item"><span class="stat-value" id="noise-metric">-</span><div class="stat-label">Noise Points</div></div><div class="stat-item"><span class="stat-value" id="attractors-metric">-</span><div class="stat-label">Attractors</div></div><div class="stat-item"><span class="stat-value" id="dbcv-metric">-</span><div class="stat-label">DBCV Score</div></div></div></div><div class="plots-container"><div class="plot-wrapper"><h3>Clustered Data with Attractors</h3><div id="cluster-plot"></div></div><div class="plot-wrapper"><h3>Density Heatmap</h3><div id="density-plot"></div></div></div>
+<div class="plots-container"><div class="plot-wrapper"><h3>Attractor Convergence Paths</h3><div id="convergence-plot"></div></div><div class="plot-wrapper"><h3>Density Gradient Field</h3><div id="gradient-plot"></div></div></div>
+<div class="plot-wrapper"><h3>Attractor Basins</h3><div id="basins-plot"></div></div></div>
+<script>
+class DENCLUE {
+    constructor(sigma = 0.5, xi = 0.01) {
+        this.sigma = sigma;
+        this.xi = xi;
+        this.labels = [];
+        this.attractors = [];
+    }
+
+    gaussian(dist) {
+        return Math.exp(-0.5 * Math.pow(dist / this.sigma, 2)) / (this.sigma * Math.sqrt(2 * Math.PI));
+    }
+
+    density(point, data) {
+        let sum = 0;
+        for (const p of data) {
+            const dist = Math.hypot(point[0] - p[0], point[1] - p[1]);
+            sum += this.gaussian(dist);
+        }
+        return sum / data.length;
+    }
+
+    gradient(point, data) {
+        let gx = 0, gy = 0;
+        for (const p of data) {
+            const dx = p[0] - point[0], dy = p[1] - point[1];
+            const dist = Math.hypot(dx, dy);
+            const g = this.gaussian(dist);
+            gx += g * dx;
+            gy += g * dy;
+        }
+        const factor = 1 / (data.length * this.sigma * this.sigma);
+        return [gx * factor, gy * factor];
+    }
+
+    hillClimb(start, data, maxIter = 50, tol = 0.001, trackPath = false) {
+        let point = [...start];
+        const path = trackPath ? [[...point]] : null;
+        for (let i = 0; i < maxIter; i++) {
+            const grad = this.gradient(point, data);
+            const newPoint = [point[0] + grad[0], point[1] + grad[1]];
+            if (Math.hypot(newPoint[0] - point[0], newPoint[1] - point[1]) < tol) break;
+            point = newPoint;
+            if (trackPath && path) path.push([...point]);
+        }
+        return trackPath ? { attractor: point, path: path } : point;
+    }
+
+    fit(data, trackPaths = false) {
+        const attractorMap = new Map();
+        this.labels = new Array(data.length).fill(-1);
+        this.convergencePaths = trackPaths ? [] : null;
+        
+        for (let i = 0; i < data.length; i++) {
+            const result = this.hillClimb(data[i], data, 50, 0.001, trackPaths);
+            const attractor = trackPaths ? result.attractor : result;
+            const density = this.density(attractor, data);
+            
+            if (trackPaths && result.path) {
+                this.convergencePaths.push({ start: data[i], path: result.path, attractor: attractor });
+            }
+            
+            if (density < this.xi) {
+                this.labels[i] = -1;
+                continue;
+            }
+            
+            let found = false;
+            for (const [key, clusterId] of attractorMap.entries()) {
+                const [ax, ay] = key.split(',').map(Number);
+                if (Math.hypot(attractor[0] - ax, attractor[1] - ay) < this.sigma) {
+                    this.labels[i] = clusterId;
+                    found = true;
+                    break;
+                }
+            }
+            
+            if (!found) {
+                const newId = attractorMap.size;
+                attractorMap.set(`${attractor[0]},${attractor[1]}`, newId);
+                this.labels[i] = newId;
+            }
+        }
+        
+        this.attractors = Array.from(attractorMap.keys()).map(k => k.split(',').map(Number));
+        return this;
+    }
+}
+
+function generateTwoMoons() {
+    const data = [];
+    for (let i = 0; i < 150; i++) {
+        const t = Math.PI * Math.random();
+        data.push([Math.cos(t) + 0.1 * (Math.random() - 0.5), Math.sin(t) + 0.1 * (Math.random() - 0.5)]);
+    }
+    for (let i = 0; i < 150; i++) {
+        const t = Math.PI * Math.random();
+        data.push([1 - Math.cos(t) + 0.1 * (Math.random() - 0.5), 0.5 - Math.sin(t) + 0.1 * (Math.random() - 0.5)]);
+    }
+    return data;
+}
+
+function generateBlobs() {
+    const data = [], centers = [[2,2],[-2,-2],[2,-2]];
+    centers.forEach(c => {
+        for (let i = 0; i < 100; i++)
+            data.push([c[0] + (Math.random() - 0.5) * 2, c[1] + (Math.random() - 0.5) * 2]);
+    });
+    for (let i = 0; i < 20; i++)
+        data.push([Math.random()*8 - 4, Math.random()*8 - 4]);
+    return data;
+}
+
+function generateUnevenDensity() {
+    const data = [];
+    for (let i = 0; i < 150; i++) data.push([(Math.random()-0.5)*0.6, (Math.random()-0.5)*0.6]);
+    for (let i = 0; i < 100; i++) data.push([3+(Math.random()-0.5)*2, 3+(Math.random()-0.5)*2]);
+    for (let i = 0; i < 50; i++) data.push([6+(Math.random()-0.5)*1, (Math.random()-0.5)*1]);
+    return data;
+}
+
+const datasets = [generateTwoMoons(), generateBlobs(), generateUnevenDensity()];
+let customData = null;
+
+function standardizeData(data) {
+    const n = data.length;
+    const meanX = data.reduce((s, p) => s + p[0], 0) / n;
+    const meanY = data.reduce((s, p) => s + p[1], 0) / n;
+    const stdX = Math.sqrt(data.reduce((s, p) => s + Math.pow(p[0]-meanX,2), 0) / n);
+    const stdY = Math.sqrt(data.reduce((s, p) => s + Math.pow(p[1]-meanY,2), 0) / n);
+    return data.map(p => [(p[0]-meanX)/stdX, (p[1]-meanY)/stdY]);
+}
+
+function runDENCLUE() {
+    const ds = document.getElementById('dataset-select').value;
+    const sigma = parseFloat(document.getElementById('sigma').value);
+    const xi = parseFloat(document.getElementById('xi').value);
+
+    let data = ds === 'custom' ? customData : datasets[parseInt(ds)];
+    if (!data) return;
+    
+    data = standardizeData(data);
+    const denclue = new DENCLUE(sigma, xi).fit(data, true);
+
+    const numClusters = new Set(denclue.labels.filter(l => l !== -1)).size;
+    const numNoise = denclue.labels.filter(l => l === -1).length;
+    
+    document.getElementById('total-points-metric').textContent = data.length;
+    document.getElementById('clusters-metric').textContent = numClusters;
+    document.getElementById('noise-metric').textContent = numNoise;
+    document.getElementById('attractors-metric').textContent = denclue.attractors.length;
+    const dbcv = calculateDBCV2D(data, denclue.labels, sigma);
+    document.getElementById('dbcv-metric').textContent = (dbcv !== -1 ? dbcv : 0).toFixed(3);
+
+    plotResults(data, denclue);
+}
+
+function calculateDBCV2D(data, labels, sigma) {
+    const clusters = [...new Set(labels)].filter(l => l !== -1);
+    if (clusters.length < 2) return -1;
+    
+    const minSamples = 5;
+    const eps = sigma * 2; // use sigma as basis for neighborhood
+    
+    let separationSum = 0, connectivitySum = 0;
+    let validClusters = 0;
+    
+    for (const c of clusters) {
+        const clusterPoints = data.filter((_, i) => labels[i] === c);
+        if (clusterPoints.length < minSamples) continue;
+        
+        let minSep = Infinity;
+        for (const otherC of clusters) {
+            if (otherC === c) continue;
+            const otherPoints = data.filter((_, i) => labels[i] === otherC);
+            for (const p1 of clusterPoints) {
+                for (const p2 of otherPoints) {
+                    const d = Math.hypot(p1[0]-p2[0], p1[1]-p2[1]);
+                    if (d < minSep) minSep = d;
+                }
+            }
+        }
+        
+        let connSum = 0, connCount = 0;
+        for (let i = 0; i < clusterPoints.length; i++) {
+            const neighbors = [];
+            for (let j = 0; j < clusterPoints.length; j++) {
+                if (i !== j) {
+                    const d = Math.hypot(clusterPoints[i][0]-clusterPoints[j][0], clusterPoints[i][1]-clusterPoints[j][1]);
+                    if (d <= eps) neighbors.push(d);
+                }
+            }
+            if (neighbors.length >= minSamples - 1) {
+                neighbors.sort((a,b)=>a-b);
+                connSum += neighbors[Math.min(minSamples-2, neighbors.length-1)];
+                connCount++;
+            }
+        }
+        
+        if (minSep !== Infinity && connCount > 0) {
+            separationSum += minSep;
+            connectivitySum += connSum / connCount;
+            validClusters++;
+        }
+    }
+    
+    if (validClusters === 0) return -1;
+    const avgSep = separationSum / validClusters;
+    const avgConn = connectivitySum / validClusters;
+    return avgSep > 0 && avgConn > 0 ? (avgSep - avgConn) / Math.max(avgSep, avgConn) : -1;
+}
+
+function plotResults(data, denclue) {
+    const colors = ['#dd8448', '#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#F44336', '#00BCD4', '#FFEB3B'];
+    const uniqueLabels = [...new Set(denclue.labels)];
+    const traces = [];
+    
+    uniqueLabels.forEach(label => {
+        const indices = denclue.labels.map((l, i) => l === label ? i : -1).filter(i => i !== -1);
+        const x = indices.map(i => data[i][0]);
+        const y = indices.map(i => data[i][1]);
+        
+        traces.push({
+            x: x, y: y, mode: 'markers', type: 'scatter',
+            name: label === -1 ? 'Noise' : `Cluster ${label}`,
+            marker: {
+                color: label === -1 ? '#666666' : colors[label % colors.length],
+                size: 8, opacity: 0.8
+            }
+        });
+    });
+    
+    if (denclue.attractors.length > 0) {
+        traces.push({
+            x: denclue.attractors.map(a => a[0]),
+            y: denclue.attractors.map(a => a[1]),
+            mode: 'markers', type: 'scatter', name: 'Attractors',
+            marker: {color: 'red', size: 15, symbol: 'star', line: {color: 'white', width: 2}}
+        });
+    }
+    
+    Plotly.newPlot('cluster-plot', traces, {
+        paper_bgcolor:'#171717', plot_bgcolor:'#171717', font:{color:'white'},
+        xaxis:{gridcolor:'#333'}, yaxis:{gridcolor:'#333'},
+        showlegend: true, legend: {bgcolor: 'rgba(0,0,0,0)'}
+    }, {responsive: true});
+    
+    const gridSize = 50;
+    const xMin = Math.min(...data.map(p => p[0])) - 1;
+    const xMax = Math.max(...data.map(p => p[0])) + 1;
+    const yMin = Math.min(...data.map(p => p[1])) - 1;
+    const yMax = Math.max(...data.map(p => p[1])) + 1;
+    
+    const xGrid = [], yGrid = [], zGrid = [];
+    for (let i = 0; i < gridSize; i++) {
+        const row = [];
+        for (let j = 0; j < gridSize; j++) {
+            const x = xMin + (xMax - xMin) * j / (gridSize - 1);
+            const y = yMin + (yMax - yMin) * i / (gridSize - 1);
+            row.push(denclue.density([x, y], data));
+        }
+        zGrid.push(row);
+    }
+    
+    for (let i = 0; i < gridSize; i++) {
+        xGrid.push(xMin + (xMax - xMin) * i / (gridSize - 1));
+        yGrid.push(yMin + (yMax - yMin) * i / (gridSize - 1));
+    }
+    
+    Plotly.newPlot('density-plot', [{
+        x: xGrid, y: yGrid, z: zGrid, type: 'contour',
+        colorscale: 'Viridis', contours: {coloring: 'heatmap'}
+    }], {
+        title: 'Density Heatmap',
+        paper_bgcolor:'#171717', plot_bgcolor:'#171717', font:{color:'white'},
+        xaxis:{gridcolor:'#333'}, yaxis:{gridcolor:'#333'}
+    }, {responsive: true});
+    
+    // Convergence paths
+    if (denclue.convergencePaths && denclue.convergencePaths.length > 0) {
+        const pathTraces = [];
+        const samplePaths = denclue.convergencePaths.filter((_,i) => i % Math.max(1, Math.floor(denclue.convergencePaths.length / 50)) === 0);
+        samplePaths.forEach((p, idx) => {
+            const px = p.path.map(pt => pt[0]);
+            const py = p.path.map(pt => pt[1]);
+            pathTraces.push({
+                x: px, y: py, mode: 'lines+markers', type: 'scatter',
+                line: {color: `rgba(221,132,72,0.3)`, width: 1},
+                marker: {size: 3, color: '#dd8448'},
+                showlegend: false
+            });
+        });
+        Plotly.newPlot('convergence-plot', pathTraces, {
+            paper_bgcolor:'#171717', plot_bgcolor:'#171717', font:{color:'white'},
+            xaxis:{gridcolor:'#333'}, yaxis:{gridcolor:'#333'}
+        }, {responsive: true});
+    }
+    
+    // Gradient field (using line traces for arrows)
+    const gradGridSize = 15;
+    const gx = [], gy = [], u = [], v = [], mag = [];
+    for (let i = 0; i < gradGridSize; i++) {
+        for (let j = 0; j < gradGridSize; j++) {
+            const x = xMin + (xMax - xMin) * j / (gradGridSize - 1);
+            const y = yMin + (yMax - yMin) * i / (gradGridSize - 1);
+            const grad = denclue.gradient([x, y], data);
+            const m = Math.hypot(grad[0], grad[1]);
+            if (m > 0.001) {
+                gx.push(x); gy.push(y);
+                u.push(grad[0] * 0.4 / m); v.push(grad[1] * 0.4 / m); mag.push(m);
+            }
+        }
+    }
+    const arrowTraces = [];
+    gx.forEach((x, i) => {
+        arrowTraces.push({
+            x: [x, x + u[i]], y: [gy[i], gy[i] + v[i]],
+            mode: 'lines', type: 'scatter',
+            line: {color: `rgba(221,132,72,${Math.min(1, mag[i] * 10)})`, width: 2},
+            showlegend: false, hoverinfo: 'skip'
+        });
+    });
+    arrowTraces.push({
+        x: gx, y: gy, mode: 'markers', type: 'scatter',
+        marker: {size: 6, color: mag, colorscale: 'Viridis', showscale: true, colorbar: {title: 'Magnitude'}, opacity: 0.7},
+        showlegend: false
+    });
+    Plotly.newPlot('gradient-plot', arrowTraces, {
+        paper_bgcolor:'#171717', plot_bgcolor:'#171717', font:{color:'white'},
+        xaxis:{gridcolor:'#333'}, yaxis:{gridcolor:'#333'}
+    }, {responsive: true});
+    
+    // Attractor basins
+    const basinGridSize = 60;
+    const basinX = [], basinY = [], basinZ = [];
+    for (let i = 0; i < basinGridSize; i++) {
+        const row = [];
+        for (let j = 0; j < basinGridSize; j++) {
+            const x = xMin + (xMax - xMin) * j / (basinGridSize - 1);
+            const y = yMin + (yMax - yMin) * i / (basinGridSize - 1);
+            const result = denclue.hillClimb([x, y], data, 50, 0.001, false);
+            const attractor = (result && result.attractor) ? result.attractor : (Array.isArray(result) ? result : [x, y]);
+            let closestId = -1, minDist = Infinity;
+            denclue.attractors.forEach((att, idx) => {
+                const d = Math.hypot(attractor[0] - att[0], attractor[1] - att[1]);
+                if (d < minDist && d < denclue.sigma) { minDist = d; closestId = idx; }
+            });
+            row.push(closestId);
+        }
+        basinZ.push(row);
+    }
+    for (let i = 0; i < basinGridSize; i++) {
+        basinX.push(xMin + (xMax - xMin) * i / (basinGridSize - 1));
+        basinY.push(yMin + (yMax - yMin) * i / (basinGridSize - 1));
+    }
+    Plotly.newPlot('basins-plot', [{
+        x: basinX, y: basinY, z: basinZ, type: 'heatmap',
+        colorscale: 'Viridis', showscale: true, colorbar: {title: 'Basin ID'}
+    }], {
+        paper_bgcolor:'#171717', plot_bgcolor:'#171717', font:{color:'white'},
+        xaxis:{gridcolor:'#333'}, yaxis:{gridcolor:'#333'}
+    }, {responsive: true});
+}
+
+document.getElementById('dataset-select').addEventListener('change', runDENCLUE);
+
+function loadCSV(event) {
+    const file = event.target.files[0];
+    if(!file) return;
+    processCSVFile(file);
+}
+
+function processCSVFile(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const csv = e.target.result;
+        const lines = csv.split('\n').filter(line => line.trim());
+        const data = [];
+        
+        for(let i = 1; i < lines.length; i++) {
+            const values = lines[i].split(',').map(v => parseFloat(v.trim()));
+            if(values.length >= 2 && !isNaN(values[0]) && !isNaN(values[1])) {
+                data.push([values[0], values[1]]);
+            }
+        }
+        
+        if(data.length > 0) {
+            customData = data;
+            document.getElementById('dataset-select').value = 'custom';
+            runDENCLUE();
+        }
+    };
+    reader.readAsText(file);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadLabel = document.querySelector('label[for="file-input"]');
+    
+    uploadLabel.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadLabel.style.borderColor = '#dd8448';
+        uploadLabel.style.backgroundColor = '#3d3d3d';
+    });
+    
+    uploadLabel.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        uploadLabel.style.borderColor = '#444';
+        uploadLabel.style.backgroundColor = '#2d2d2d';
+    });
+    
+    uploadLabel.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadLabel.style.borderColor = '#444';
+        uploadLabel.style.backgroundColor = '#2d2d2d';
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            processCSVFile(files[0]);
+        }
+    });
+});
+
+function exportResults() {
+    const ds = document.getElementById('dataset-select').value;
+    let data = ds === 'custom' ? customData : datasets[parseInt(ds)];
+    if (!data) {
+        alert('No data to export!');
+        return;
+    }
+    
+    data = standardizeData(data);
+    const denclue = new DENCLUE(
+        parseFloat(document.getElementById('sigma').value),
+        parseFloat(document.getElementById('xi').value)
+    ).fit(data);
+    
+    let csv = 'X,Y,Cluster\n';
+    for(let i = 0; i < data.length; i++) {
+        csv += `${data[i][0]},${data[i][1]},${denclue.labels[i]}\n`;
+    }
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'denclue_results.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
+
+function generateNewData() {
+    const select = document.getElementById('dataset-select');
+    const currentIndex = parseInt(select.value);
+    const newIndex = (currentIndex + 1) % 3;
+    select.value = newIndex.toString();
+    runDENCLUE();
+}
+
+function downloadPlot() {
+    Plotly.downloadImage('cluster-plot', {
+        format: 'png', width: 1200, height: 800,
+        filename: 'denclue_clusters'
+    });
+}
+
+runDENCLUE();
+</script>
+<script src="../sidebar.js"></script>`n</body>
+</html>
+
+

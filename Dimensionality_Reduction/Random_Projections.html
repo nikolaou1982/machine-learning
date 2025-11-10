@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Interactive Random Projections implementation in 2D. Visualize and experiment with this dimensionality reduction algorithm using real-time charts and data analysis tools.">
+  <link rel="canonical" href="https://yourdomain.com/Dimensionality_Reduction/Random_Projections.html">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Random Projections (2D) - Interactive Implementation | Dimensionality Reduction | ML Tools",
+  "description": "Interactive Random Projections implementation in 2D. Visualize and experiment with this dimensionality reduction algorithm using real-time charts and data analysis tools.",
+  "url": "https://yourdomain.com/Dimensionality_Reduction/Random_Projections.html",
+  "about": {
+    "@type": "Thing",
+    "name": "Random Projections",
+    "description": "Random Projections algorithm for dimensionality reduction"
+  }
+}
+  </script>
+    <title>Random Projections (2D) - Interactive Implementation | Dimensionality Reduction | ML Tools</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            color: #676767;
+            background-color: #1e1e1e;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #171717;
+            padding: 30px 20px;
+            border-right: 1px solid #333;
+            overflow-y: auto;
+            height: 100vh;
+        }
+        .sidebar h1 { color: white; font-size: 1.8rem; font-weight: bold; margin-bottom: 30px; text-align: center; }
+        .nav-section { margin-bottom: 30px; }
+        .nav-section h3 { color: #dd8448; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px; }
+        .nav-item { display: block; color: #676767; text-decoration: none; padding: 12px 15px; margin-bottom: 5px; border-radius: 8px; transition: all 0.3s ease; font-weight: 500; }
+        .nav-item:hover { background-color: #2d2d2d; color: white; transform: translateX(5px); }
+        .nav-item.active { background-color: #dd8448; color: white; }
+        .nav-category { margin-bottom: 20px; }
+        .nav-category-header { color: #dd8448; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; padding: 10px 15px; cursor: pointer; border-radius: 8px; transition: background-color 0.3s ease; display: flex; justify-content: space-between; align-items: center; letter-spacing: 1px; }
+        .nav-category-header:hover { background-color: #2d2d2d; }
+        .nav-category-header .arrow { transition: transform 0.3s ease; font-size: 0.7rem; }
+        .nav-category-header.collapsed .arrow { transform: rotate(-90deg); }
+        .nav-subcategory { margin-left: 15px; margin-top: 10px; overflow: hidden; max-height: 1200px; transition: max-height 0.3s ease; }
+        .nav-subcategory.collapsed { max-height: 0; }
+        .nav-subheader { color: #999; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; padding: 8px 15px; margin-top: 5px; letter-spacing: 0.5px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-radius: 6px; transition: background-color 0.3s ease; }
+        .nav-subheader:hover { background-color: #2d2d2d; }
+        .nav-subheader .arrow { font-size: 0.6rem; transition: transform 0.3s ease; }
+        .nav-subheader.collapsed .arrow { transform: rotate(-90deg); }
+        .nav-subheader.category-header { color: #dd8448; font-size: 0.85rem; font-weight: 700; padding: 10px 15px; margin-top: 8px; letter-spacing: 1px; border: 1px solid rgba(221,132,72,0.3); }
+        .nav-subheader.category-header:hover { background-color: rgba(221,132,72,0.15); border-color: rgba(221,132,72,0.5); }
+        .nav-subgroup { overflow: hidden; max-height: 200px; transition: max-height 0.3s ease, padding-bottom 0.3s ease; padding-bottom: 5px; }
+        .nav-subgroup.collapsed { max-height: 0; padding-bottom: 0; }
+        .nav-subgroup.category-group { max-height: 1000px; }
+        .nav-subgroup.category-group.collapsed { max-height: 0; }
+        .nav-subheader.nested { margin-left: 10px; font-size: 0.7rem; }
+        .nav-subgroup.nested { margin-left: 10px; max-height: 200px; }
+        .nav-subheader.subcategory-header { color: #999; font-size: 0.75rem; font-weight: 600; padding: 8px 15px; margin-left: 10px; margin-top: 5px; letter-spacing: 0.5px; border: 1px solid rgba(153, 153, 153, 0.2); }
+        .nav-subheader.subcategory-header:hover { background-color: rgba(45, 45, 45, 0.5); border-color: rgba(153, 153, 153, 0.4); }
+        .nav-subgroup.subcategory-group { margin-left: 10px; max-height: 2000px; overflow: hidden; transition: max-height 0.3s ease, padding-bottom 0.3s ease; padding-bottom: 5px; }
+        .nav-subgroup.subcategory-group.collapsed { max-height: 0; padding-bottom: 0; }
+        .nav-item.sub { padding: 8px 15px; font-size: 0.9rem; margin-left: 10px; margin-bottom: 5px; }
+        .main-content {
+            flex: 1;
+            padding: 20px;
+        }
+        .main-title {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .subtitle {
+            color: #676767;
+            font-size: 1rem;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .controls-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .control-group {
+            background-color: #171717;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            min-width: 200px;
+            box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset;
+        }
+        .control-group h3 {
+            color: white;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+            margin-top: 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+        .control-item {
+            margin-bottom: 15px;
+        }
+        .control-item label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            color: #676767;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        #n-dims-value, #distance-preservation-value {
+            display: inline-block;
+            background: rgba(221,132,72,0.15);
+            color: #ffb07a;
+            border: 1px solid rgba(221,132,72,0.35);
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            line-height: 18px;
+        }
+        input[type="range"]::-webkit-slider-thumb { background: #dd8448; }
+        input[type="range"] { accent-color: #dd8448; }
+        .control-item input, .control-item select {
+            width: 100%;
+            padding: 8px 12px;
+            background-color: #2d2d2d;
+            border: 1px solid #444;
+            border-radius: 6px;
+            color: white;
+            font-family: 'Nunito', sans-serif;
+        }
+        .control-item input:focus, .control-item select:focus {
+            outline: none;
+            border-color: #dd8448;
+        }
+        .control-item input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+        }
+        .stats-container {
+            background-color: #171717;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            margin-bottom: 30px;
+        }
+        .stats-container h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        .stat-item {
+            background-color: #2d2d2d;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-value {
+            color: #dd8448;
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: block;
+        }
+        .stat-label {
+            color: #676767;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        .plots-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .plot-wrapper {
+            background-color: #171717;
+            border-radius: 12px;
+            border: 1px solid #333;
+            padding: 20px;
+            flex: 1;
+            min-width: 400px;
+        }
+        .plot-wrapper h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        .plot-wrapper > div {
+            height: 500px;
+        }
+        .btn {
+            background-color: #ffffff;
+            color: #171717;
+            border: 1px solid #444;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Nunito', sans-serif;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn:hover {
+            background-color: #f0f0f0;
+            border-color: #666;
+        }
+        .control-group.actions .btn {
+            background-color: #dd8448;
+            color: white;
+            border: 1px solid #dd8448;
+            display: block;
+            width: 100%;
+            margin-right: 0;
+            margin-bottom: 10px;
+        }
+        .control-group.actions .btn:hover {
+            background-color: #c67339;
+        }
+        .csv-format {
+            padding: 2px;
+            background: linear-gradient(-30deg, rgba(221, 132, 72, 0.4), transparent, rgba(221, 132, 72, 0.4)), linear-gradient(to bottom, #2d2d2d, #2d2d2d);
+            position: relative;
+        }
+        .csv-format::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 1px solid rgba(221, 132, 72, 0.5);
+            border-radius: 12px;
+            pointer-events: none;
+        }
+        .csv-info-card {
+            background: #171717;
+            border-radius: 10px;
+            padding: 16px;
+            margin: 2px;
+            position: relative;
+            z-index: 10;
+        }
+        .csv-badge {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 4px 8px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.8);
+            width: fit-content;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .csv-title {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 8px 0 4px 0;
+        }
+        .csv-desc {
+            color: rgba(255,255,255,0.6);
+            font-size: 11px;
+            line-height: 1.3;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar"></div>
+    <div class="main-content">
+        <h1 class="main-title">Random Projections</h1>
+        <p class="subtitle">Fast dimensionality reduction using random matrices — preserve distances and reduce dimensions efficiently!</p>
+    
+        <div class="controls-container">
+            <div class="control-group">
+                <h3>Dataset</h3>
+                <div class="control-item">
+                    <label for="dataset-select">Select Dataset:</label>
+                    <select id="dataset-select">
+                        <option value="iris">Iris (4 features, 150 samples)</option>
+                        <option value="wine">Wine (13 features, 178 samples)</option>
+                        <option value="breast-cancer">Breast Cancer (30 features, 569 samples)</option>
+                        <option value="diabetes">Diabetes (8 features, 442 samples)</option>
+                        <option value="custom">Custom CSV Data</option>
+                    </select>
+                </div>
+                <div class="control-item">
+                    <input type="file" id="file-input" accept=".csv" style="display: none;" onchange="loadCSV(event)">
+                    <label for="file-input" style="display: inline-block; background-color: #2d2d2d; color: white; padding: 10px 20px; border-radius: 6px; border: 2px dashed #444; cursor: pointer; transition: all 0.3s ease; font-weight: 500; text-align: center; width: 100%; box-sizing: border-box;">📁 Upload CSV</label>
+                </div>
+            </div>
+            
+            <div class="control-group csv-format">
+                <div class="csv-info-card">
+                    <div class="csv-badge">Format</div>
+                    <div class="csv-title">CSV Upload</div>
+                    <div class="csv-desc">
+                        Numeric columns only<br>
+                        First row: headers (optional)<br>
+                        Example: feature1,feature2,feature3<br>
+                        1.0,2.3,3.1<br>
+                        4.2,5.5,6.7
+                    </div>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <h3>Random Projections Parameters</h3>
+                <div class="control-item">
+                    <label for="n-dims-slider">Number of Dimensions: <span id="n-dims-value">2</span></label>
+                    <input type="range" id="n-dims-slider" min="1" max="10" step="1" value="2">
+                </div>
+                <div class="control-item">
+                    <label for="matrix-type-select">Random Matrix Type:</label>
+                    <select id="matrix-type-select">
+                        <option value="gaussian">Gaussian (Best distance preservation)</option>
+                        <option value="sparse">Sparse (Faster computation)</option>
+                    </select>
+                </div>
+                <div class="control-item">
+                    <label>
+                        <input type="checkbox" id="standardize-check">
+                        Standardize Features (optional)
+                    </label>
+                </div>
+                <div class="control-item">
+                    <label for="random-seed-input">Random Seed:</label>
+                    <input type="number" id="random-seed-input" value="42" min="0" step="1">
+                </div>
+                <div class="control-item">
+                    <label style="color: #999; font-size: 0.85rem;">Distance Preservation: <span id="distance-preservation-value">-</span></label>
+                </div>
+            </div>
+            
+            <div class="control-group actions">
+                <h3>Actions</h3>
+                <button class="btn" onclick="runRandomProjections()">Run Random Projections</button>
+                <button class="btn" onclick="generateNewSeed()">New Random Seed</button>
+                <button class="btn" onclick="exportResults()">Export Results</button>
+                <button class="btn" onclick="downloadPlot()">Download Plot</button>
+            </div>
+        </div>
+        
+        <div class="stats-container">
+            <h3>Random Projections Statistics</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-value" id="original-dims">-</span>
+                    <div class="stat-label">Original Dimensions</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="reduced-dims">-</span>
+                    <div class="stat-label">Reduced Dimensions</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="distance-preservation">-</span>
+                    <div class="stat-label">Distance Preservation (R²)</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="mean-distance-error">-</span>
+                    <div class="stat-label">Mean Distance Error (%)</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="compression-ratio">-</span>
+                    <div class="stat-label">Compression Ratio</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="total-samples">-</span>
+                    <div class="stat-label">Total Samples</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="plots-container">
+            <div class="plot-wrapper">
+                <h3>Random Projection (2D)</h3>
+                <div id="projection-plot"></div>
+            </div>
+            <div class="plot-wrapper">
+                <h3>Distance Preservation</h3>
+                <div id="distance-plot"></div>
+            </div>
+        </div>
+
+        <div class="plots-container">
+            <div class="plot-wrapper">
+                <h3>Distance Error Distribution</h3>
+                <div id="error-plot"></div>
+            </div>
+            <div class="plot-wrapper">
+                <h3>Original vs Projected (Sample Pairs)</h3>
+                <div id="comparison-plot"></div>
+            </div>
+        </div>
+
+<script>
+    // Random Projections Implementation
+    class RandomProjections {
+        constructor() {
+            this.projectionMatrix = null;
+            this.featureNames = null;
+            this.randomSeed = null;
+            this.matrixType = 'gaussian';
+        }
+
+        generateRandomMatrix(d, k, matrixType = 'gaussian', seed = null) {
+            // Set random seed if provided
+            if (seed !== null) {
+                this.setSeed(seed);
+            }
+            
+            const matrix = [];
+            const scale = 1 / Math.sqrt(k); // Scale factor for variance preservation
+            
+            for (let i = 0; i < d; i++) {
+                const row = [];
+                for (let j = 0; j < k; j++) {
+                    let value;
+                    if (matrixType === 'gaussian') {
+                        // Gaussian random matrix: N(0, 1/k)
+                        value = this.boxMuller() * scale;
+                    } else if (matrixType === 'sparse') {
+                        // Sparse random matrix (Achlioptas): ±1/√k with prob 1/6 each, 0 with prob 2/3
+                        const r = this.random();
+                        if (r < 1/6) {
+                            value = scale;
+                        } else if (r < 1/3) {
+                            value = -scale;
+                        } else {
+                            value = 0;
+                        }
+                    }
+                    row.push(value);
+                }
+                matrix.push(row);
+            }
+            
+            return matrix;
+        }
+
+        random() {
+            // Seeded random number generator (Linear Congruential Generator)
+            if (this._seed === undefined) {
+                this._seed = Math.floor(Math.random() * 1000000);
+            }
+            this._seed = (this._seed * 9301 + 49297) % 233280;
+            return this._seed / 233280;
+        }
+
+        boxMuller() {
+            // Box-Muller transform for generating normal random variables
+            if (this._spare !== undefined) {
+                const spare = this._spare;
+                this._spare = undefined;
+                return spare;
+            }
+            const u1 = this.random();
+            const u2 = this.random();
+            const z0 = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+            const z1 = Math.sqrt(-2 * Math.log(u1)) * Math.sin(2 * Math.PI * u2);
+            this._spare = z1;
+            return z0;
+        }
+
+        setSeed(seed) {
+            // Set seed for random number generator
+            this._seed = seed;
+            this._spare = undefined;
+        }
+
+        fit(X, k, matrixType = 'gaussian', seed = null, standardize = false) {
+            const n = X.length;
+            const d = X[0].length;
+            
+            // Store feature names if available
+            if (X.featureNames) {
+                this.featureNames = X.featureNames;
+            }
+            
+            // Standardize if requested
+            if (standardize) {
+                // Calculate mean and std
+                const mean = new Array(d).fill(0);
+                for (let i = 0; i < n; i++) {
+                    for (let j = 0; j < d; j++) {
+                        mean[j] += X[i][j];
+                    }
+                }
+                for (let j = 0; j < d; j++) {
+                    mean[j] /= n;
+                }
+                
+                const std = new Array(d).fill(0);
+                for (let i = 0; i < n; i++) {
+                    for (let j = 0; j < d; j++) {
+                        std[j] += Math.pow(X[i][j] - mean[j], 2);
+                    }
+                }
+                for (let j = 0; j < d; j++) {
+                    std[j] = Math.sqrt(std[j] / (n - 1));
+                    if (std[j] === 0) std[j] = 1;
+                }
+                
+                // Standardize data
+                for (let i = 0; i < n; i++) {
+                    for (let j = 0; j < d; j++) {
+                        X[i][j] = (X[i][j] - mean[j]) / std[j];
+                    }
+                }
+            }
+            
+            // Generate random projection matrix
+            this.projectionMatrix = this.generateRandomMatrix(d, k, matrixType, seed);
+            this.matrixType = matrixType;
+            this.randomSeed = seed;
+            
+            return this;
+        }
+
+        transform(X, k = null) {
+            if (!this.projectionMatrix) {
+                throw new Error('Random Projections must be fitted before transform');
+            }
+            
+            const n = X.length;
+            const d = X[0].length;
+            const actualK = k || this.projectionMatrix[0].length;
+            
+            // Project data: Y = X × R
+            const XProjected = [];
+            for (let i = 0; i < n; i++) {
+                const row = [];
+                for (let j = 0; j < actualK; j++) {
+                    let sum = 0;
+                    for (let dim = 0; dim < d; dim++) {
+                        sum += X[i][dim] * this.projectionMatrix[dim][j];
+                    }
+                    row.push(sum);
+                }
+                XProjected.push(row);
+            }
+            
+            return XProjected;
+        }
+
+        calculateDistances(X) {
+            const n = X.length;
+            const distances = [];
+            for (let i = 0; i < n; i++) {
+                for (let j = i + 1; j < n; j++) {
+                    let dist = 0;
+                    for (let d = 0; d < X[i].length; d++) {
+                        dist += Math.pow(X[i][d] - X[j][d], 2);
+                    }
+                    distances.push({
+                        i: i,
+                        j: j,
+                        distance: Math.sqrt(dist)
+                    });
+                }
+            }
+            return distances;
+        }
+    }
+
+
+    // Dataset loading functions (same as PCA)
+    function loadIris() {
+        const irisData = [
+            [5.1,3.5,1.4,0.2],[4.9,3.0,1.4,0.2],[4.7,3.2,1.3,0.2],[4.6,3.1,1.5,0.2],[5.0,3.6,1.4,0.2],
+            [5.4,3.9,1.7,0.4],[4.6,3.4,1.4,0.3],[5.0,3.4,1.5,0.2],[4.4,2.9,1.4,0.2],[4.9,3.1,1.5,0.1],
+            [5.4,3.7,1.5,0.2],[4.8,3.4,1.6,0.2],[4.8,3.0,1.4,0.1],[4.3,3.0,1.1,0.1],[5.8,4.0,1.2,0.2],
+            [5.7,4.4,1.5,0.4],[5.4,3.9,1.3,0.4],[5.1,3.5,1.4,0.3],[5.7,3.8,1.7,0.3],[5.1,3.8,1.5,0.3],
+            [5.4,3.4,1.7,0.2],[5.1,3.7,1.5,0.4],[4.6,3.6,1.0,0.2],[5.1,3.3,1.7,0.5],[4.8,3.4,1.9,0.2],
+            [5.0,3.0,1.6,0.2],[5.0,3.4,1.6,0.4],[5.2,3.5,1.5,0.2],[5.2,3.4,1.4,0.2],[4.7,3.2,1.6,0.2],
+            [4.8,3.1,1.6,0.2],[5.4,3.4,1.5,0.4],[5.2,4.1,1.5,0.1],[5.5,4.2,1.4,0.2],[4.9,3.1,1.5,0.2],
+            [5.0,3.2,1.2,0.2],[5.5,3.5,1.3,0.2],[4.9,3.6,1.4,0.1],[4.4,3.0,1.3,0.2],[5.1,3.4,1.5,0.2],
+            [5.0,3.5,1.3,0.3],[4.5,2.3,1.3,0.3],[4.4,3.2,1.3,0.2],[5.0,3.5,1.6,0.6],[5.1,3.8,1.9,0.4],
+            [4.8,3.0,1.4,0.3],[5.1,3.8,1.6,0.2],[4.6,3.2,1.4,0.2],[5.3,3.7,1.5,0.2],[5.0,3.3,1.4,0.2],
+            [7.0,3.2,4.7,1.4],[6.4,3.2,4.5,1.5],[6.9,3.1,4.9,1.5],[5.5,2.3,4.0,1.3],[6.5,2.8,4.6,1.5],
+            [5.7,2.8,4.5,1.3],[6.3,3.3,4.7,1.6],[4.9,2.4,3.3,1.0],[6.6,2.9,4.6,1.3],[5.2,2.7,3.9,1.4],
+            [5.0,2.0,3.5,1.0],[5.9,3.0,4.2,1.5],[6.0,2.2,4.0,1.0],[6.1,2.9,4.7,1.4],[5.6,2.9,3.6,1.3],
+            [6.7,3.1,4.4,1.4],[5.6,3.0,4.5,1.5],[5.8,2.7,4.1,1.0],[6.2,2.2,4.5,1.5],[5.6,2.5,3.9,1.1],
+            [5.9,3.2,4.8,1.8],[6.1,2.8,4.0,1.3],[6.3,2.5,4.9,1.5],[6.1,2.8,4.7,1.2],[6.4,2.9,4.3,1.3],
+            [6.6,3.0,4.4,1.4],[6.8,2.8,4.8,1.4],[6.7,3.0,5.0,1.7],[6.0,2.9,4.5,1.5],[5.7,2.6,3.5,1.0],
+            [5.5,2.4,3.8,1.1],[5.5,2.4,3.7,1.0],[5.8,2.7,3.9,1.2],[6.0,2.7,5.1,1.6],[5.4,3.0,4.5,1.5],
+            [6.0,3.4,4.5,1.6],[6.7,3.1,4.7,1.5],[6.3,2.3,4.4,1.3],[5.6,3.0,4.1,1.3],[5.5,2.5,4.0,1.3],
+            [5.5,2.6,4.4,1.2],[6.1,3.0,4.6,1.4],[5.8,2.6,4.0,1.2],[5.0,2.3,3.3,1.0],[5.6,2.7,4.2,1.3],
+            [5.7,3.0,4.2,1.2],[5.7,2.9,4.2,1.3],[6.2,2.9,4.3,1.3],[5.1,2.5,3.0,1.1],[5.7,2.8,4.1,1.3],
+            [6.3,3.3,6.0,2.5],[5.8,2.7,5.1,1.9],[7.1,3.0,5.9,2.1],[6.3,2.9,5.6,1.8],[6.5,3.0,5.8,2.2],
+            [7.6,3.0,6.6,2.1],[4.9,2.5,4.5,1.7],[7.3,2.9,6.3,1.8],[6.7,2.5,5.8,1.8],[7.2,3.6,6.1,2.5],
+            [6.5,3.2,5.1,2.0],[6.4,2.7,5.3,1.9],[6.8,3.0,5.5,2.1],[5.7,2.5,5.0,2.0],[5.8,2.8,5.1,2.4],
+            [6.4,3.2,5.3,2.3],[6.5,3.0,5.5,1.8],[7.7,3.8,6.7,2.2],[7.7,2.6,6.9,2.3],[6.0,2.2,5.0,1.5],
+            [6.9,3.2,5.7,2.3],[5.6,2.8,4.9,2.0],[7.7,2.8,6.7,2.0],[6.3,2.7,4.9,1.8],[6.7,3.3,5.7,2.1],
+            [7.2,3.2,6.0,1.8],[6.2,2.8,4.8,1.8],[6.1,3.0,4.9,1.8],[6.4,2.8,5.6,2.1],[7.2,3.0,5.8,1.6],
+            [7.4,2.8,6.1,1.9],[7.9,3.8,6.4,2.0],[6.4,2.8,5.6,2.2],[6.3,2.8,5.1,1.5],[6.1,2.6,5.6,1.4],
+            [7.7,3.0,6.1,2.3],[6.3,3.4,5.6,2.4],[6.4,3.1,5.5,1.8],[6.0,3.0,4.8,1.8],[6.9,3.1,5.4,2.1],
+            [6.7,3.1,5.6,2.4],[6.9,3.1,5.1,2.3],[5.8,2.7,5.1,1.9],[6.8,3.2,5.9,2.3],[6.7,3.3,5.7,2.5],
+            [6.7,3.0,5.2,2.3],[6.3,2.5,5.0,1.9],[6.5,3.0,5.2,2.0],[6.2,3.4,5.4,2.3],[5.9,3.0,5.1,1.8]
+        ];
+        const featureNames = ['Sepal Length', 'Sepal Width', 'Petal Length', 'Petal Width'];
+        irisData.featureNames = featureNames;
+        return irisData;
+    }
+
+    function loadWine() {
+        const wineData = [];
+        const featureNames = [
+            'Alcohol', 'Malic Acid', 'Ash', 'Alcalinity of Ash', 'Magnesium',
+            'Total Phenols', 'Flavanoids', 'Nonflavanoid Phenols', 'Proanthocyanins',
+            'Color Intensity', 'Hue', 'OD280/OD315', 'Proline'
+        ];
+        
+        for (let i = 0; i < 178; i++) {
+            const wine = [];
+            wine.push(13.0 + Math.random() * 2.5);
+            wine.push(1.0 + Math.random() * 3.0);
+            wine.push(2.0 + Math.random() * 0.5);
+            wine.push(15.0 + Math.random() * 10.0);
+            wine.push(80 + Math.random() * 50);
+            wine.push(1.5 + Math.random() * 1.5);
+            wine.push(0.5 + Math.random() * 3.0);
+            wine.push(0.1 + Math.random() * 0.4);
+            wine.push(0.5 + Math.random() * 1.5);
+            wine.push(3.0 + Math.random() * 8.0);
+            wine.push(0.8 + Math.random() * 1.2);
+            wine.push(1.5 + Math.random() * 2.0);
+            wine.push(400 + Math.random() * 800);
+            wineData.push(wine);
+        }
+        
+        wineData.featureNames = featureNames;
+        return wineData;
+    }
+
+    function loadBreastCancer() {
+        const baseFeatures = ['Radius', 'Texture', 'Perimeter', 'Area', 'Smoothness', 
+                             'Compactness', 'Concavity', 'Concave Points', 'Symmetry', 'Fractal Dimension'];
+        const featureNames = [];
+        ['mean', 'se', 'worst'].forEach(prefix => {
+            baseFeatures.forEach(feat => {
+                featureNames.push(`${feat} (${prefix})`);
+            });
+        });
+        
+        const data = [];
+        for (let i = 0; i < 569; i++) {
+            const sample = [];
+            for (let j = 0; j < 30; j++) {
+                const featureIdx = j % 10;
+                let baseValue;
+                switch(featureIdx) {
+                    case 0: baseValue = 10 + Math.random() * 15; break;
+                    case 1: baseValue = 15 + Math.random() * 20; break;
+                    case 2: baseValue = 60 + Math.random() * 80; break;
+                    case 3: baseValue = 300 + Math.random() * 800; break;
+                    case 4: baseValue = 0.05 + Math.random() * 0.05; break;
+                    case 5: baseValue = 0.05 + Math.random() * 0.2; break;
+                    case 6: baseValue = 0.01 + Math.random() * 0.3; break;
+                    case 7: baseValue = 0.005 + Math.random() * 0.1; break;
+                    case 8: baseValue = 0.1 + Math.random() * 0.2; break;
+                    case 9: baseValue = 0.04 + Math.random() * 0.03; break;
+                }
+                if (j < 10) sample.push(baseValue);
+                else if (j < 20) sample.push(baseValue * (0.01 + Math.random() * 0.02));
+                else sample.push(baseValue * (1.0 + Math.random() * 0.3));
+            }
+            data.push(sample);
+        }
+        
+        data.featureNames = featureNames;
+        return data;
+    }
+
+    function loadDiabetes() {
+        const featureNames = ['Age', 'Sex', 'BMI', 'BP', 'S1', 'S2', 'S3', 'S4'];
+        const data = [];
+        
+        for (let i = 0; i < 442; i++) {
+            const sample = [];
+            sample.push(20 + Math.random() * 60);
+            sample.push(Math.round(Math.random()));
+            sample.push(18 + Math.random() * 20);
+            sample.push(80 + Math.random() * 40);
+            sample.push(100 + Math.random() * 100);
+            sample.push(100 + Math.random() * 100);
+            sample.push(20 + Math.random() * 40);
+            sample.push(3 + Math.random() * 5);
+            data.push(sample);
+        }
+        
+        data.featureNames = featureNames;
+        return data;
+    }
+
+    let currentData = null;
+    let currentRP = null;
+    let currentProjected = null;
+    let originalDistances = null;
+    let projectedDistances = null;
+
+    function loadDataset(name) {
+        let data;
+        switch(name) {
+            case 'iris':
+                data = loadIris();
+                break;
+            case 'wine':
+                data = loadWine();
+                break;
+            case 'breast-cancer':
+                data = loadBreastCancer();
+                break;
+            case 'diabetes':
+                data = loadDiabetes();
+                break;
+            default:
+                return null;
+        }
+        return data;
+    }
+
+    function loadCSV(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const csv = e.target.result;
+            const lines = csv.split('\n').filter(line => line.trim());
+            if (lines.length === 0) return;
+            
+            const data = [];
+            let featureNames = null;
+            let startIdx = 0;
+            
+            const firstLine = lines[0].split(',');
+            if (isNaN(parseFloat(firstLine[0].trim()))) {
+                featureNames = firstLine.map(s => s.trim());
+                startIdx = 1;
+            }
+            
+            for (let i = startIdx; i < lines.length; i++) {
+                const values = lines[i].split(',').map(v => parseFloat(v.trim()));
+                if (values.every(v => !isNaN(v)) && values.length > 0) {
+                    data.push(values);
+                }
+            }
+            
+            if (data.length > 0) {
+                const nFeatures = data[0].length;
+                const filtered = data.filter(row => row.length === nFeatures);
+                
+                if (filtered.length > 0) {
+                    currentData = filtered;
+                    if (!featureNames) {
+                        currentData.featureNames = filtered[0].map((_, i) => `Feature ${i + 1}`);
+                    } else {
+                        currentData.featureNames = featureNames.slice(0, nFeatures);
+                    }
+                    document.getElementById('dataset-select').value = 'custom';
+                    runRandomProjections();
+                }
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    function generateNewSeed() {
+        const newSeed = Math.floor(Math.random() * 1000000);
+        document.getElementById('random-seed-input').value = newSeed;
+        runRandomProjections();
+    }
+
+    function runRandomProjections() {
+        const datasetName = document.getElementById('dataset-select').value;
+        const nDims = parseInt(document.getElementById('n-dims-slider').value);
+        const matrixType = document.getElementById('matrix-type-select').value;
+        const seed = parseInt(document.getElementById('random-seed-input').value);
+        const standardize = document.getElementById('standardize-check').checked;
+        
+        if (datasetName !== 'custom' && (!currentData || currentData.datasetName !== datasetName)) {
+            currentData = loadDataset(datasetName);
+            if (currentData) currentData.datasetName = datasetName;
+        }
+        
+        if (!currentData || currentData.length === 0) {
+            alert('Please load a dataset first');
+            return;
+        }
+        
+        const maxDims = Math.min(nDims, currentData[0].length, currentData.length - 1);
+        const actualNDims = Math.min(nDims, maxDims);
+        
+        // Make a copy of data for processing
+        const dataCopy = currentData.map(row => [...row]);
+        
+        currentRP = new RandomProjections();
+        currentRP.fit(dataCopy, actualNDims, matrixType, seed, standardize);
+        
+        currentProjected = currentRP.transform(dataCopy, actualNDims);
+        
+        // Calculate distances
+        originalDistances = currentRP.calculateDistances(currentData);
+        projectedDistances = currentRP.calculateDistances(currentProjected);
+        
+        updateStatistics(actualNDims);
+        plotAll(actualNDims);
+    }
+
+    function updateStatistics(nDims) {
+        const originalDims = currentData[0].length;
+        
+        // Calculate distance preservation (R² correlation)
+        const origDists = originalDistances.map(d => d.distance);
+        const projDists = projectedDistances.map(d => d.distance);
+        
+        const meanOrig = origDists.reduce((a, b) => a + b, 0) / origDists.length;
+        const meanProj = projDists.reduce((a, b) => a + b, 0) / projDists.length;
+        
+        let numerator = 0, denomOrig = 0, denomProj = 0;
+        for (let i = 0; i < origDists.length; i++) {
+            const diffOrig = origDists[i] - meanOrig;
+            const diffProj = projDists[i] - meanProj;
+            numerator += diffOrig * diffProj;
+            denomOrig += diffOrig * diffOrig;
+            denomProj += diffProj * diffProj;
+        }
+        const rSquared = (numerator * numerator) / (denomOrig * denomProj);
+        
+        // Calculate mean distance error
+        let totalError = 0;
+        for (let i = 0; i < origDists.length; i++) {
+            const error = Math.abs(origDists[i] - projDists[i]) / origDists[i];
+            totalError += error;
+        }
+        const meanError = (totalError / origDists.length) * 100;
+        
+        document.getElementById('original-dims').textContent = originalDims;
+        document.getElementById('reduced-dims').textContent = nDims;
+        document.getElementById('distance-preservation').textContent = rSquared.toFixed(4);
+        document.getElementById('mean-distance-error').textContent = meanError.toFixed(2) + '%';
+        document.getElementById('compression-ratio').textContent = (originalDims / nDims).toFixed(2) + 'x';
+        document.getElementById('total-samples').textContent = currentData.length;
+        document.getElementById('distance-preservation-value').textContent = (rSquared * 100).toFixed(1) + '%';
+    }
+
+    function plotAll(nDims) {
+        plotProjection(nDims);
+        plotDistancePreservation();
+        plotDistanceError();
+        plotComparison();
+    }
+
+    function plotProjection(nDims) {
+        if (nDims < 2) {
+            document.getElementById('projection-plot').innerHTML = '<p style="color: #676767; text-align: center; padding: 50px;">Need at least 2 dimensions for 2D visualization</p>';
+            return;
+        }
+        
+        const dim1 = currentProjected.map(row => row[0]);
+        const dim2 = currentProjected.map(row => row[1]);
+        
+        Plotly.newPlot('projection-plot', [{
+            x: dim1,
+            y: dim2,
+            mode: 'markers',
+            type: 'scatter',
+            marker: {
+                color: dim1,
+                colorscale: 'Viridis',
+                size: 6,
+                showscale: true,
+                colorbar: { title: 'Dimension 1' }
+            },
+            text: currentProjected.map((_, i) => `Sample ${i + 1}`),
+            hovertemplate: 'Dim 1: %{x:.2f}<br>Dim 2: %{y:.2f}<br>%{text}<extra></extra>'
+        }], {
+            title: 'Random Projection (2D)',
+            paper_bgcolor: '#171717',
+            plot_bgcolor: '#171717',
+            font: { color: 'white' },
+            xaxis: { title: 'Random Dimension 1', color: 'white' },
+            yaxis: { title: 'Random Dimension 2', color: 'white' }
+        });
+    }
+
+    function plotDistancePreservation() {
+        const origDists = originalDistances.map(d => d.distance);
+        const projDists = projectedDistances.map(d => d.distance);
+        
+        Plotly.newPlot('distance-plot', [{
+            x: origDists,
+            y: projDists,
+            mode: 'markers',
+            type: 'scatter',
+            marker: { size: 4, color: '#dd8448', opacity: 0.6 },
+            name: 'Distance Pairs',
+            hovertemplate: 'Original: %{x:.3f}<br>Projected: %{y:.3f}<extra></extra>'
+        }, {
+            x: [Math.min(...origDists), Math.max(...origDists)],
+            y: [Math.min(...origDists), Math.max(...origDists)],
+            mode: 'lines',
+            type: 'scatter',
+            line: { color: '#5ba3f5', width: 2, dash: 'dash' },
+            name: 'Perfect Preservation'
+        }], {
+            title: 'Distance Preservation (Original vs Projected)',
+            paper_bgcolor: '#171717',
+            plot_bgcolor: '#171717',
+            font: { color: 'white' },
+            xaxis: { title: 'Original Distance', color: 'white' },
+            yaxis: { title: 'Projected Distance', color: 'white' },
+            showlegend: true
+        });
+    }
+
+    function plotDistanceError() {
+        const errors = [];
+        for (let i = 0; i < originalDistances.length; i++) {
+            const error = Math.abs(originalDistances[i].distance - projectedDistances[i].distance) / originalDistances[i].distance * 100;
+            errors.push(error);
+        }
+        
+        Plotly.newPlot('error-plot', [{
+            x: errors,
+            type: 'histogram',
+            marker: { color: '#dd8448' },
+            nbinsx: 30,
+            hovertemplate: 'Error: %{x:.2f}%<br>Count: %{y}<extra></extra>'
+        }], {
+            title: 'Distance Error Distribution',
+            paper_bgcolor: '#171717',
+            plot_bgcolor: '#171717',
+            font: { color: 'white' },
+            xaxis: { title: 'Relative Error (%)', color: 'white' },
+            yaxis: { title: 'Frequency', color: 'white' },
+            showlegend: false
+        });
+    }
+
+    function plotComparison() {
+        // Sample a subset of pairs for visualization
+        const sampleSize = Math.min(100, originalDistances.length);
+        const step = Math.floor(originalDistances.length / sampleSize);
+        const sampledOrig = [];
+        const sampledProj = [];
+        const indices = [];
+        
+        for (let i = 0; i < originalDistances.length; i += step) {
+            sampledOrig.push(originalDistances[i].distance);
+            sampledProj.push(projectedDistances[i].distance);
+            indices.push(i);
+        }
+        
+        Plotly.newPlot('comparison-plot', [{
+            x: indices,
+            y: sampledOrig,
+            mode: 'lines+markers',
+            type: 'scatter',
+            name: 'Original Distance',
+            line: { color: '#5ba3f5', width: 2 },
+            marker: { size: 4, color: '#5ba3f5' }
+        }, {
+            x: indices,
+            y: sampledProj,
+            mode: 'lines+markers',
+            type: 'scatter',
+            name: 'Projected Distance',
+            line: { color: '#dd8448', width: 2 },
+            marker: { size: 4, color: '#dd8448' }
+        }], {
+            title: 'Distance Comparison (Sample Pairs)',
+            paper_bgcolor: '#171717',
+            plot_bgcolor: '#171717',
+            font: { color: 'white' },
+            xaxis: { title: 'Pair Index', color: 'white' },
+            yaxis: { title: 'Distance', color: 'white' },
+            showlegend: true
+        });
+    }
+
+    function exportResults() {
+        if (!currentProjected || !currentRP) return;
+        
+        const nDims = parseInt(document.getElementById('n-dims-slider').value);
+        const featureNames = currentRP.featureNames || currentData.featureNames || 
+            currentData[0].map((_, i) => `Feature ${i + 1}`);
+        
+        let csv = 'Sample';
+        for (let i = 0; i < nDims; i++) {
+            csv += `,RP${i + 1}`;
+        }
+        csv += '\n';
+        
+        currentProjected.forEach((row, idx) => {
+            csv += `${idx + 1}`;
+            for (let i = 0; i < nDims; i++) {
+                csv += `,${row[i]}`;
+            }
+            csv += '\n';
+        });
+        
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'random_projections_results.csv';
+        a.click();
+    }
+
+    function downloadPlot() {
+        Plotly.downloadImage('projection-plot', {
+            format: 'png',
+            width: 1200,
+            height: 800,
+            filename: 'random_projections'
+        });
+    }
+
+    // Event listeners
+    document.getElementById('n-dims-slider').addEventListener('input', e => {
+        const maxDims = currentData ? Math.min(parseInt(e.target.value), currentData[0].length, currentData.length - 1) : parseInt(e.target.value);
+        document.getElementById('n-dims-value').textContent = maxDims;
+        if (currentRP && currentData) {
+            const nDims = Math.min(parseInt(e.target.value), currentData[0].length, currentData.length - 1);
+            const matrixType = document.getElementById('matrix-type-select').value;
+            const seed = parseInt(document.getElementById('random-seed-input').value);
+            const standardize = document.getElementById('standardize-check').checked;
+            const dataCopy = currentData.map(row => [...row]);
+            currentRP.fit(dataCopy, nDims, matrixType, seed, standardize);
+            currentProjected = currentRP.transform(dataCopy, nDims);
+            originalDistances = currentRP.calculateDistances(currentData);
+            projectedDistances = currentRP.calculateDistances(currentProjected);
+            updateStatistics(nDims);
+            plotAll(nDims);
+        }
+    });
+
+    document.getElementById('matrix-type-select').addEventListener('change', e => {
+        if (currentRP && currentData) {
+            const nDims = parseInt(document.getElementById('n-dims-slider').value);
+            const actualNDims = Math.min(nDims, currentData[0].length, currentData.length - 1);
+            const seed = parseInt(document.getElementById('random-seed-input').value);
+            const standardize = document.getElementById('standardize-check').checked;
+            const dataCopy = currentData.map(row => [...row]);
+            currentRP.fit(dataCopy, actualNDims, e.target.value, seed, standardize);
+            currentProjected = currentRP.transform(dataCopy, actualNDims);
+            originalDistances = currentRP.calculateDistances(currentData);
+            projectedDistances = currentRP.calculateDistances(currentProjected);
+            updateStatistics(actualNDims);
+            plotAll(actualNDims);
+        }
+    });
+
+    document.getElementById('random-seed-input').addEventListener('change', e => {
+        if (currentRP && currentData) {
+            const nDims = parseInt(document.getElementById('n-dims-slider').value);
+            const actualNDims = Math.min(nDims, currentData[0].length, currentData.length - 1);
+            const matrixType = document.getElementById('matrix-type-select').value;
+            const seed = parseInt(e.target.value);
+            const standardize = document.getElementById('standardize-check').checked;
+            const dataCopy = currentData.map(row => [...row]);
+            currentRP.fit(dataCopy, actualNDims, matrixType, seed, standardize);
+            currentProjected = currentRP.transform(dataCopy, actualNDims);
+            originalDistances = currentRP.calculateDistances(currentData);
+            projectedDistances = currentRP.calculateDistances(currentProjected);
+            updateStatistics(actualNDims);
+            plotAll(actualNDims);
+        }
+    });
+
+    document.getElementById('standardize-check').addEventListener('change', e => {
+        if (currentRP && currentData) {
+            const nDims = parseInt(document.getElementById('n-dims-slider').value);
+            const actualNDims = Math.min(nDims, currentData[0].length, currentData.length - 1);
+            const matrixType = document.getElementById('matrix-type-select').value;
+            const seed = parseInt(document.getElementById('random-seed-input').value);
+            const dataCopy = currentData.map(row => [...row]);
+            currentRP.fit(dataCopy, actualNDims, matrixType, seed, e.target.checked);
+            currentProjected = currentRP.transform(dataCopy, actualNDims);
+            originalDistances = currentRP.calculateDistances(currentData);
+            projectedDistances = currentRP.calculateDistances(currentProjected);
+            updateStatistics(actualNDims);
+            plotAll(actualNDims);
+        }
+    });
+
+    document.getElementById('dataset-select').addEventListener('change', e => {
+        if (e.target.value !== 'custom') {
+            currentData = loadDataset(e.target.value);
+            if (currentData) {
+                currentData.datasetName = e.target.value;
+                const maxDims = Math.min(10, currentData[0].length, currentData.length - 1);
+                document.getElementById('n-dims-slider').max = maxDims;
+                document.getElementById('n-dims-slider').value = Math.min(2, maxDims);
+                document.getElementById('n-dims-value').textContent = Math.min(2, maxDims);
+                runRandomProjections();
+            }
+        }
+    });
+
+    // Initialize with Iris dataset
+    window.addEventListener('load', () => {
+        currentData = loadDataset('iris');
+        if (currentData) {
+            currentData.datasetName = 'iris';
+            runRandomProjections();
+        }
+    });
+</script>
+    </div>
+    <script src="../sidebar.js"></script>
+</body>
+</html>
+

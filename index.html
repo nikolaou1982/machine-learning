@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Explore comprehensive machine learning tools for unsupervised learning including clustering, anomaly detection, and dimensionality reduction methods with interactive visualizations.">
+  <link rel="canonical" href="https://yourdomain.com/index.html">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "ML Tools - Unsupervised Learning",
+  "description": "Interactive machine learning tools for unsupervised learning algorithms",
+  "url": "https://yourdomain.com",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://yourdomain.com/search?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+}
+  </script>
+  <title>Unsupervised Learning Tools - Machine Learning Algorithms & Visualizations</title>
+  <style>
+    /* Reset and base styles */
+
+    /* CSS Variables */
+    :root {
+      --color-neutral-900: oklch(0.185 0 0);
+      
+      color-scheme: light dark;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: oklch(0.145 0 0);
+      color: oklch(0.985 0 0);
+      overflow-x: hidden;
+    }
+
+    /* Main container */
+    .mindmap-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: visible;
+      padding: 2em;
+      z-index: 10;
+      pointer-events: none;
+    }
+    
+    .mindmap-container .card-container {
+      pointer-events: auto;
+    }
+
+    /* SVG positioning for filters */
+    .svg-container {
+      position: absolute;
+      width: 0;
+      height: 0;
+    }
+
+    /* SVG for connection lines */
+    .connections-svg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Card container */
+    .card-container {
+      padding: 2px;
+      border-radius: 50%;
+      position: relative;
+      background: linear-gradient(
+          -30deg,
+          var(--gradient-color),
+          transparent,
+          var(--gradient-color)
+        ),
+        linear-gradient(
+          to bottom,
+          var(--color-neutral-900),
+          var(--color-neutral-900)
+        );
+      z-index: 2;
+      
+      &[center] {
+        --f: url(#🌀↖️);
+        --electric-border-color: #4a90e2;
+        --electric-light-color: oklch(from var(--electric-border-color) l c h);
+        --gradient-color: oklch(
+          from var(--electric-border-color) 0.3 calc(c / 2) h / 0.4
+        );
+      }
+      &[branch] {
+        --f: url(#🌀🎨);
+        --electric-border-color: #5ba3f5;
+        --electric-light-color: oklch(from var(--electric-border-color) l c h);
+        --gradient-color: oklch(
+          from var(--electric-border-color) 0.3 calc(c / 2) h / 0.4
+        );
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      &[branch].selected {
+        --f: url(#🌀↖️);
+        --electric-border-color: #dd8448;
+        --electric-light-color: oklch(from var(--electric-border-color) l c h);
+        --gradient-color: oklch(
+          from var(--electric-border-color) 0.3 calc(c / 2) h / 0.4
+        );
+      }
+      &[branch]:hover:not(.selected) {
+        filter: brightness(1.1);
+      }
+    }
+
+    /* Center card - larger */
+    .card-container[center] .main-card {
+      width: 28rem;
+    }
+
+    /* Branch cards - smaller */
+    .card-container[branch] .main-card {
+      width: 13rem;
+    }
+
+    /* Inner container */
+    .inner-container {
+      position: relative;
+    }
+
+    /* Border layers */
+    .border-outer {
+      border: 2px solid oklch(from var(--electric-border-color) l c h / 0.5);
+      border-radius: 50%;
+      padding-right: .15em;
+      padding-bottom: .15em;
+    }
+
+    .main-card {
+      aspect-ratio: 1;
+      border-radius: 50%;
+      border: 2px solid var(--electric-border-color);
+      margin-top: -4px;
+      margin-left: -4px;
+      filter: var(--f);
+    }
+
+    /* Glow effects */
+    .glow-layer-1 {
+      border: 2px solid oklch(from var(--electric-border-color) l c h / 0.6);
+      border-radius: 50%;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      filter: blur(1px);
+    }
+
+    .glow-layer-2 {
+      border: 2px solid var(--electric-light-color);
+      border-radius: 50%;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      filter: blur(4px);
+    }
+
+    /* Overlay effects */
+    .overlay-1 {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 50%;
+      opacity: 1;
+      mix-blend-mode: overlay;
+      transform: scale(1.1);
+      filter: blur(16px);
+      background: linear-gradient(
+        -30deg,
+        white,
+        transparent 30%,
+        transparent 70%,
+        white
+      );
+    }
+
+    .overlay-2 {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 50%;
+      opacity: 0.5;
+      mix-blend-mode: overlay;
+      transform: scale(1.1);
+      filter: blur(16px);
+      background: linear-gradient(
+        -30deg,
+        white,
+        transparent 30%,
+        transparent 70%,
+        white
+      );
+    }
+
+    /* Background glow */
+    .background-glow {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 50%;
+      filter: blur(32px);
+      transform: scale(1.1);
+      opacity: 0.3;
+      z-index: -1;
+      background: linear-gradient(
+        -30deg,
+        var(--electric-light-color),
+        transparent,
+        var(--electric-border-color)
+      );
+    }
+
+    /* Content container */
+    .content-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    /* Content sections */
+    .content-top {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px;
+      padding-bottom: 16px;
+      height: 100%;
+    }
+
+    .content-bottom {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px;
+      padding-top: 16px;
+    }
+
+    /* Typography */
+    .title {
+      font-size: 2.25em;
+      font-weight: 500;
+      margin-top: auto;
+      text-align: center;
+    }
+
+    .title-center {
+      font-size: 3em;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .title-branch {
+      font-size: 1.75em;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .description {
+      opacity: 0.5;
+      text-align: center;
+    }
+
+
+    /* Tooltip */
+    .tooltip {
+      position: absolute;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 0.5em 1em;
+      border-radius: 8px;
+      font-size: 0.85em;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+    }
+
+    .branch-card:hover .tooltip {
+      opacity: 1;
+      transform: translateY(-15px);
+    }
+
+    .branch-top .tooltip {
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-10px);
+      margin-bottom: 10px;
+    }
+
+    .branch-top:hover .tooltip {
+      transform: translateX(-50%) translateY(-15px);
+    }
+
+    .branch-left .tooltip {
+      right: 100%;
+      top: 50%;
+      transform: translateY(-50%) translateX(-10px);
+      margin-right: 10px;
+    }
+
+    .branch-left:hover .tooltip {
+      transform: translateY(-50%) translateX(-15px);
+    }
+
+    .branch-right .tooltip {
+      left: 100%;
+      top: 50%;
+      transform: translateY(-50%) translateX(10px);
+      margin-left: 10px;
+    }
+
+    .branch-right:hover .tooltip {
+      transform: translateY(-50%) translateX(15px);
+    }
+
+    /* Instruction text */
+    .instruction-hint {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: radial-gradient(
+          47.2% 50% at 50.39% 88.37%,
+          rgba(255, 255, 255, 0.12) 0%,
+          rgba(255, 255, 255, 0) 100%
+        ),
+        rgba(255, 255, 255, 0.08);
+      padding: 0.75em 1.5em;
+      border-radius: 14px;
+      font-size: 0.9em;
+      color: rgba(255, 255, 255, 0.7);
+      z-index: 100;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      animation: fadeInOut 4s ease-in-out infinite;
+    }
+
+    @keyframes fadeInOut {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; }
+    }
+
+    /* Annotation display area */
+    .annotation-display {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: radial-gradient(
+          47.2% 50% at 50.39% 88.37%,
+          rgba(255, 255, 255, 0.15) 0%,
+          rgba(255, 255, 255, 0) 100%
+        ),
+        rgba(255, 255, 255, 0.1);
+      padding: 1.5em 2em;
+      border-radius: 16px;
+      max-width: 800px;
+      width: 90%;
+      z-index: 100;
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      opacity: 0;
+      transform: translateX(-50%) translateY(20px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      pointer-events: none;
+    }
+
+    .annotation-display.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+
+    .annotation-display .annotation-title {
+      font-size: 2em;
+      font-weight: 500;
+      margin-bottom: 0.75rem;
+      color: white;
+      text-align: center;
+    }
+
+    .annotation-display .annotation-content {
+      font-size: 1.1em;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.9);
+      text-align: center;
+    }
+
+    /* Card positioning */
+    .center-card {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .branch-card {
+      position: absolute;
+      cursor: pointer;
+      transition: transform 0.2s ease, filter 0.2s ease;
+    }
+    
+    .branch-card:hover {
+      transform: scale(1.01);
+    }
+    
+    .branch-top:hover {
+      transform: translateX(-50%) scale(1.01);
+    }
+    
+    .branch-left:hover {
+      transform: translateY(-50%) scale(1.01);
+    }
+    
+    .branch-right:hover {
+      transform: translate(-100%, -50%) scale(1.01);
+    }
+
+    .branch-top {
+      top: calc(50% - 14rem - 6.5rem - 3rem);
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .branch-left {
+      top: 50%;
+      left: calc(50% - 14rem - 6.5rem - 3rem);
+      transform: translateY(-50%);
+    }
+
+    .branch-right {
+      top: 50%;
+      left: calc(50% + 14rem + 6.5rem + 3rem);
+      transform: translate(-100%, -50%);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 1200px) {
+      .branch-top {
+        top: calc(50% - 14rem - 6.5rem - 2rem);
+      }
+      .branch-left {
+        left: calc(50% - 14rem - 6.5rem - 2rem);
+      }
+      .branch-right {
+        left: calc(50% + 14rem + 6.5rem + 2rem);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .card-container[center] .main-card {
+        width: 20rem;
+      }
+      .card-container[branch] .main-card {
+        width: 10rem;
+      }
+      .title-center {
+        font-size: 2em;
+      }
+      .title-branch {
+        font-size: 1.25em;
+      }
+      .branch-top {
+        top: calc(50% - 10rem - 5rem - 1.5rem);
+      }
+      .branch-left {
+        left: calc(50% - 10rem - 5rem - 1.5rem);
+      }
+      .branch-right {
+        left: calc(50% + 10rem + 5rem + 1.5rem);
+      }
+    }
+  </style>
+</head>
+<body>
+  <svg class="svg-container">
+    <defs>
+      <filter id="🌀↖️" colorInterpolationFilters="sRGB" x="-20%" y="-20%" width="140%" height="140%">
+        <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="10" result="noise1" seed="1" />
+        <feOffset in="noise1" dx="0" dy="0" result="offsetNoise1">
+          <animate attributeName="dy" values="700; 0" dur="6s" repeatCount="indefinite" calcMode="linear" />
+        </feOffset>
+
+        <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="10" result="noise2" seed="1" />
+        <feOffset in="noise2" dx="0" dy="0" result="offsetNoise2">
+          <animate attributeName="dy" values="0; -700" dur="6s" repeatCount="indefinite" calcMode="linear" />
+        </feOffset>
+
+        <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="10" result="noise1" seed="2" />
+        <feOffset in="noise1" dx="0" dy="0" result="offsetNoise3">
+          <animate attributeName="dx" values="490; 0" dur="6s" repeatCount="indefinite" calcMode="linear" />
+        </feOffset>
+
+        <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="10" result="noise2" seed="2" />
+        <feOffset in="noise2" dx="0" dy="0" result="offsetNoise4">
+          <animate attributeName="dx" values="0; -490" dur="6s" repeatCount="indefinite" calcMode="linear" />
+        </feOffset>
+
+        <feComposite in="offsetNoise1" in2="offsetNoise2" result="part1" />
+        <feComposite in="offsetNoise3" in2="offsetNoise4" result="part2" />
+        <feBlend in="part1" in2="part2" mode="color-dodge" result="combinedNoise" />
+
+        <feDisplacementMap in="SourceGraphic" in2="combinedNoise" scale="30" xChannelSelector="R" yChannelSelector="B" />
+      </filter>
+      <filter id="🌀🎨" colorInterpolationFilters="sRGB" x="-20%" y="-20%" width="140%" height="140%">
+        <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="7" />
+        <feColorMatrix type="hueRotate" result="pt1" >
+          <animate attributeName="values" values="0;360;" dur=".6s" repeatCount="indefinite" calcMode="paced" />
+        </feColorMatrix>
+        <feComposite />
+        <feTurbulence type="turbulence" baseFrequency="0.03" numOctaves="7" seed="5" />
+        <feColorMatrix type="hueRotate" result="pt2">
+          <animate attributeName="values" values="0; 333; 199; 286; 64; 168; 256; 157; 360;" dur="5s" repeatCount="indefinite" calcMode="paced" />
+        </feColorMatrix>
+        <feBlend in="pt1" in2="pt2" mode="normal" result="combinedNoise" />
+        
+        <feDisplacementMap in="SourceGraphic" scale="30" xChannelSelector="R" yChannelSelector="B" />
+      </filter>
+    </defs>
+  </svg>
+
+  <svg class="connections-svg" id="connections">
+    <!-- Lines will be drawn by JavaScript or can be static -->
+  </svg>
+
+  <div class="mindmap-container">
+    <!-- Center Card: Unsupervised Learning -->
+    <div center class="card-container center-card">
+      <div class="inner-container">
+        <div class="border-outer">
+          <div center class="main-card"></div>
+        </div>
+        <div class="glow-layer-1"></div>
+        <div class="glow-layer-2"></div>
+      </div>
+
+      <div class="overlay-1"></div>
+      <div class="overlay-2"></div>
+      <div class="background-glow"></div>
+
+      <div class="content-container">
+        <div class="content-top">
+          <p class="title-center">Unsupervised Learning</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Branch Card 1: Clustering -->
+    <div branch class="card-container branch-card branch-top" data-section="clustering" id="clustering-card">
+      <div class="tooltip">Double-click to view section</div>
+      <div class="inner-container">
+        <div class="border-outer">
+          <div branch class="main-card"></div>
+        </div>
+        <div class="glow-layer-1"></div>
+        <div class="glow-layer-2"></div>
+      </div>
+
+      <div class="overlay-1"></div>
+      <div class="overlay-2"></div>
+      <div class="background-glow"></div>
+
+      <div class="content-container">
+        <div class="content-top">
+          <p class="title-branch">Clustering</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Branch Card 2: Anomaly Detection -->
+    <div branch class="card-container branch-card branch-left" data-section="anomaly-detection" id="anomaly-card">
+      <div class="tooltip">Double-click to view section</div>
+      <div class="inner-container">
+        <div class="border-outer">
+          <div branch class="main-card"></div>
+        </div>
+        <div class="glow-layer-1"></div>
+        <div class="glow-layer-2"></div>
+      </div>
+
+      <div class="overlay-1"></div>
+      <div class="overlay-2"></div>
+      <div class="background-glow"></div>
+
+      <div class="content-container">
+        <div class="content-top">
+          <p class="title-branch">Anomaly Detection</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Branch Card 3: Dimensionality Reduction -->
+    <div branch class="card-container branch-card branch-right" data-section="dimensionality-reduction" id="dimensionality-card">
+      <div class="tooltip">Double-click to view section</div>
+      <div class="inner-container">
+        <div class="border-outer">
+          <div branch class="main-card"></div>
+        </div>
+        <div class="glow-layer-1"></div>
+        <div class="glow-layer-2"></div>
+      </div>
+
+      <div class="overlay-1"></div>
+      <div class="overlay-2"></div>
+      <div class="background-glow"></div>
+
+      <div class="content-container">
+        <div class="content-top">
+          <p class="title-branch">Dimensionality Reduction</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Instruction Hint -->
+  <div class="instruction-hint">💡 Double-click any circle to navigate</div>
+
+  <!-- Annotation Display Area -->
+  <div class="annotation-display" id="annotation-display">
+    <h2 class="annotation-title" id="annotation-title"></h2>
+    <div class="annotation-content" id="annotation-content"></div>
+  </div>
+
+  <script>
+    // Draw connection lines between cards
+    function drawConnections() {
+      const svg = document.getElementById('connections');
+      const centerCard = document.querySelector('.center-card');
+      const branchCards = document.querySelectorAll('.branch-card');
+      
+      // Clear existing lines
+      svg.innerHTML = '';
+      
+      // Get center card position
+      const centerRect = centerCard.getBoundingClientRect();
+      const centerX = centerRect.left + centerRect.width / 2;
+      const centerY = centerRect.top + centerRect.height / 2;
+      
+      branchCards.forEach(branchCard => {
+        const branchRect = branchCard.getBoundingClientRect();
+        const branchX = branchRect.left + branchRect.width / 2;
+        const branchY = branchRect.top + branchRect.height / 2;
+        
+        // Calculate radius of center and branch circles
+        const centerRadius = centerRect.width / 2;
+        const branchRadius = branchRect.width / 2;
+        
+        // Calculate angle
+        const dx = branchX - centerX;
+        const dy = branchY - centerY;
+        const angle = Math.atan2(dy, dx);
+        
+        // Calculate start and end points on circle edges
+        const startX = centerX + Math.cos(angle) * centerRadius;
+        const startY = centerY + Math.sin(angle) * centerRadius;
+        const endX = branchX - Math.cos(angle) * branchRadius;
+        const endY = branchY - Math.sin(angle) * branchRadius;
+        
+        // Create line
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', startX);
+        line.setAttribute('y1', startY);
+        line.setAttribute('x2', endX);
+        line.setAttribute('y2', endY);
+        line.setAttribute('stroke', '#5ba3f5');
+        line.setAttribute('stroke-width', '2');
+        line.setAttribute('opacity', '0.6');
+        svg.appendChild(line);
+      });
+    }
+    
+    // Draw connections on load and resize
+    window.addEventListener('load', drawConnections);
+    window.addEventListener('resize', drawConnections);
+
+    // Menu functionality
+    const branchCards = document.querySelectorAll('.branch-card');
+    let selectedCard = null;
+
+    // Initialize - check if there's a hash in URL
+    function initMenu() {
+      const hash = window.location.hash.substring(1);
+      if (hash) {
+        const targetCard = document.querySelector(`[data-section="${hash}"]`);
+        if (targetCard) {
+          selectCard(targetCard);
+        }
+      }
+    }
+
+    // Annotation content mapping
+    const annotationContent = {
+      'clustering': {
+        title: 'Clustering',
+        content: 'Clustering is an unsupervised learning technique that groups similar data points together based on their characteristics. It helps identify patterns and structures in data without prior knowledge of the groups.'
+      },
+      'anomaly-detection': {
+        title: 'Anomaly Detection',
+        content: 'Anomaly detection identifies unusual patterns or outliers in data that do not conform to expected behavior. It\'s crucial for detecting fraud, system intrusions, and other rare events.'
+      },
+      'dimensionality-reduction': {
+        title: 'Dimensionality Reduction',
+        content: 'Dimensionality reduction techniques reduce the number of features in a dataset while preserving important information. This helps with visualization, noise reduction, and computational efficiency.'
+      }
+    };
+
+    // Select a card and display annotation
+    function selectCard(card) {
+      // Remove selected class from all cards
+      branchCards.forEach(c => c.classList.remove('selected'));
+      
+      // Add selected class to clicked card
+      card.classList.add('selected');
+      selectedCard = card;
+
+      // Get the section ID
+      const sectionId = card.getAttribute('data-section');
+      
+      // Get annotation content
+      const annotation = annotationContent[sectionId];
+      
+      if (annotation) {
+        // Update annotation display
+        const annotationDisplay = document.getElementById('annotation-display');
+        const annotationTitle = document.getElementById('annotation-title');
+        const annotationContentEl = document.getElementById('annotation-content');
+        
+        if (annotationDisplay && annotationTitle && annotationContentEl) {
+          annotationTitle.textContent = annotation.title;
+          annotationContentEl.textContent = annotation.content;
+          annotationDisplay.classList.add('visible');
+          
+          // Hide instruction hint
+          const hint = document.querySelector('.instruction-hint');
+          if (hint) {
+            hint.style.opacity = '0';
+            hint.style.transition = 'opacity 0.5s ease';
+            setTimeout(() => hint.style.display = 'none', 500);
+          }
+        }
+        
+        // Update URL hash (but don't scroll)
+        window.location.hash = sectionId;
+      }
+    }
+
+    // Add click handlers to branch cards (single click to select)
+    // Use a timeout to distinguish between single and double clicks
+    const clickTimeouts = new Map();
+    branchCards.forEach(card => {
+      card.addEventListener('click', (e) => {
+        // Clear any existing timeout for this card
+        if (clickTimeouts.has(card)) {
+          clearTimeout(clickTimeouts.get(card));
+        }
+        
+        // Set a timeout to handle single click after a delay
+        const timeout = setTimeout(() => {
+          selectCard(card);
+          // Hide instruction hint after first interaction
+          const hint = document.querySelector('.instruction-hint');
+          if (hint) {
+            hint.style.opacity = '0';
+            hint.style.transition = 'opacity 0.5s ease';
+            setTimeout(() => hint.style.display = 'none', 500);
+          }
+          clickTimeouts.delete(card);
+        }, 300); // 300ms delay to detect double-click
+        
+        clickTimeouts.set(card, timeout);
+      });
+    });
+
+    // Add double-click handlers to branch cards (double click to navigate)
+    branchCards.forEach(card => {
+      card.addEventListener('dblclick', (e) => {
+        // Clear the single-click timeout for this card
+        if (clickTimeouts.has(card)) {
+          clearTimeout(clickTimeouts.get(card));
+          clickTimeouts.delete(card);
+        }
+        
+        // Prevent default behavior
+        e.preventDefault();
+        
+        // Check if this is the clustering card - navigate to Clustering/main.html
+        if (card.id === 'clustering-card') {
+          window.location.href = 'Clustering/main.html';
+          return;
+        }
+        // Check if this is the anomaly detection card - navigate to Anomaly_Detection/Anomaly_Detection.html
+        if (card.id === 'anomaly-card') {
+          window.location.href = 'Anomaly_Detection/Anomaly_Detection.html';
+          return;
+        }
+        // Check if this is the dimensionality reduction card - navigate to Dimensionality_Reduction/Dimensionality_Reduction.html
+        if (card.id === 'dimensionality-card') {
+          window.location.href = 'Dimensionality_Reduction/Dimensionality_Reduction.html';
+          return;
+        }
+        selectCard(card);
+      });
+    });
+
+    // Handle hash changes (back/forward buttons)
+    window.addEventListener('hashchange', () => {
+      const hash = window.location.hash.substring(1);
+      if (hash) {
+        const targetCard = document.querySelector(`[data-section="${hash}"]`);
+        if (targetCard) {
+          selectCard(targetCard);
+        }
+      } else {
+        // Remove selection if no hash
+        branchCards.forEach(c => c.classList.remove('selected'));
+        selectedCard = null;
+      }
+    });
+
+    // Initialize menu on load
+    initMenu();
+  </script>
+</body>
+</html>
+

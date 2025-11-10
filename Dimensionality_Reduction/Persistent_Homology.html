@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Interactive Persistent Homology implementation in 2D. Visualize and experiment with this dimensionality reduction algorithm using real-time charts and data analysis tools.">
+  <link rel="canonical" href="https://yourdomain.com/Dimensionality_Reduction/Persistent_Homology.html">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Persistent Homology (2D) - Interactive Implementation | Dimensionality Reduction | ML Tools",
+  "description": "Interactive Persistent Homology implementation in 2D. Visualize and experiment with this dimensionality reduction algorithm using real-time charts and data analysis tools.",
+  "url": "https://yourdomain.com/Dimensionality_Reduction/Persistent_Homology.html",
+  "about": {
+    "@type": "Thing",
+    "name": "Persistent Homology",
+    "description": "Persistent Homology algorithm for dimensionality reduction"
+  }
+}
+  </script>
+    <title>Persistent Homology (2D) - Interactive Implementation | Dimensionality Reduction | ML Tools</title>
+    <script src="https://cdn.plot.ly/plotly-2.26.0.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            color: #676767;
+            background-color: #1e1e1e;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #171717;
+            padding: 30px 20px;
+            border-right: 1px solid #333;
+            overflow-y: auto;
+            height: 100vh;
+        }
+        .sidebar h1 { color: white; font-size: 1.8rem; font-weight: bold; margin-bottom: 30px; text-align: center; }
+        .nav-section { margin-bottom: 30px; }
+        .nav-section h3 { color: #dd8448; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px; }
+        .nav-item { display: block; color: #676767; text-decoration: none; padding: 12px 15px; margin-bottom: 5px; border-radius: 8px; transition: all 0.3s ease; font-weight: 500; }
+        .nav-item:hover { background-color: #2d2d2d; color: white; transform: translateX(5px); }
+        .nav-item.active { background-color: #dd8448; color: white; }
+        .nav-category { margin-bottom: 20px; }
+        .nav-category-header { color: #dd8448; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; padding: 10px 15px; cursor: pointer; border-radius: 8px; transition: background-color 0.3s ease; display: flex; justify-content: space-between; align-items: center; letter-spacing: 1px; }
+        .nav-category-header:hover { background-color: #2d2d2d; }
+        .nav-category-header .arrow { transition: transform 0.3s ease; font-size: 0.7rem; }
+        .nav-category-header.collapsed .arrow { transform: rotate(-90deg); }
+        .nav-subcategory { margin-left: 15px; margin-top: 10px; overflow: hidden; max-height: 1200px; transition: max-height 0.3s ease; }
+        .nav-subcategory.collapsed { max-height: 0; }
+        .nav-subheader { color: #999; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; padding: 8px 15px; margin-top: 5px; letter-spacing: 0.5px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-radius: 6px; transition: background-color 0.3s ease; }
+        .nav-subheader:hover { background-color: #2d2d2d; }
+        .nav-subheader .arrow { font-size: 0.6rem; transition: transform 0.3s ease; }
+        .nav-subheader.collapsed .arrow { transform: rotate(-90deg); }
+        .nav-subheader.category-header { color: #dd8448; font-size: 0.85rem; font-weight: 700; padding: 10px 15px; margin-top: 8px; letter-spacing: 1px; border: 1px solid rgba(221,132,72,0.3); }
+        .nav-subheader.category-header:hover { background-color: rgba(221,132,72,0.15); border-color: rgba(221,132,72,0.5); }
+        .nav-subgroup { overflow: hidden; max-height: 200px; transition: max-height 0.3s ease; padding-bottom: 5px; }
+        .nav-subgroup.collapsed { max-height: 0; }
+        .nav-subgroup.category-group { max-height: 1000px; }
+        .nav-subgroup.category-group.collapsed { max-height: 0; }
+        .nav-subheader.nested { margin-left: 10px; font-size: 0.7rem; }
+        .nav-subgroup.nested { margin-left: 10px; max-height: 200px; }
+        .nav-subheader.subcategory-header { color: #999; font-size: 0.75rem; font-weight: 600; padding: 8px 15px; margin-left: 10px; margin-top: 5px; letter-spacing: 0.5px; border: 1px solid rgba(153, 153, 153, 0.2); }
+        .nav-subheader.subcategory-header:hover { background-color: rgba(45, 45, 45, 0.5); border-color: rgba(153, 153, 153, 0.4); }
+        .nav-subgroup.subcategory-group { margin-left: 10px; max-height: 2000px; overflow: hidden; transition: max-height 0.3s ease; padding-bottom: 5px; }
+        .nav-subgroup.subcategory-group.collapsed { max-height: 0; }
+        .nav-item.sub { padding: 8px 15px; font-size: 0.9rem; margin-left: 10px; margin-bottom: 5px; }
+        .main-content {
+            flex: 1;
+            padding: 20px;
+        }
+        .main-title {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .subtitle {
+            color: #676767;
+            font-size: 1rem;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .controls-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .control-group {
+            background-color: #171717;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            min-width: 200px;
+            box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset;
+        }
+        .control-group h3 {
+            color: white;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+            margin-top: 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+        .control-item {
+            margin-bottom: 15px;
+        }
+        .control-item label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            color: #676767;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        #stress-value, #distance-correlation-value {
+            display: inline-block;
+            background: rgba(221,132,72,0.15);
+            color: #ffb07a;
+            border: 1px solid rgba(221,132,72,0.35);
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            line-height: 18px;
+        }
+        input[type="range"]::-webkit-slider-thumb { background: #dd8448; }
+        input[type="range"] { accent-color: #dd8448; }
+        .control-item input, .control-item select {
+            width: 100%;
+            padding: 8px 12px;
+            background-color: #2d2d2d;
+            border: 1px solid #444;
+            border-radius: 6px;
+            color: white;
+            font-family: 'Nunito', sans-serif;
+        }
+        .control-item input:focus, .control-item select:focus {
+            outline: none;
+            border-color: #dd8448;
+        }
+        .control-item input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+        }
+        .stats-container {
+            background-color: #171717;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            margin-bottom: 30px;
+        }
+        .stats-container h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        .stat-item {
+            background-color: #2d2d2d;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-value {
+            color: #dd8448;
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: block;
+        }
+        .stat-label {
+            color: #676767;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        .plots-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .plot-wrapper {
+            background-color: #171717;
+            border-radius: 12px;
+            border: 1px solid #333;
+            padding: 20px;
+            flex: 1;
+            min-width: 400px;
+        }
+        .plot-wrapper h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        .plot-wrapper > div {
+            height: 500px;
+        }
+        .btn {
+            background-color: #ffffff;
+            color: #171717;
+            border: 1px solid #444;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Nunito', sans-serif;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn:hover {
+            background-color: #f0f0f0;
+            border-color: #666;
+        }
+        .control-group.actions .btn {
+            background-color: #dd8448;
+            color: white;
+            border: 1px solid #dd8448;
+            display: block;
+            width: 100%;
+            margin-right: 0;
+            margin-bottom: 10px;
+        }
+        .control-group.actions .btn:hover {
+            background-color: #c67339;
+        }
+        .csv-format {
+            padding: 2px;
+            background: linear-gradient(-30deg, rgba(221, 132, 72, 0.4), transparent, rgba(221, 132, 72, 0.4)), linear-gradient(to bottom, #2d2d2d, #2d2d2d);
+            position: relative;
+        }
+        .csv-format::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 1px solid rgba(221, 132, 72, 0.5);
+            border-radius: 12px;
+            pointer-events: none;
+        }
+        .csv-info-card {
+            background: #171717;
+            border-radius: 10px;
+            padding: 16px;
+            margin: 2px;
+            position: relative;
+            z-index: 10;
+        }
+        .csv-badge {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 4px 8px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.8);
+            width: fit-content;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .csv-title {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 8px 0 4px 0;
+        }
+        .csv-desc {
+            color: rgba(255,255,255,0.6);
+            font-size: 11px;
+            line-height: 1.3;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar"></div>
+    <div class="main-content">
+        <h1 class="main-title">Persistent Homology</h1>
+        <p class="subtitle">Topological data analysis — track birth and death of topological features across scales!</p>
+    
+        <div class="controls-container">
+            <div class="control-group">
+                <h3>Dataset</h3>
+                <div class="control-item">
+                    <label for="dataset-select">Select Dataset:</label>
+                    <select id="dataset-select">
+                        <option value="iris">Iris (4 features, 150 samples)</option>
+                        <option value="wine">Wine (13 features, 178 samples)</option>
+                        <option value="breast-cancer">Breast Cancer (30 features, 569 samples)</option>
+                        <option value="diabetes">Diabetes (8 features, 442 samples)</option>
+                        <option value="custom">Custom CSV Data</option>
+                    </select>
+                </div>
+                <div class="control-item">
+                    <input type="file" id="file-input" accept=".csv" style="display: none;" onchange="loadCSV(event)">
+                    <label for="file-input" style="display: inline-block; background-color: #2d2d2d; color: white; padding: 10px 20px; border-radius: 6px; border: 2px dashed #444; cursor: pointer; transition: all 0.3s ease; font-weight: 500; text-align: center; width: 100%; box-sizing: border-box;">📁 Upload CSV</label>
+                </div>
+            </div>
+            
+            <div class="control-group csv-format">
+                <div class="csv-info-card">
+                    <div class="csv-badge">Format</div>
+                    <div class="csv-title">CSV Upload</div>
+                    <div class="csv-desc">
+                        Numeric columns only<br>
+                        First row: headers (optional)<br>
+                        Example: feature1,feature2,feature3<br>
+                        1.0,2.3,3.1<br>
+                        4.2,5.5,6.7
+                    </div>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <h3>Persistent Homology Parameters</h3>
+                <div class="control-item">
+                    <label for="max-filtration-slider">Max Filtration Distance: <span id="max-filtration-value">1.0</span></label>
+                    <input type="range" id="max-filtration-slider" min="0.1" max="5.0" step="0.1" value="1.0">
+                </div>
+                <div class="control-item">
+                    <label for="num-steps-slider">Number of Steps: <span id="num-steps-value">50</span></label>
+                    <input type="range" id="num-steps-slider" min="20" max="200" step="10" value="50">
+                </div>
+                <div class="control-item">
+                    <label for="max-dimension-select">Max Dimension:</label>
+                    <select id="max-dimension-select">
+                        <option value="0">H₀ (Components)</option>
+                        <option value="1" selected>H₁ (Loops/Holes)</option>
+                        <option value="2">H₂ (Voids)</option>
+                    </select>
+                </div>
+                <div class="control-item">
+                    <label for="distance-metric-select">Distance Metric:</label>
+                    <select id="distance-metric-select">
+                        <option value="euclidean">Euclidean</option>
+                        <option value="manhattan">Manhattan</option>
+                        <option value="cosine">Cosine</option>
+                    </select>
+                </div>
+                <div class="control-item">
+                    <label>
+                        <input type="checkbox" id="standardize-check" checked>
+                        Normalize Features (recommended)
+                    </label>
+                </div>
+                <div class="control-item">
+                    <label for="persistence-threshold-slider">Persistence Threshold: <span id="persistence-threshold-value">0.01</span></label>
+                    <input type="range" id="persistence-threshold-slider" min="0.001" max="0.5" step="0.001" value="0.01">
+                </div>
+            </div>
+            
+            <div class="control-group actions">
+                <h3>Actions</h3>
+                <button class="btn" onclick="runPersistentHomology()">Run Persistent Homology</button>
+                <button class="btn" onclick="exportResults()">Export Results</button>
+                <button class="btn" onclick="downloadPlot()">Download Plot</button>
+            </div>
+        </div>
+        
+        <div class="stats-container">
+            <h3>Topological Statistics</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-value" id="h0-features">-</span>
+                    <div class="stat-label">H₀ Features (Components)</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="h1-features">-</span>
+                    <div class="stat-label">H₁ Features (Holes)</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="h2-features">-</span>
+                    <div class="stat-label">H₂ Features (Voids)</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="max-persistence">-</span>
+                    <div class="stat-label">Max Persistence</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="total-features">-</span>
+                    <div class="stat-label">Total Features</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="total-samples">-</span>
+                    <div class="stat-label">Total Samples</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="plots-container">
+            <div class="plot-wrapper">
+                <h3>Persistence Diagram</h3>
+                <div id="persistence-diagram-plot"></div>
+            </div>
+            <div class="plot-wrapper">
+                <h3>Barcode (H₀ - Components)</h3>
+                <div id="barcode-h0-plot"></div>
+            </div>
+        </div>
+
+        <div class="plots-container">
+            <div class="plot-wrapper">
+                <h3>Barcode (H₁ - Holes)</h3>
+                <div id="barcode-h1-plot"></div>
+            </div>
+            <div class="plot-wrapper">
+                <h3>Point Cloud Visualization</h3>
+                <div id="point-cloud-plot"></div>
+            </div>
+        </div>
+
+
+<script>
+    class MinHeap {
+        constructor() {
+            this.heap = [];
+        }
+
+        push(item) {
+            this.heap.push(item);
+            this.bubbleUp(this.heap.length - 1);
+        }
+
+        pop() {
+            if (this.heap.length === 0) return null;
+            if (this.heap.length === 1) return this.heap.pop();
+            const min = this.heap[0];
+            this.heap[0] = this.heap.pop();
+            this.bubbleDown(0);
+            return min;
+        }
+
+        bubbleUp(index) {
+            while (index > 0) {
+                const parent = Math.floor((index - 1) / 2);
+                if (this.heap[parent].dist <= this.heap[index].dist) break;
+                [this.heap[parent], this.heap[index]] = [this.heap[index], this.heap[parent]];
+                index = parent;
+            }
+        }
+
+        bubbleDown(index) {
+            const length = this.heap.length;
+            while (true) {
+                const left = index * 2 + 1;
+                const right = index * 2 + 2;
+                let smallest = index;
+
+                if (left < length && this.heap[left].dist < this.heap[smallest].dist) {
+                    smallest = left;
+                }
+                if (right < length && this.heap[right].dist < this.heap[smallest].dist) {
+                    smallest = right;
+                }
+                if (smallest === index) break;
+                [this.heap[index], this.heap[smallest]] = [this.heap[smallest], this.heap[index]];
+                index = smallest;
+            }
+        }
+
+        isEmpty() {
+            return this.heap.length === 0;
+        }
+    }
+
+    // Union-Find data structure for connected components (H₀)
+    class UnionFind {
+        constructor(n) {
+            this.parent = Array.from({length: n}, (_, i) => i);
+            this.rank = Array(n).fill(0);
+        }
+
+        find(x) {
+            if (this.parent[x] !== x) {
+                this.parent[x] = this.find(this.parent[x]); // Path compression
+            }
+            return this.parent[x];
+        }
+
+        union(x, y) {
+            const rootX = this.find(x);
+            const rootY = this.find(y);
+            
+            if (rootX === rootY) return false; // Already in same component
+            
+            // Union by rank
+            if (this.rank[rootX] < this.rank[rootY]) {
+                this.parent[rootX] = rootY;
+            } else if (this.rank[rootX] > this.rank[rootY]) {
+                this.parent[rootY] = rootX;
+            } else {
+                this.parent[rootY] = rootX;
+                this.rank[rootX]++;
+            }
+            return true; // Components merged
+        }
+
+        getComponents() {
+            const components = {};
+            for (let i = 0; i < this.parent.length; i++) {
+                const root = this.find(i);
+                if (!components[root]) {
+                    components[root] = [];
+                }
+                components[root].push(i);
+            }
+            return Object.values(components);
+        }
+    }
+
+    // Persistent Homology Implementation
+    class PersistentHomology {
+        constructor() {
+            this.persistentFeatures = { 0: [], 1: [], 2: [] }; // Features by dimension
+            this.distanceMatrix = null;
+            this.mean = null;
+            this.std = null;
+            this.featureNames = null;
+            this.normalizedData = null;
+            this.maxPersistence = 0;
+        }
+
+        // Compute distance between two points based on metric
+        computeDistance(p1, p2, metric = 'euclidean') {
+            if (metric === 'euclidean') {
+                let sum = 0;
+                for (let i = 0; i < p1.length; i++) {
+                    sum += Math.pow(p1[i] - p2[i], 2);
+                }
+                return Math.sqrt(sum);
+            } else if (metric === 'manhattan') {
+                let sum = 0;
+                for (let i = 0; i < p1.length; i++) {
+                    sum += Math.abs(p1[i] - p2[i]);
+                }
+                return sum;
+            } else if (metric === 'cosine') {
+                let dotProduct = 0;
+                let norm1 = 0;
+                let norm2 = 0;
+                for (let i = 0; i < p1.length; i++) {
+                    dotProduct += p1[i] * p2[i];
+                    norm1 += p1[i] * p1[i];
+                    norm2 += p2[i] * p2[i];
+                }
+                const norm = Math.sqrt(norm1) * Math.sqrt(norm2);
+                if (norm === 0) return 0;
+                const cosine = dotProduct / norm;
+                return 1 - cosine; // Convert similarity to distance
+            }
+            return 0;
+        }
+
+        // Compute pairwise distance matrix
+        computeDistanceMatrix(X, metric = 'euclidean') {
+            const n = X.length;
+            const D = Array(n).fill(null).map(() => Array(n).fill(0));
+            
+            for (let i = 0; i < n; i++) {
+                D[i][i] = 0;
+                for (let j = i + 1; j < n; j++) {
+                    const dist = this.computeDistance(X[i], X[j], metric);
+                    D[i][j] = dist;
+                    D[j][i] = dist;
+                }
+            }
+            
+            return D;
+        }
+
+        // Build Vietoris-Rips complex at scale epsilon
+        buildVietorisRipsComplex(distanceMatrix, epsilon, maxDim = 2) {
+            const n = distanceMatrix.length;
+            const simplices = {
+                0: [], // Vertices (points)
+                1: [], // Edges
+                2: []  // Triangles
+            };
+
+            // Add all vertices (0-simplices)
+            for (let i = 0; i < n; i++) {
+                simplices[0].push({ vertices: [i], birth: 0 });
+            }
+
+            // Add edges (1-simplices) - pairs of points within distance epsilon
+            for (let i = 0; i < n; i++) {
+                for (let j = i + 1; j < n; j++) {
+                    const dist = distanceMatrix[i][j];
+                    if (dist <= epsilon) {
+                        simplices[1].push({ vertices: [i, j], birth: dist });
+                    }
+                }
+            }
+
+            // Add triangles (2-simplices) if maxDim >= 2
+            // Limit triangle computation for performance - only check a subset
+            if (maxDim >= 2) {
+                const maxTriangles = 500; // Limit to prevent excessive computation
+                let triangleCount = 0;
+                // Only check triangles for points that are already connected by edges
+                const edgeSet = new Set();
+                for (const edge of simplices[1]) {
+                    const [u, v] = edge.vertices;
+                    edgeSet.add(`${Math.min(u, v)},${Math.max(u, v)}`);
+                }
+                
+                for (let i = 0; i < n && triangleCount < maxTriangles; i++) {
+                    for (let j = i + 1; j < n && triangleCount < maxTriangles; j++) {
+                        // Only check if edge (i,j) exists
+                        if (!edgeSet.has(`${i},${j}`)) continue;
+                        for (let k = j + 1; k < n && triangleCount < maxTriangles; k++) {
+                            // Only check if edges (i,k) and (j,k) exist
+                            if (!edgeSet.has(`${i},${k}`) || !edgeSet.has(`${j},${k}`)) continue;
+                            
+                            const distIJ = distanceMatrix[i][j];
+                            const distIK = distanceMatrix[i][k];
+                            const distJK = distanceMatrix[j][k];
+                            const maxDist = Math.max(distIJ, distIK, distJK);
+                            if (maxDist <= epsilon && isFinite(maxDist)) {
+                                simplices[2].push({ vertices: [i, j, k], birth: maxDist });
+                                triangleCount++;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return simplices;
+        }
+
+        // Compute H₀ (connected components) using Union-Find
+        computeH0(distanceMatrix, maxEpsilon, numSteps) {
+            const edges = [];
+            const n = distanceMatrix.length;
+
+            // Collect all edges with their distances
+            for (let i = 0; i < n; i++) {
+                for (let j = i + 1; j < n; j++) {
+                    const dist = distanceMatrix[i][j];
+                    if (dist <= maxEpsilon) {
+                        edges.push({ i, j, dist: dist });
+                    }
+                }
+            }
+
+            // Sort edges by distance
+            edges.sort((a, b) => a.dist - b.dist);
+
+            const features = [];
+            const uf = new UnionFind(n);
+            
+            // Start with n components (each point is its own component)
+            // As edges are added, components merge and one dies
+
+            // Process edges in order of increasing distance
+            for (const edge of edges) {
+                const rootI = uf.find(edge.i);
+                const rootJ = uf.find(edge.j);
+                
+                if (rootI !== rootJ) {
+                    // Two components merge - one dies
+                    const death = edge.dist;
+                    const birth = 0; // All components are born at epsilon=0
+                    
+                    // Record the death of one component
+                    features.push({ birth: birth, death: death, dimension: 0 });
+                    
+                    // Merge the components
+                    uf.union(edge.i, edge.j);
+                }
+            }
+
+            // Remaining components never die (infinite persistence)
+            // Only add one feature for the final connected component
+            const finalComponents = uf.getComponents();
+            if (finalComponents.length > 0) {
+                // Add one feature representing the final component that persists
+                features.push({ birth: 0, death: maxEpsilon, dimension: 0 });
+            }
+
+            return features;
+        }
+
+        // Simplified H₁ computation (loops/holes) - using cycle detection
+        async computeH1(distanceMatrix, maxEpsilon, numSteps, progressCallback = null) {
+            const features = [];
+            const stepSize = maxEpsilon / numSteps;
+            const n = distanceMatrix.length;
+            const foundCycles = new Set();
+
+            // Limit computation for performance - only check a few epsilon values
+            const maxSamples = Math.min(10, Math.max(3, Math.floor(numSteps / 10))); // Check at most 10 samples
+            const sampleRate = Math.max(1, Math.floor(numSteps / maxSamples));
+
+            let processedSteps = 0;
+            for (let step = 0; step <= numSteps; step += sampleRate) {
+                const epsilon = Math.min(step * stepSize, maxEpsilon);
+                const complex = this.buildVietorisRipsComplex(distanceMatrix, epsilon, 2);
+
+                // Find cycles (loops) in the 1-skeleton - limit to triangles only for speed
+                const cycles = [];
+                // Only use triangles as cycles (much faster)
+                for (const triangle of complex[2] || []) {
+                    const [a, b, c] = triangle.vertices;
+                    const cycleKey = [a, b, c].sort((x, y) => x - y).join(',');
+                    if (!foundCycles.has(cycleKey)) {
+                        foundCycles.add(cycleKey);
+                        cycles.push([a, b, c, a]);
+                    }
+                }
+                
+                for (const cycle of cycles) {
+                    // Create a unique key for the cycle
+                    const cycleKey = [...cycle].sort((a, b) => a - b).join(',');
+                    
+                    if (!foundCycles.has(cycleKey)) {
+                        foundCycles.add(cycleKey);
+                        
+                        // Cycle is born at this epsilon
+                        // Simplified death: assume it dies shortly after birth (or at maxEpsilon)
+                        const death = Math.min(epsilon + stepSize * 5, maxEpsilon);
+                        features.push({ 
+                            birth: epsilon, 
+                            death: death, 
+                            dimension: 1
+                        });
+                    }
+                }
+                
+                processedSteps++;
+                // Update progress every few steps
+                if (progressCallback && processedSteps % 2 === 0) {
+                    await new Promise(resolve => setTimeout(resolve, 0));
+                    progressCallback(processedSteps, maxSamples, features.length);
+                }
+            }
+
+            return features;
+        }
+
+        // Removed findCycles, findCycleDeath, and isCycleFilled - simplified H₁ computation
+        // now only uses triangles directly, which is much faster
+
+        // Main fit method for Persistent Homology
+        async fit(X, maxEpsilon, numSteps, maxDim, normalize = true, distanceMetric = 'euclidean', persistenceThreshold = 0.01, progressCallback = null) {
+            const n = X.length;
+            const p = X[0].length;
+            
+            // Store feature names if available
+            if (X.featureNames) {
+                this.featureNames = X.featureNames;
+            }
+            
+            // Normalize data
+            let XNormalized = X.map(row => [...row]);
+            if (normalize) {
+                this.mean = new Array(p).fill(0);
+                this.std = new Array(p).fill(0);
+                
+                // Calculate mean
+                for (let i = 0; i < n; i++) {
+                    for (let j = 0; j < p; j++) {
+                        this.mean[j] += X[i][j];
+                    }
+                }
+                for (let j = 0; j < p; j++) {
+                    this.mean[j] /= n;
+                }
+                
+                // Calculate std
+                for (let i = 0; i < n; i++) {
+                    for (let j = 0; j < p; j++) {
+                        this.std[j] += Math.pow(X[i][j] - this.mean[j], 2);
+                    }
+                }
+                for (let j = 0; j < p; j++) {
+                    this.std[j] = Math.sqrt(this.std[j] / (n - 1));
+                    if (this.std[j] === 0) this.std[j] = 1;
+                }
+                
+                // Normalize
+                for (let i = 0; i < n; i++) {
+                    for (let j = 0; j < p; j++) {
+                        XNormalized[i][j] = (X[i][j] - this.mean[j]) / this.std[j];
+                    }
+                }
+            } else {
+                this.mean = Array(p).fill(0);
+                this.std = Array(p).fill(1);
+            }
+
+            this.normalizedData = XNormalized;
+            
+            // Progress update
+            if (progressCallback) {
+                await new Promise(resolve => setTimeout(resolve, 0));
+                progressCallback(0, 4, 0);
+            }
+            
+            // Step 1: Compute pairwise distance matrix
+            // Add delay to allow UI updates
+            await new Promise(resolve => setTimeout(resolve, 10));
+            this.distanceMatrix = this.computeDistanceMatrix(XNormalized, distanceMetric);
+            
+            if (progressCallback) {
+                await new Promise(resolve => setTimeout(resolve, 0));
+                progressCallback(1, 4, 0);
+            }
+            
+            // Step 2: Compute H₀ (connected components)
+            // Add delay to allow UI updates during computation
+            await new Promise(resolve => setTimeout(resolve, 10));
+            this.persistentFeatures[0] = this.computeH0(this.distanceMatrix, maxEpsilon, numSteps);
+            
+            if (progressCallback) {
+                await new Promise(resolve => setTimeout(resolve, 0));
+                progressCallback(2, 4, this.persistentFeatures[0].length);
+            }
+            
+            // Step 3: Compute H₁ (loops/holes) if maxDim >= 1
+            if (maxDim >= 1) {
+                // Create a progress callback for H₁ computation
+                const h1ProgressCallback = (processed, total, featureCount) => {
+                    if (progressCallback) {
+                        progressCallback(2.5, 4, featureCount); // Use 2.5 to indicate H₁ in progress
+                    }
+                };
+                this.persistentFeatures[1] = await this.computeH1(this.distanceMatrix, maxEpsilon, numSteps, h1ProgressCallback);
+            } else {
+                this.persistentFeatures[1] = [];
+            }
+            
+            if (progressCallback) {
+                await new Promise(resolve => setTimeout(resolve, 0));
+                progressCallback(3, 4, 0);
+            }
+            
+            // Step 4: Filter by persistence threshold and compute max persistence
+            this.maxPersistence = 0;
+            for (let dim = 0; dim <= maxDim; dim++) {
+                this.persistentFeatures[dim] = this.persistentFeatures[dim].filter(f => {
+                    const persistence = f.death - f.birth;
+                    if (persistence > this.maxPersistence) {
+                        this.maxPersistence = persistence;
+                    }
+                    return persistence >= persistenceThreshold;
+                });
+            }
+            
+            if (progressCallback) {
+                await new Promise(resolve => setTimeout(resolve, 0));
+                progressCallback(4, 4, this.maxPersistence);
+            }
+            
+            return this;
+        }
+    }
+
+    // Old unused methods removed - not needed for Persistent Homology
+
+    // Dataset loading functions - embedded datasets to avoid CORS issues
+    function loadIris() {
+        // Iris dataset: sepal length, sepal width, petal length, petal width
+        // Embedded classic Iris dataset (first 150 samples)
+        const irisData = [
+            [5.1,3.5,1.4,0.2],[4.9,3.0,1.4,0.2],[4.7,3.2,1.3,0.2],[4.6,3.1,1.5,0.2],[5.0,3.6,1.4,0.2],
+            [5.4,3.9,1.7,0.4],[4.6,3.4,1.4,0.3],[5.0,3.4,1.5,0.2],[4.4,2.9,1.4,0.2],[4.9,3.1,1.5,0.1],
+            [5.4,3.7,1.5,0.2],[4.8,3.4,1.6,0.2],[4.8,3.0,1.4,0.1],[4.3,3.0,1.1,0.1],[5.8,4.0,1.2,0.2],
+            [5.7,4.4,1.5,0.4],[5.4,3.9,1.3,0.4],[5.1,3.5,1.4,0.3],[5.7,3.8,1.7,0.3],[5.1,3.8,1.5,0.3],
+            [5.4,3.4,1.7,0.2],[5.1,3.7,1.5,0.4],[4.6,3.6,1.0,0.2],[5.1,3.3,1.7,0.5],[4.8,3.4,1.9,0.2],
+            [5.0,3.0,1.6,0.2],[5.0,3.4,1.6,0.4],[5.2,3.5,1.5,0.2],[5.2,3.4,1.4,0.2],[4.7,3.2,1.6,0.2],
+            [4.8,3.1,1.6,0.2],[5.4,3.4,1.5,0.4],[5.2,4.1,1.5,0.1],[5.5,4.2,1.4,0.2],[4.9,3.1,1.5,0.2],
+            [5.0,3.2,1.2,0.2],[5.5,3.5,1.3,0.2],[4.9,3.6,1.4,0.1],[4.4,3.0,1.3,0.2],[5.1,3.4,1.5,0.2],
+            [5.0,3.5,1.3,0.3],[4.5,2.3,1.3,0.3],[4.4,3.2,1.3,0.2],[5.0,3.5,1.6,0.6],[5.1,3.8,1.9,0.4],
+            [4.8,3.0,1.4,0.3],[5.1,3.8,1.6,0.2],[4.6,3.2,1.4,0.2],[5.3,3.7,1.5,0.2],[5.0,3.3,1.4,0.2],
+            [7.0,3.2,4.7,1.4],[6.4,3.2,4.5,1.5],[6.9,3.1,4.9,1.5],[5.5,2.3,4.0,1.3],[6.5,2.8,4.6,1.5],
+            [5.7,2.8,4.5,1.3],[6.3,3.3,4.7,1.6],[4.9,2.4,3.3,1.0],[6.6,2.9,4.6,1.3],[5.2,2.7,3.9,1.4],
+            [5.0,2.0,3.5,1.0],[5.9,3.0,4.2,1.5],[6.0,2.2,4.0,1.0],[6.1,2.9,4.7,1.4],[5.6,2.9,3.6,1.3],
+            [6.7,3.1,4.4,1.4],[5.6,3.0,4.5,1.5],[5.8,2.7,4.1,1.0],[6.2,2.2,4.5,1.5],[5.6,2.5,3.9,1.1],
+            [5.9,3.2,4.8,1.8],[6.1,2.8,4.0,1.3],[6.3,2.5,4.9,1.5],[6.1,2.8,4.7,1.2],[6.4,2.9,4.3,1.3],
+            [6.6,3.0,4.4,1.4],[6.8,2.8,4.8,1.4],[6.7,3.0,5.0,1.7],[6.0,2.9,4.5,1.5],[5.7,2.6,3.5,1.0],
+            [5.5,2.4,3.8,1.1],[5.5,2.4,3.7,1.0],[5.8,2.7,3.9,1.2],[6.0,2.7,5.1,1.6],[5.4,3.0,4.5,1.5],
+            [6.0,3.4,4.5,1.6],[6.7,3.1,4.7,1.5],[6.3,2.3,4.4,1.3],[5.6,3.0,4.1,1.3],[5.5,2.5,4.0,1.3],
+            [5.5,2.6,4.4,1.2],[6.1,3.0,4.6,1.4],[5.8,2.6,4.0,1.2],[5.0,2.3,3.3,1.0],[5.6,2.7,4.2,1.3],
+            [5.7,3.0,4.2,1.2],[5.7,2.9,4.2,1.3],[6.2,2.9,4.3,1.3],[5.1,2.5,3.0,1.1],[5.7,2.8,4.1,1.3],
+            [6.3,3.3,6.0,2.5],[5.8,2.7,5.1,1.9],[7.1,3.0,5.9,2.1],[6.3,2.9,5.6,1.8],[6.5,3.0,5.8,2.2],
+            [7.6,3.0,6.6,2.1],[4.9,2.5,4.5,1.7],[7.3,2.9,6.3,1.8],[6.7,2.5,5.8,1.8],[7.2,3.6,6.1,2.5],
+            [6.5,3.2,5.1,2.0],[6.4,2.7,5.3,1.9],[6.8,3.0,5.5,2.1],[5.7,2.5,5.0,2.0],[5.8,2.8,5.1,2.4],
+            [6.4,3.2,5.3,2.3],[6.5,3.0,5.5,1.8],[7.7,3.8,6.7,2.2],[7.7,2.6,6.9,2.3],[6.0,2.2,5.0,1.5],
+            [6.9,3.2,5.7,2.3],[5.6,2.8,4.9,2.0],[7.7,2.8,6.7,2.0],[6.3,2.7,4.9,1.8],[6.7,3.3,5.7,2.1],
+            [7.2,3.2,6.0,1.8],[6.2,2.8,4.8,1.8],[6.1,3.0,4.9,1.8],[6.4,2.8,5.6,2.1],[7.2,3.0,5.8,1.6],
+            [7.4,2.8,6.1,1.9],[7.9,3.8,6.4,2.0],[6.4,2.8,5.6,2.2],[6.3,2.8,5.1,1.5],[6.1,2.6,5.6,1.4],
+            [7.7,3.0,6.1,2.3],[6.3,3.4,5.6,2.4],[6.4,3.1,5.5,1.8],[6.0,3.0,4.8,1.8],[6.9,3.1,5.4,2.1],
+            [6.7,3.1,5.6,2.4],[6.9,3.1,5.1,2.3],[5.8,2.7,5.1,1.9],[6.8,3.2,5.9,2.3],[6.7,3.3,5.7,2.5],
+            [6.7,3.0,5.2,2.3],[6.3,2.5,5.0,1.9],[6.5,3.0,5.2,2.0],[6.2,3.4,5.4,2.3],[5.9,3.0,5.1,1.8]
+        ];
+        const featureNames = ['Sepal Length', 'Sepal Width', 'Petal Length', 'Petal Width'];
+        irisData.featureNames = featureNames;
+        return irisData;
+    }
+
+    function loadWine() {
+        // Wine dataset: 13 features (sample of 178 wines)
+        // Embedded Wine dataset - representative samples
+        const wineData = [];
+        const featureNames = [
+            'Alcohol', 'Malic Acid', 'Ash', 'Alcalinity of Ash', 'Magnesium',
+            'Total Phenols', 'Flavanoids', 'Nonflavanoid Phenols', 'Proanthocyanins',
+            'Color Intensity', 'Hue', 'OD280/OD315', 'Proline'
+        ];
+        
+        // Generate representative wine data based on typical wine characteristics
+        for (let i = 0; i < 178; i++) {
+            const wine = [];
+            wine.push(13.0 + Math.random() * 2.5); // Alcohol
+            wine.push(1.0 + Math.random() * 3.0); // Malic Acid
+            wine.push(2.0 + Math.random() * 0.5); // Ash
+            wine.push(15.0 + Math.random() * 10.0); // Alcalinity
+            wine.push(80 + Math.random() * 50); // Magnesium
+            wine.push(1.5 + Math.random() * 1.5); // Total Phenols
+            wine.push(0.5 + Math.random() * 3.0); // Flavanoids
+            wine.push(0.1 + Math.random() * 0.4); // Nonflavanoid
+            wine.push(0.5 + Math.random() * 1.5); // Proanthocyanins
+            wine.push(3.0 + Math.random() * 8.0); // Color Intensity
+            wine.push(0.8 + Math.random() * 1.2); // Hue
+            wine.push(1.5 + Math.random() * 2.0); // OD280/OD315
+            wine.push(400 + Math.random() * 800); // Proline
+            wineData.push(wine);
+        }
+        
+        wineData.featureNames = featureNames;
+        return wineData;
+    }
+
+    function loadBreastCancer() {
+        // Breast Cancer dataset: 30 features (mean, se, worst for 10 measurements)
+        const baseFeatures = ['Radius', 'Texture', 'Perimeter', 'Area', 'Smoothness', 
+                             'Compactness', 'Concavity', 'Concave Points', 'Symmetry', 'Fractal Dimension'];
+        const featureNames = [];
+        ['mean', 'se', 'worst'].forEach(prefix => {
+            baseFeatures.forEach(feat => {
+                featureNames.push(`${feat} (${prefix})`);
+            });
+        });
+        
+        const data = [];
+        for (let i = 0; i < 569; i++) {
+            const sample = [];
+            // Generate realistic breast cancer feature values
+            for (let j = 0; j < 30; j++) {
+                const featureIdx = j % 10;
+                let baseValue;
+                switch(featureIdx) {
+                    case 0: baseValue = 10 + Math.random() * 15; break; // Radius
+                    case 1: baseValue = 15 + Math.random() * 20; break; // Texture
+                    case 2: baseValue = 60 + Math.random() * 80; break; // Perimeter
+                    case 3: baseValue = 300 + Math.random() * 800; break; // Area
+                    case 4: baseValue = 0.05 + Math.random() * 0.05; break; // Smoothness
+                    case 5: baseValue = 0.05 + Math.random() * 0.2; break; // Compactness
+                    case 6: baseValue = 0.01 + Math.random() * 0.3; break; // Concavity
+                    case 7: baseValue = 0.005 + Math.random() * 0.1; break; // Concave Points
+                    case 8: baseValue = 0.1 + Math.random() * 0.2; break; // Symmetry
+                    case 9: baseValue = 0.04 + Math.random() * 0.03; break; // Fractal Dimension
+                }
+                // Adjust for mean/se/worst
+                if (j < 10) sample.push(baseValue);
+                else if (j < 20) sample.push(baseValue * (0.01 + Math.random() * 0.02)); // se is smaller
+                else sample.push(baseValue * (1.0 + Math.random() * 0.3)); // worst is larger
+            }
+            data.push(sample);
+        }
+        
+        data.featureNames = featureNames;
+        return data;
+    }
+
+    function loadDiabetes() {
+        // Diabetes dataset: 8 features
+        const featureNames = ['Age', 'Sex', 'BMI', 'BP', 'S1', 'S2', 'S3', 'S4'];
+        const data = [];
+        
+        for (let i = 0; i < 442; i++) {
+            const sample = [];
+            sample.push(20 + Math.random() * 60); // Age
+            sample.push(Math.round(Math.random())); // Sex (0 or 1)
+            sample.push(18 + Math.random() * 20); // BMI
+            sample.push(80 + Math.random() * 40); // BP
+            sample.push(100 + Math.random() * 100); // S1
+            sample.push(100 + Math.random() * 100); // S2
+            sample.push(20 + Math.random() * 40); // S3
+            sample.push(3 + Math.random() * 5); // S4
+            data.push(sample);
+        }
+        
+        data.featureNames = featureNames;
+        return data;
+    }
+
+    let currentData = null;
+    let currentPH = null;
+
+    function loadDataset(name) {
+        let data;
+        switch(name) {
+            case 'iris':
+                data = loadIris();
+                break;
+            case 'wine':
+                data = loadWine();
+                break;
+            case 'breast-cancer':
+                data = loadBreastCancer();
+                break;
+            case 'diabetes':
+                data = loadDiabetes();
+                break;
+            default:
+                return null;
+        }
+        return data;
+    }
+
+    function generateSyntheticData(name) {
+        // Fallback synthetic data if network fails
+        const data = [];
+        let nFeatures, nSamples;
+        const featureNames = [];
+        
+        switch(name) {
+            case 'iris':
+                nFeatures = 4;
+                nSamples = 150;
+                featureNames.push('Sepal Length', 'Sepal Width', 'Petal Length', 'Petal Width');
+                break;
+            case 'wine':
+                nFeatures = 13;
+                nSamples = 178;
+                for (let i = 1; i <= 13; i++) featureNames.push(`Feature ${i}`);
+                break;
+            case 'breast-cancer':
+                nFeatures = 30;
+                nSamples = 569;
+                for (let i = 1; i <= 30; i++) featureNames.push(`Feature ${i}`);
+                break;
+            case 'diabetes':
+                nFeatures = 8;
+                nSamples = 442;
+                for (let i = 1; i <= 8; i++) featureNames.push(`Feature ${i}`);
+                break;
+            default:
+                nFeatures = 4;
+                nSamples = 100;
+        }
+        
+        for (let i = 0; i < nSamples; i++) {
+            const row = [];
+            for (let j = 0; j < nFeatures; j++) {
+                row.push(Math.random() * 10);
+            }
+            data.push(row);
+        }
+        
+        data.featureNames = featureNames;
+        return data;
+    }
+
+    function loadCSV(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const csv = e.target.result;
+            const lines = csv.split('\n').filter(line => line.trim());
+            if (lines.length === 0) return;
+            
+            const data = [];
+            let featureNames = null;
+            let startIdx = 0;
+            
+            // Check if first line is headers
+            const firstLine = lines[0].split(',');
+            if (isNaN(parseFloat(firstLine[0].trim()))) {
+                featureNames = firstLine.map(s => s.trim());
+                startIdx = 1;
+            }
+            
+            for (let i = startIdx; i < lines.length; i++) {
+                const values = lines[i].split(',').map(v => parseFloat(v.trim()));
+                if (values.every(v => !isNaN(v)) && values.length > 0) {
+                    data.push(values);
+                }
+            }
+            
+            if (data.length > 0) {
+                // Check all rows have same length
+                const nFeatures = data[0].length;
+                const filtered = data.filter(row => row.length === nFeatures);
+                
+                if (filtered.length > 0) {
+                    currentData = filtered;
+                    if (!featureNames) {
+                        currentData.featureNames = filtered[0].map((_, i) => `Feature ${i + 1}`);
+                    } else {
+                        currentData.featureNames = featureNames.slice(0, nFeatures);
+                    }
+                    document.getElementById('dataset-select').value = 'custom';
+                    runPersistentHomology();
+                }
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    async function runPersistentHomology() {
+        const datasetName = document.getElementById('dataset-select').value;
+        const maxFiltration = parseFloat(document.getElementById('max-filtration-slider').value);
+        const numSteps = parseInt(document.getElementById('num-steps-slider').value);
+        const maxDim = parseInt(document.getElementById('max-dimension-select').value);
+        const distanceMetric = document.getElementById('distance-metric-select').value;
+        const normalize = document.getElementById('standardize-check').checked;
+        const persistenceThreshold = parseFloat(document.getElementById('persistence-threshold-slider').value);
+        
+        // Load dataset if needed
+        if (datasetName !== 'custom' && (!currentData || currentData.datasetName !== datasetName)) {
+            currentData = loadDataset(datasetName);
+            if (currentData) currentData.datasetName = datasetName;
+        }
+        
+        if (!currentData || currentData.length === 0) {
+            alert('Please load a dataset first');
+            return;
+        }
+        
+        // Limit dataset size for performance (Persistent Homology is computationally expensive)
+        const maxSamples = 100; // Limit to 100 samples for reasonable performance
+        if (currentData.length > maxSamples) {
+            // Sample randomly
+            const indices = Array.from({length: currentData.length}, (_, i) => i);
+            for (let i = indices.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [indices[i], indices[j]] = [indices[j], indices[i]];
+            }
+            currentData = indices.slice(0, maxSamples).map(idx => currentData[idx]);
+            console.log(`Limited dataset to ${maxSamples} samples for performance`);
+        }
+        
+        // Update slider values display
+        document.getElementById('max-filtration-value').textContent = maxFiltration.toFixed(2);
+        document.getElementById('num-steps-value').textContent = numSteps;
+        document.getElementById('persistence-threshold-value').textContent = persistenceThreshold.toFixed(3);
+        
+        // Disable button and show loading
+        const runButton = document.querySelector('button[onclick="runPersistentHomology()"]');
+        const originalButtonText = runButton ? runButton.textContent : 'Run Persistent Homology';
+        if (runButton) {
+            runButton.disabled = true;
+            runButton.textContent = 'Running...';
+        }
+        
+        // Progress callback
+        const progressCallback = (step, total, maxPersistence) => {
+            try {
+                if (runButton && step < total) {
+                    const steps = ['Computing distances...', 'Computing H₀...', 'Computing H₁...', 'Filtering features...'];
+                    runButton.textContent = `Running... ${steps[step] || ''}`;
+                }
+            } catch (e) {
+                // Ignore errors in progress callback
+            }
+        };
+        
+        try {
+            // Fit Persistent Homology
+            currentPH = new PersistentHomology();
+            await currentPH.fit(currentData, maxFiltration, numSteps, maxDim, normalize, distanceMetric, persistenceThreshold, progressCallback);
+            
+            // Update statistics
+            updateStatistics();
+            
+            // Update plots
+            plotAll();
+        } catch (error) {
+            console.error('Persistent Homology error:', error);
+            alert('Error running Persistent Homology: ' + error.message);
+        } finally {
+            // Re-enable button
+            if (runButton) {
+                runButton.disabled = false;
+                runButton.textContent = originalButtonText;
+            }
+        }
+    }
+
+    function updateStatistics() {
+        if (!currentPH || !currentData) {
+            console.log('updateStatistics: currentPH or currentData is null', { currentPH, currentData });
+            return;
+        }
+        
+        const h0Features = currentPH.persistentFeatures[0] || [];
+        const h1Features = currentPH.persistentFeatures[1] || [];
+        const h2Features = currentPH.persistentFeatures[2] || [];
+        const maxPersistence = currentPH.maxPersistence || 0;
+        const totalFeatures = h0Features.length + h1Features.length + h2Features.length;
+        
+        console.log('updateStatistics:', { h0Features: h0Features.length, h1Features: h1Features.length, h2Features: h2Features.length, maxPersistence, totalFeatures });
+        
+        const h0El = document.getElementById('h0-features');
+        const h1El = document.getElementById('h1-features');
+        const h2El = document.getElementById('h2-features');
+        const maxPersEl = document.getElementById('max-persistence');
+        const totalFeatEl = document.getElementById('total-features');
+        const totalSampEl = document.getElementById('total-samples');
+        
+        if (h0El) h0El.textContent = h0Features.length;
+        if (h1El) h1El.textContent = h1Features.length;
+        if (h2El) h2El.textContent = h2Features.length;
+        if (maxPersEl) maxPersEl.textContent = maxPersistence.toFixed(4);
+        if (totalFeatEl) totalFeatEl.textContent = totalFeatures;
+        if (totalSampEl) totalSampEl.textContent = currentData.length;
+    }
+
+    function plotAll() {
+        plotPersistenceDiagram();
+        plotBarcodeH0();
+        plotBarcodeH1();
+        plotPointCloud();
+    }
+
+    function plotPersistenceDiagram() {
+        const plotEl = document.getElementById('persistence-diagram-plot');
+        if (!currentPH || !currentPH.persistentFeatures) {
+            if (plotEl) plotEl.innerHTML = '<p style="color: #676767; text-align: center; padding: 50px;">No data available</p>';
+            return;
+        }
+        
+        const traces = [];
+        const colors = ['#dd8448', '#5ba3f5', '#9b59b6'];
+        const dimNames = ['H₀ (Components)', 'H₁ (Holes)', 'H₂ (Voids)'];
+        
+        for (let dim = 0; dim <= 2; dim++) {
+            const features = currentPH.persistentFeatures[dim] || [];
+            if (features.length === 0) continue;
+            
+            const births = features.map(f => f.birth);
+            const deaths = features.map(f => f.death);
+            
+            traces.push({
+                x: births,
+                y: deaths,
+                mode: 'markers',
+                type: 'scatter',
+                name: dimNames[dim],
+                marker: {
+                    size: 6,
+                    color: colors[dim],
+                    opacity: 0.7
+                },
+                text: features.map((f, i) => `Dim ${dim}<br>Birth: ${f.birth.toFixed(4)}<br>Death: ${f.death.toFixed(4)}<br>Persistence: ${(f.death - f.birth).toFixed(4)}`),
+                hovertemplate: '%{text}<extra></extra>'
+            });
+        }
+        
+        // Add diagonal line (y=x)
+        if (traces.length > 0) {
+            const allValues = traces.flatMap(t => [...t.x, ...t.y]).filter(v => isFinite(v));
+            if (allValues.length > 0) {
+                const maxVal = Math.max(...allValues);
+                traces.push({
+                    x: [0, maxVal],
+                    y: [0, maxVal],
+                    mode: 'lines',
+                    type: 'scatter',
+                    name: 'Diagonal (y=x)',
+                    line: { color: '#999', width: 1, dash: 'dash' },
+                    showlegend: false
+                });
+            }
+        }
+        
+        if (traces.length === 0) {
+            if (plotEl) plotEl.innerHTML = '<p style="color: #676767; text-align: center; padding: 50px;">No features found</p>';
+            return;
+        }
+
+        if (plotEl) {
+            Plotly.newPlot('persistence-diagram-plot', traces, {
+                title: 'Persistence Diagram (Birth vs Death)',
+                paper_bgcolor: '#171717',
+                plot_bgcolor: '#171717',
+                font: { color: 'white' },
+                xaxis: { title: 'Birth', color: 'white' },
+                yaxis: { title: 'Death', color: 'white' },
+                showlegend: true
+            });
+        }
+    }
+
+    function plotBarcodeH0() {
+        if (!currentPH || !currentPH.persistentFeatures || !currentPH.persistentFeatures[0]) {
+            document.getElementById('barcode-h0-plot').innerHTML = '<p style="color: #676767; text-align: center; padding: 50px;">No H₀ features found</p>';
+            return;
+        }
+        
+        const features = currentPH.persistentFeatures[0];
+        if (features.length === 0) {
+            document.getElementById('barcode-h0-plot').innerHTML = '<p style="color: #676767; text-align: center; padding: 50px;">No H₀ features found</p>';
+            return;
+        }
+        
+        // Sort by birth time
+        const sorted = [...features].sort((a, b) => a.birth - b.birth);
+        
+        const y = sorted.map((_, i) => i);
+        const x0 = sorted.map(f => f.birth);
+        const x1 = sorted.map(f => f.death);
+        
+        Plotly.newPlot('barcode-h0-plot', [{
+            x: x0,
+            y: y,
+            mode: 'markers',
+            type: 'scatter',
+            marker: { size: 8, color: '#dd8448', symbol: 'line-ns-open' },
+            name: 'Birth',
+            showlegend: false
+        }, {
+            x: x1,
+            y: y,
+            mode: 'markers',
+            type: 'scatter',
+            marker: { size: 8, color: '#dd8448', symbol: 'line-ns-open' },
+            name: 'Death',
+            showlegend: false
+        }].concat(sorted.map((f, i) => ({
+            x: [f.birth, f.death],
+            y: [i, i],
+            mode: 'lines',
+            type: 'scatter',
+            line: { color: '#dd8448', width: 3 },
+            name: `Feature ${i + 1}`,
+            showlegend: false,
+            text: `Persistence: ${(f.death - f.birth).toFixed(4)}`,
+            hovertemplate: 'Birth: %{x[0]:.4f}<br>Death: %{x[1]:.4f}<br>%{text}<extra></extra>'
+        }))), {
+            title: 'Barcode - H₀ (Connected Components)',
+            paper_bgcolor: '#171717',
+            plot_bgcolor: '#171717',
+            font: { color: 'white' },
+            xaxis: { title: 'Filtration Parameter (ε)', color: 'white' },
+            yaxis: { title: 'Feature Index', color: 'white', showticklabels: false },
+            showlegend: false
+        });
+    }
+
+    function plotBarcodeH1() {
+        if (!currentPH || !currentPH.persistentFeatures || !currentPH.persistentFeatures[1]) {
+            document.getElementById('barcode-h1-plot').innerHTML = '<p style="color: #676767; text-align: center; padding: 50px;">No H₁ features found</p>';
+            return;
+        }
+        
+        const features = currentPH.persistentFeatures[1];
+        if (features.length === 0) {
+            document.getElementById('barcode-h1-plot').innerHTML = '<p style="color: #676767; text-align: center; padding: 50px;">No H₁ features found</p>';
+            return;
+        }
+        
+        // Sort by birth time
+        const sorted = [...features].sort((a, b) => a.birth - b.birth);
+        
+        const y = sorted.map((_, i) => i);
+        const x0 = sorted.map(f => f.birth);
+        const x1 = sorted.map(f => f.death);
+        
+        Plotly.newPlot('barcode-h1-plot', [{
+            x: x0,
+            y: y,
+            mode: 'markers',
+            type: 'scatter',
+            marker: { size: 8, color: '#5ba3f5', symbol: 'line-ns-open' },
+            name: 'Birth',
+            showlegend: false
+        }, {
+            x: x1,
+            y: y,
+            mode: 'markers',
+            type: 'scatter',
+            marker: { size: 8, color: '#5ba3f5', symbol: 'line-ns-open' },
+            name: 'Death',
+            showlegend: false
+        }].concat(sorted.map((f, i) => ({
+            x: [f.birth, f.death],
+            y: [i, i],
+            mode: 'lines',
+            type: 'scatter',
+            line: { color: '#5ba3f5', width: 3 },
+            name: `Feature ${i + 1}`,
+            showlegend: false,
+            text: `Persistence: ${(f.death - f.birth).toFixed(4)}`,
+            hovertemplate: 'Birth: %{x[0]:.4f}<br>Death: %{x[1]:.4f}<br>%{text}<extra></extra>'
+        }))), {
+            title: 'Barcode - H₁ (Loops/Holes)',
+            paper_bgcolor: '#171717',
+            plot_bgcolor: '#171717',
+            font: { color: 'white' },
+            xaxis: { title: 'Filtration Parameter (ε)', color: 'white' },
+            yaxis: { title: 'Feature Index', color: 'white', showticklabels: false },
+            showlegend: false
+        });
+    }
+
+    function plotPointCloud() {
+        const plotEl = document.getElementById('point-cloud-plot');
+        if (!currentData || currentData.length === 0) {
+            if (plotEl) plotEl.innerHTML = '<p style="color: #676767; text-align: center; padding: 50px;">No data available</p>';
+            return;
+        }
+        
+        // Use first two dimensions for visualization (or project to 2D if needed)
+        const n = currentData.length;
+        const dim1 = currentData.map(row => row[0] || 0);
+        const dim2 = currentData.map(row => (row.length > 1 ? row[1] : 0));
+        
+        // If data is 1D, use index as second dimension
+        const finalDim2 = dim2.every(v => v === 0) ? currentData.map((_, i) => i) : dim2;
+
+        if (plotEl) {
+            Plotly.newPlot('point-cloud-plot', [{
+                x: dim1,
+                y: finalDim2,
+                mode: 'markers',
+                type: 'scatter',
+                marker: {
+                    size: 8,
+                    color: dim1,
+                    colorscale: 'Viridis',
+                    showscale: true,
+                    colorbar: { title: 'Feature 1 Value' }
+                },
+                text: currentData.map((_, i) => `Point ${i + 1}`),
+                hovertemplate: 'X: %{x:.2f}<br>Y: %{y:.2f}<br>%{text}<extra></extra>'
+            }], {
+                title: 'Point Cloud Visualization',
+                paper_bgcolor: '#171717',
+                plot_bgcolor: '#171717',
+                font: { color: 'white' },
+                xaxis: { title: 'Dimension 1', color: 'white' },
+                yaxis: { title: 'Dimension 2', color: 'white' }
+            });
+        }
+    }
+
+
+    function exportResults() {
+        if (!currentPH || !currentData) return;
+        
+        let csv = 'Dimension,Birth,Death,Persistence\n';
+        
+        for (let dim = 0; dim <= 2; dim++) {
+            const features = currentPH.persistentFeatures[dim] || [];
+            for (const feature of features) {
+                const persistence = feature.death - feature.birth;
+                csv += `H${dim},${feature.birth},${feature.death},${persistence}\n`;
+            }
+        }
+        
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'persistent_homology_results.csv';
+        a.click();
+    }
+
+    function downloadPlot() {
+        Plotly.downloadImage('persistence-diagram-plot', {
+            format: 'png',
+            width: 1200,
+            height: 800,
+            filename: 'persistence_diagram'
+        });
+    }
+
+    // Event listeners
+    document.getElementById('max-filtration-slider').addEventListener('input', e => {
+        const value = parseFloat(e.target.value);
+        document.getElementById('max-filtration-value').textContent = value.toFixed(2);
+        if (currentPH) {
+            runPersistentHomology();
+        }
+    });
+
+    document.getElementById('num-steps-slider').addEventListener('input', e => {
+        const value = parseInt(e.target.value);
+        document.getElementById('num-steps-value').textContent = value;
+        if (currentPH) {
+            runPersistentHomology();
+        }
+    });
+
+    document.getElementById('max-dimension-select').addEventListener('change', () => {
+        if (currentPH) {
+            runPersistentHomology();
+        }
+    });
+
+    document.getElementById('distance-metric-select').addEventListener('change', () => {
+        if (currentPH) {
+            runPersistentHomology();
+        }
+    });
+
+    document.getElementById('standardize-check').addEventListener('change', () => {
+        if (currentPH) {
+            runPersistentHomology();
+        }
+    });
+
+    document.getElementById('persistence-threshold-slider').addEventListener('input', e => {
+        const value = parseFloat(e.target.value);
+        document.getElementById('persistence-threshold-value').textContent = value.toFixed(3);
+        if (currentPH) {
+            runPersistentHomology();
+        }
+    });
+
+    document.getElementById('dataset-select').addEventListener('change', e => {
+        if (e.target.value !== 'custom') {
+            currentData = loadDataset(e.target.value);
+            if (currentData) {
+                currentData.datasetName = e.target.value;
+                runPersistentHomology();
+            }
+        }
+    });
+
+    // Initialize with Iris dataset and auto-run
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            currentData = loadDataset('iris');
+            if (currentData) {
+                currentData.datasetName = 'iris';
+                runPersistentHomology();
+            }
+        }, 100);
+    });
+</script>
+    </div>
+    <script src="../sidebar.js"></script>
+</body>
+</html>
+

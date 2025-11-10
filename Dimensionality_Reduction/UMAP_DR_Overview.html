@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Learn about UMAP, a dimensionality reduction method. Comprehensive overview with theory, applications, and use cases for machine learning and data science.">
+  <link rel="canonical" href="https://yourdomain.com/Dimensionality_Reduction/UMAP_DR_Overview.html">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "name": "UMAP - Overview & Theory | Dimensionality Reduction | ML Tools",
+  "description": "Learn about UMAP, a dimensionality reduction method. Comprehensive overview with theory, applications, and use cases for machine learning and data science.",
+  "url": "https://yourdomain.com/Dimensionality_Reduction/UMAP_DR_Overview.html",
+  "about": {
+    "@type": "Thing",
+    "name": "UMAP",
+    "description": "UMAP algorithm for dimensionality reduction"
+  },
+  "headline": "UMAP",
+  "articleSection": "Dimensionality Reduction"
+}
+  </script>
+    <title>UMAP - Overview & Theory | Dimensionality Reduction | ML Tools</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            color: #cfcfcf;
+            background-color: #1e1e1e;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #171717;
+            padding: 30px 20px;
+            border-right: 1px solid #333;
+            overflow-y: auto;
+            height: 100vh;
+        }
+        .sidebar h1 { color: white; font-size: 1.8rem; font-weight: bold; margin-bottom: 30px; text-align: center; }
+        .nav-section { margin-bottom: 30px; }
+        .nav-section h3 { color: #dd8448; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px; }
+        .nav-item { display: block; color: #676767; text-decoration: none; padding: 12px 15px; margin-bottom: 5px; border-radius: 8px; transition: all 0.3s ease; font-weight: 500; }
+        .nav-item:hover { background-color: #2d2d2d; color: white; transform: translateX(5px); }
+        .nav-item.active { background-color: #dd8448; color: white; }
+        .nav-category { margin-bottom: 20px; }
+        .nav-category-header { color: #dd8448; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; padding: 10px 15px; cursor: pointer; border-radius: 8px; transition: background-color 0.3s ease; display: flex; justify-content: space-between; align-items: center; letter-spacing: 1px; }
+        .nav-category-header:hover { background-color: #2d2d2d; }
+        .nav-category-header .arrow { transition: transform 0.3s ease; font-size: 0.7rem; }
+        .nav-category-header.collapsed .arrow { transform: rotate(-90deg); }
+        .nav-subcategory { margin-left: 15px; margin-top: 10px; overflow: hidden; max-height: 1200px; transition: max-height 0.3s ease; }
+        .nav-subcategory.collapsed { max-height: 0; }
+        .nav-subheader { color: #999; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; padding: 8px 15px; margin-top: 5px; letter-spacing: 0.5px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-radius: 6px; transition: background-color 0.3s ease; }
+        .nav-subheader:hover { background-color: #2d2d2d; }
+        .nav-subheader .arrow { font-size: 0.6rem; transition: transform 0.3s ease; }
+        .nav-subheader.collapsed .arrow { transform: rotate(-90deg); }
+        .nav-subheader.category-header { color: #dd8448; font-size: 0.85rem; font-weight: 700; padding: 10px 15px; margin-top: 8px; letter-spacing: 1px; border: 1px solid rgba(221,132,72,0.3); }
+        .nav-subheader.category-header:hover { background-color: rgba(221,132,72,0.15); border-color: rgba(221,132,72,0.5); }
+        .nav-subgroup { overflow: hidden; max-height: 200px; transition: max-height 0.3s ease; padding-bottom: 5px; }
+        .nav-subgroup.collapsed { max-height: 0; }
+        .nav-subgroup.category-group { max-height: 1000px; }
+        .nav-subgroup.category-group.collapsed { max-height: 0; }
+        .nav-subheader.nested { margin-left: 10px; font-size: 0.7rem; }
+        .nav-subgroup.nested { margin-left: 10px; max-height: 200px; }
+        .nav-subheader.subcategory-header { color: #999; font-size: 0.75rem; font-weight: 600; padding: 8px 15px; margin-left: 10px; margin-top: 5px; letter-spacing: 0.5px; border: 1px solid rgba(153, 153, 153, 0.2); }
+        .nav-subheader.subcategory-header:hover { background-color: rgba(45, 45, 45, 0.5); border-color: rgba(153, 153, 153, 0.4); }
+        .nav-subgroup.subcategory-group { margin-left: 10px; max-height: 2000px; overflow: hidden; transition: max-height 0.3s ease; padding-bottom: 5px; }
+        .nav-subgroup.subcategory-group.collapsed { max-height: 0; }
+        .nav-item.sub { padding: 8px 15px; font-size: 0.9rem; margin-left: 10px; margin-bottom: 5px; }
+        .main-content {
+            flex: 1;
+            padding: 40px;
+        }
+        .title {
+            color: #ffffff;
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin: 0 0 8px 0;
+        }
+        .subtitle {
+            color: #8a8a8a;
+            font-size: 1rem;
+            margin-bottom: 28px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+        .card {
+            background-color: #171717;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 22px;
+            transition: border-color 0.3s ease, transform 0.3s ease;
+        }
+        .card:hover { border-color: #dd8448; transform: translateY(-3px); }
+        .card h3 { color: #ffffff; margin: 0 0 8px 0; font-size: 1.15rem; }
+        .card p { color: #9a9a9a; margin: 0; line-height: 1.6; }
+        .section {
+            background-color: #171717;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .section h2 {
+            color: #ffffff;
+            font-size: 1.5rem;
+            margin: 0 0 12px 0;
+        }
+        .badge {
+            display: inline-block;
+            background: rgba(221,132,72,0.15);
+            color: #ffb07a;
+            border: 1px solid rgba(221,132,72,0.35);
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        .list { margin: 0; padding-left: 18px; color: #b0b0b0; }
+        .list li { margin-bottom: 6px; }
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .callout {
+            background: #202020;
+            border: 1px dashed #3a3a3a;
+            border-radius: 10px;
+            padding: 14px;
+            color: #a9a9a9;
+        }
+        .kpi {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 10px;
+        }
+        .kpi .item {
+            background: #1c1c1c;
+            border: 1px solid #2a2a2a;
+            border-radius: 10px;
+            padding: 10px 12px;
+        }
+        .kpi .label { color: #8e8e8e; font-size: 12px; }
+        .kpi .value { color: #ffffff; font-weight: 700; font-size: 18px; }
+        .muted { color: #9a9a9a; }
+        .accent { color: #dd8448; }
+    </style>
+</head>
+<body>
+    <div class="sidebar"></div>
+    <div class="main-content">
+        <h1 class="title">UMAP Overview <span class="badge">Guide</span></h1>
+        <div class="subtitle">Uniform Manifold Approximation and Projection: fast, scalable dimensionality reduction that preserves both local and global structure using Riemannian geometry and fuzzy simplicial sets.</div>
+
+        <div class="grid">
+            <div class="card">
+                <h3>Primary Uses</h3>
+                <p>Data visualization, dimensionality reduction, preserving global structure, fast computation on large datasets, single-cell RNA-seq analysis, exploratory data analysis, feature extraction, can transform new data points.</p>
+            </div>
+            <div class="card">
+                <h3>Strengths</h3>
+                <p>Faster than t-SNE, preserves global structure better, can transform new data points, scalable to large datasets, deterministic results (with fixed random seed), handles non-linear manifolds, preserves both local and global relationships.</p>
+            </div>
+            <div class="card">
+                <h3>Watch-outs</h3>
+                <p>Requires tuning of n_neighbors and min_dist parameters, computationally expensive for very large datasets, memory intensive, sensitive to parameter choices, may require preprocessing for best results.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>How It Works <span class="badge">Mathematical Foundation</span></h2>
+            <div class="summary">
+                <div>
+                    <p class="muted"><span class="accent">UMAP</span> constructs a high-dimensional weighted graph representing the data manifold, then finds a low-dimensional representation that preserves the topological structure of this graph. It uses fuzzy simplicial sets and Riemannian geometry to model the manifold structure.</p>
+                    <ul class="list">
+                        <li><strong>High-Dimensional Graph:</strong> For each point, find k nearest neighbors and compute distances. Create a weighted graph where edge weights represent local manifold structure.</li>
+                        <li><strong>Fuzzy Simplicial Sets:</strong> Convert distances to probabilities using a local metric: <em>ρ<sub>i</sub> = distance to nearest neighbor</em>, <em>σ<sub>i</sub></em> chosen so that <em>Σ<sub>j</sub> exp(-max(0, d(x<sub>i</sub>, x<sub>j</sub>) - ρ<sub>i</sub>) / σ<sub>i</sub>) = log<sub>2</sub>(k)</em>.</li>
+                        <li><strong>High-Dimensional Probabilities:</strong> <em>p<sub>j|i</sub> = exp(-max(0, d(x<sub>i</sub>, x<sub>j</sub>) - ρ<sub>i</sub>) / σ<sub>i</sub>)</em>, then symmetrize: <em>p<sub>ij</sub> = p<sub>j|i</sub> + p<sub>i|j</sub> - p<sub>j|i</sub>p<sub>i|j</sub></em>.</li>
+                        <li><strong>Low-Dimensional Probabilities:</strong> Use a smooth approximation: <em>q<sub>ij</sub> = (1 + a(||y<sub>i</sub> - y<sub>j</sub>||<sup>2b</sup>))<sup>-1</sup></em>, where <em>a</em> and <em>b</em> are chosen based on <em>min_dist</em>.</li>
+                        <li><strong>Cross-Entropy Loss:</strong> Minimize <em>C = Σ<sub>ij</sub> [p<sub>ij</sub> log(p<sub>ij</sub>/q<sub>ij</sub>) + (1 - p<sub>ij</sub>) log((1 - p<sub>ij</sub>)/(1 - q<sub>ij</sub>))]</em>.</li>
+                        <li><strong>Gradient Descent:</strong> Use stochastic gradient descent with negative sampling for efficiency.</li>
+                        <li><strong>Riemannian Geometry:</strong> Assumes data lies on a Riemannian manifold and preserves the manifold's topological structure.</li>
+                    </ul>
+                </div>
+                <div class="callout">Tip: n_neighbors balances local vs global structure (typically 15-50). Lower values emphasize local structure; higher values preserve more global structure. min_dist controls how tightly points are packed in the embedding (typically 0.1-0.5). Lower values = tighter clusters, higher values = more spread out.</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Dimensionality Reduction Statistics <span class="badge">Interpretation</span></h2>
+            <div class="kpi">
+                <div class="item"><div class="label">Original Dimensions</div><div class="value">Input feature count</div></div>
+                <div class="item"><div class="label">Reduced Dimensions</div><div class="value">Embedding size (typically 2-3)</div></div>
+                <div class="item"><div class="label">Cross-Entropy Loss</div><div class="value">Final cost (lower = better)</div></div>
+                <div class="item"><div class="label">n_neighbors</div><div class="value">Number of neighbors per point</div></div>
+                <div class="item"><div class="label">Compression Ratio</div><div class="value">Original dims / reduced dims</div></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Reading the Visualizations <span class="badge">Analysis</span></h2>
+            <ul class="list">
+                <li><strong>2D Embedding Plot:</strong> Visualize clusters and structure; should show both local neighborhoods and global relationships.</li>
+                <li><strong>Cross-Entropy Loss History:</strong> Monitor convergence; should decrease and stabilize. Faster convergence than t-SNE.</li>
+                <li><strong>Probability Comparison:</strong> Compare high-dimensional vs low-dimensional probabilities; good preservation = points align along diagonal.</li>
+                <li><strong>Global Structure:</strong> Unlike t-SNE, UMAP preserves global structure—distant points in high-D should be distant in low-D.</li>
+                <li><strong>Cluster Separation:</strong> Well-separated clusters indicate good local structure preservation.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Parameter Guidance <span class="badge">Best Practice</span></h2>
+            <ul class="list">
+                <li><strong>n_neighbors:</strong> Typically 15-50. Lower = more local structure, higher = more global structure. Start with 15-30.</li>
+                <li><strong>min_dist:</strong> Typically 0.1-0.5. Controls minimum distance between points in embedding. Lower = tighter clusters, higher = more spread out. Start with 0.1.</li>
+                <li><strong>n_components:</strong> Usually 2-3 for visualization. Higher dimensions preserve more structure but harder to visualize.</li>
+                <li><strong>metric:</strong> Distance metric (Euclidean, Manhattan, etc.). Euclidean is default and works well for most cases.</li>
+                <li><strong>Normalization:</strong> Standardize features before UMAP to treat all dimensions uniformly.</li>
+                <li><strong>Random Seed:</strong> Set for reproducibility (UMAP is deterministic with fixed seed).</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Data Preparation <span class="badge">Checklist</span></h2>
+            <ul class="list">
+                <li>Normalize or standardize features (critical for distance-based methods).</li>
+                <li>Ensure sufficient sample size—UMAP works well with hundreds to millions of samples.</li>
+                <li>Impute or remove missing values—distance computation requires complete data.</li>
+                <li>Consider dimensionality reduction (e.g., PCA) before UMAP for very high-dimensional data to reduce noise.</li>
+                <li>Remove outliers that could distort the manifold structure.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Common Pitfalls <span class="badge">Avoid</span></h2>
+            <ul class="list">
+                <li><strong>n_neighbors too low:</strong> Emphasizes very local structure; embedding becomes fragmented, loses global relationships.</li>
+                <li><strong>n_neighbors too high:</strong> Considers too many neighbors; loses local structure, approaches PCA-like behavior.</li>
+                <li><strong>min_dist too low:</strong> Points pack too tightly; clusters become indistinguishable.</li>
+                <li><strong>min_dist too high:</strong> Points spread too far; loses local structure, embedding becomes too sparse.</li>
+                <li><strong>Not normalizing:</strong> Features with different scales dominate the distance metric.</li>
+                <li><strong>Ignoring global structure:</strong> Unlike t-SNE, UMAP preserves global structure—use this advantage.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>When to Use <span class="badge">Application</span></h2>
+            <ul class="list">
+                <li>Visualizing high-dimensional data when you need both local and global structure preservation.</li>
+                <li>Large-scale dimensionality reduction (faster than t-SNE).</li>
+                <li>When you need to transform new data points (unlike t-SNE).</li>
+                <li>Single-cell RNA-seq and other high-dimensional biological data visualization.</li>
+                <li>Exploratory data analysis on large datasets.</li>
+                <li>When global structure is important (e.g., preserving distances between clusters).</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Alternatives to Consider <span class="badge">Comparison</span></h2>
+            <ul class="list">
+                <li><strong>t-SNE:</strong> Better for local structure visualization, but slower and doesn't preserve global structure or transform new points.</li>
+                <li><strong>PCA:</strong> Much faster, preserves global structure, but only linear relationships.</li>
+                <li><strong>Isomap:</strong> Preserves geodesic distances; better for manifold unfolding, but slower.</li>
+                <li><strong>Autoencoders:</strong> Can transform new points, but requires training and may be slower.</li>
+                <li><strong>TriMap:</strong> Similar to UMAP but uses triplets instead of pairs, may preserve more global structure.</li>
+            </ul>
+        </div>
+    </div>
+    <script src="../sidebar.js"></script>
+</body>
+</html>
+
