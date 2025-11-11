@@ -1,0 +1,60 @@
+# ============================================
+# FIX GITHUB PAGES 404 - EXACT COMMANDS
+# ============================================
+# 
+# Your files ARE in git correctly (index.html at root)
+# The issue is likely GitHub Pages configuration
+#
+# ============================================
+
+# STEP 1: Verify files are committed correctly
+git ls-tree HEAD --name-only | Select-String "index.html"
+
+# STEP 2: Ensure everything is pushed (even if already pushed)
+git push origin main --force
+
+# ============================================
+# THEN CONFIGURE GITHUB PAGES:
+# ============================================
+# 
+# 1. Go to: https://github.com/nikolaou1982/machine-learning/settings/pages
+# 
+# 2. Under "Source":
+#    - Branch: Select "main"
+#    - Folder: Select "/ (root)" 
+#    - Click "Save"
+#
+# 3. Wait 1-2 minutes for GitHub to build
+#
+# 4. Check build status:
+#    - Go to: https://github.com/nikolaou1982/machine-learning/actions
+#    - Look for "pages build and deployment"
+#    - Check if it succeeded or has errors
+#
+# 5. Test the site:
+#    - https://nikolaou1982.github.io/machine-learning/
+#
+# ============================================
+# IF STILL NOT WORKING:
+# ============================================
+#
+# Force rebuild by:
+# 1. Settings → Pages
+# 2. Change branch to something else, Save
+# 3. Change back to "main", Save
+# 4. Wait 1-2 minutes
+#
+# ============================================
+# VERIFY FILES ON GITHUB:
+# ============================================
+# Go to: https://github.com/nikolaou1982/machine-learning
+# You should see:
+# - index.html (in root)
+# - sidebar.js (in root)  
+# - Clustering/ folder
+# - Anomaly_Detection/ folder
+# - Dimensionality_Reduction/ folder
+#
+# If files are NOT visible, run:
+# git add . && git commit -m "Add all files" && git push origin main --force
+

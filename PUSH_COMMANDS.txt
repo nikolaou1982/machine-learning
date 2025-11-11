@@ -1,0 +1,17 @@
+# Commands to Fix GitHub Pages 404 Error
+# Copy and paste these commands one by one, or run the one-liner at the bottom
+
+# Step 1: Add all site files
+git add index.html sidebar.js robots.txt sitemap.xml Clustering/ Anomaly_Detection/ Dimensionality_Reduction/ scripts/
+
+# Step 2: Commit
+git commit -m "Add all site files for GitHub Pages"
+
+# Step 3: Push to GitHub
+git push origin main --force
+
+# ============================================
+# ONE-LINER (Run this if you want to do it all at once):
+# ============================================
+# git add index.html sidebar.js robots.txt sitemap.xml Clustering/ Anomaly_Detection/ Dimensionality_Reduction/ scripts/ && git commit -m "Add all site files for GitHub Pages" && git push origin main --force
+

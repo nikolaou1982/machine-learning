@@ -1,0 +1,25 @@
+# ============================================
+# FINAL PUSH COMMAND - FIXED
+# ============================================
+# 
+# The branch has been renamed from "master" to "main"
+# Now push with this command:
+# ============================================
+
+git push origin main --force
+
+# ============================================
+# IF YOU GET "BRANCH NOT FOUND" ERROR:
+# ============================================
+# The remote might still have "master" branch.
+# Use this instead:
+#
+# git push origin main:main --force
+#
+# OR push to master first, then switch on GitHub:
+#
+# git push origin main:master --force
+#
+# Then on GitHub: Settings → Branches → rename master to main
+# ============================================
+

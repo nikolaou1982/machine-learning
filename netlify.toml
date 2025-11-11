@@ -1,0 +1,48 @@
+# Netlify configuration file
+
+[build]
+  # No build command needed - static site
+  publish = "."
+
+[build.environment]
+  # Node version (if needed for any processing)
+  NODE_VERSION = "18"
+
+# Redirect rules - only for SPA routing (not needed for static HTML)
+# Removed catch-all redirect as it breaks direct file access
+
+# Headers for better performance
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Cache static assets
+[[headers]]
+  for = "/Clustering/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/Anomaly_Detection/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/Dimensionality_Reduction/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+

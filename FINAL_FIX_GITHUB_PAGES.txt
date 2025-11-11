@@ -1,0 +1,51 @@
+# ============================================
+# FINAL FIX FOR GITHUB PAGES 404 ERROR
+# ============================================
+# 
+# PROBLEM: Git repository root is at wrong level
+# Files are committed as "Desktop/CV/index.html" instead of "index.html"
+# GitHub Pages expects files at repository root
+#
+# ============================================
+# SOLUTION: Re-initialize Git in CV Folder
+# ============================================
+
+# Step 1: Navigate to CV folder
+cd C:\Users\ΕΜΠΟΡΙΚΟ\Desktop\CV
+
+# Step 2: Remove connection to parent git repo (if .git exists in parent)
+# Check if there's a .git in parent:
+# If yes, you may need to remove it or work around it
+
+# Step 3: Initialize new git repo in CV folder
+git init
+
+# Step 4: Add remote
+git remote add origin https://github.com/nikolaou1982/machine-learning.git
+
+# Step 5: Add ALL site files
+git add index.html sidebar.js robots.txt sitemap.xml .gitignore
+git add Clustering/
+git add Anomaly_Detection/
+git add Dimensionality_Reduction/
+git add scripts/
+
+# Step 6: Commit
+git commit -m "Fix: Initialize repository in CV folder - files at root for GitHub Pages"
+
+# Step 7: Force push (this will overwrite GitHub with correct structure)
+git push origin main --force
+
+# ============================================
+# ONE-LINER (after cd to CV folder):
+# ============================================
+# git init && git remote add origin https://github.com/nikolaou1982/machine-learning.git && git add index.html sidebar.js robots.txt sitemap.xml .gitignore Clustering/ Anomaly_Detection/ Dimensionality_Reduction/ scripts/ && git commit -m "Fix: Initialize repository in CV folder" && git push origin main --force
+
+# ============================================
+# AFTER PUSHING:
+# ============================================
+# 1. Go to: https://github.com/nikolaou1982/machine-learning/settings/pages
+# 2. Set Source: Branch "main", Folder "/ (root)"
+# 3. Wait 1-2 minutes
+# 4. Test: https://nikolaou1982.github.io/machine-learning/
+

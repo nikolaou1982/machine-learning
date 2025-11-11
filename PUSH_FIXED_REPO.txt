@@ -1,0 +1,23 @@
+# ============================================
+# PUSH FIXED REPOSITORY TO GITHUB
+# ============================================
+# 
+# The repository has been re-initialized in the CV folder
+# Files are now at the root (index.html, not Desktop/CV/index.html)
+#
+# ============================================
+# FINAL COMMAND TO PUSH:
+# ============================================
+
+git push origin main --force
+
+# ============================================
+# AFTER PUSHING:
+# ============================================
+# 1. Go to: https://github.com/nikolaou1982/machine-learning/settings/pages
+# 2. Set Source: Branch "main", Folder "/ (root)"
+# 3. Wait 1-2 minutes
+# 4. Test: https://nikolaou1982.github.io/machine-learning/
+#
+# The site should now work because files are at the repository root!
+

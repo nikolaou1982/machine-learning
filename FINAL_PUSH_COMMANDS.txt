@@ -1,0 +1,40 @@
+# ============================================
+# FINAL COMMANDS TO FIX GITHUB PAGES 404
+# ============================================
+# Copy and paste these commands exactly as shown
+
+# Step 1: Verify you're in the right directory
+cd C:\Users\ΕΜΠΟΡΙΚΟ\Desktop\CV
+
+# Step 2: Add ALL site files (this will add everything in the CV folder)
+git add index.html sidebar.js robots.txt sitemap.xml
+git add Clustering/
+git add Anomaly_Detection/
+git add Dimensionality_Reduction/
+git add scripts/
+
+# Step 3: Check what will be committed
+git status
+
+# Step 4: Commit everything
+git commit -m "Add all site files for GitHub Pages"
+
+# Step 5: Push to GitHub (force push to overwrite)
+git push origin main --force
+
+# ============================================
+# ONE-LINER (if you prefer):
+# ============================================
+# git add index.html sidebar.js robots.txt sitemap.xml Clustering/ Anomaly_Detection/ Dimensionality_Reduction/ scripts/ && git commit -m "Add all site files for GitHub Pages" && git push origin main --force
+
+# ============================================
+# AFTER PUSHING:
+# ============================================
+# 1. Wait 1-2 minutes
+# 2. Check: https://github.com/nikolaou1982/machine-learning
+#    - You should see index.html and all folders
+# 3. Verify GitHub Pages settings:
+#    - Go to: Settings → Pages
+#    - Source: Branch "main", Folder "/ (root)"
+# 4. Test: https://nikolaou1982.github.io/machine-learning/
+

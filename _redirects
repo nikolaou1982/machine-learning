@@ -1,0 +1,9 @@
+# Netlify redirects file
+# This ensures all routes work correctly
+
+# Redirect root to index.html
+/ /index.html 200
+
+# Redirect trailing slashes to remove them (then let normal routing handle it)
+/*/ /:splat 301
+
